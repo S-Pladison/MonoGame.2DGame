@@ -132,7 +132,7 @@ namespace Pladi.Tiles
             return false;
         }
 
-        public void TileCollisionWithEntity(Entity entity, out bool onFloor, int minIntersArea = 0, float offsetY = 1f)
+        public void TileCollisionWithEntity(Entity entity, out bool onFloor, int minIntersArea = 0, float offset = 1f)
         {
             onFloor = false;
 
@@ -172,12 +172,12 @@ namespace Pladi.Tiles
                         if (entity.Position.X > tileRectangle.X)
                         {
                             // Ограничение слева
-                            entity.Position.X = tileRectangle.X + tileRectangle.Width;
+                            entity.Position.X = tileRectangle.X + tileRectangle.Width - offset;
                         }
                         else
                         {
                             // Ограничение справа
-                            entity.Position.X = tileRectangle.X - hitbox.Width;
+                            entity.Position.X = tileRectangle.X - hitbox.Width + offset;
                         }
 
                         entity.Velocity.X = 0;
@@ -187,12 +187,12 @@ namespace Pladi.Tiles
                         if (entity.Position.Y > tileRectangle.Y)
                         {
                             // Ограничение свехру
-                            entity.Position.Y = tileRectangle.Y + tileRectangle.Height;
+                            entity.Position.Y = tileRectangle.Y + tileRectangle.Height - offset;
                         }
                         else
                         {
                             // Ограничение под
-                            entity.Position.Y = tileRectangle.Y - hitbox.Height + offsetY;
+                            entity.Position.Y = tileRectangle.Y - hitbox.Height + offset;
                             onFloor = true;
                         }
 

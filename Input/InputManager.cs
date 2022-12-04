@@ -33,18 +33,18 @@ namespace Pladi.Input
         public bool IsPressed(Keys key)
             => currentKeyboardState.IsKeyDown(key);
 
-        public bool IsPressed(MouseInput input)
+        public bool IsPressed(MouseInputTypes input)
             => IsPressed(currentMouseState, input);
 
-        private bool IsPressed(MouseState state, MouseInput input)
+        private bool IsPressed(MouseState state, MouseInputTypes input)
         {
             return input switch
             {
-                MouseInput.LeftButton => state.LeftButton == ButtonState.Pressed,
-                MouseInput.MiddleButton => state.MiddleButton == ButtonState.Pressed,
-                MouseInput.RightButton => state.RightButton == ButtonState.Pressed,
-                MouseInput.Button1 => state.XButton1 == ButtonState.Pressed,
-                MouseInput.Button2 => state.XButton2 == ButtonState.Pressed,
+                MouseInputTypes.LeftButton => state.LeftButton == ButtonState.Pressed,
+                MouseInputTypes.MiddleButton => state.MiddleButton == ButtonState.Pressed,
+                MouseInputTypes.RightButton => state.RightButton == ButtonState.Pressed,
+                MouseInputTypes.Button1 => state.XButton1 == ButtonState.Pressed,
+                MouseInputTypes.Button2 => state.XButton2 == ButtonState.Pressed,
                 _ => false,
             };
         }
@@ -52,18 +52,18 @@ namespace Pladi.Input
         public bool IsHeld(Keys key)
             => currentKeyboardState.IsKeyDown(key) && previousKeyboardState.IsKeyDown(key);
 
-        public bool IsHeld(MouseInput input)
+        public bool IsHeld(MouseInputTypes input)
             => IsPressed(currentMouseState, input) && IsPressed(previousMouseState, input);
 
         public bool JustPressed(Keys key)
             => currentKeyboardState.IsKeyDown(key) && !previousKeyboardState.IsKeyDown(key);
 
-        public bool JustPressed(MouseInput input)
+        public bool JustPressed(MouseInputTypes input)
             => IsPressed(currentMouseState, input) && !IsPressed(previousMouseState, input);
 
         public bool JustReleased(Keys key)
             => !currentKeyboardState.IsKeyDown(key) && previousKeyboardState.IsKeyDown(key);
-        public bool JustReleased(MouseInput input)
+        public bool JustReleased(MouseInputTypes input)
             => !IsPressed(currentMouseState, input) && IsPressed(previousMouseState, input);
 
         public Vector2 GetMousePosition()

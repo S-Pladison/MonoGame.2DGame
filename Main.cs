@@ -56,10 +56,6 @@ namespace Pladi
             form.MinimumSize = new System.Drawing.Size(minScreenWidth, minScreenHeight);
 
             Window.AllowUserResizing = true;
-            Window.ClientSizeChanged += (obj, args) =>
-            {
-                SetDisplayMode(Window.ClientBounds.Width, Window.ClientBounds.Height);
-            };
         }
 
         protected override void Initialize()
@@ -89,10 +85,12 @@ namespace Pladi
 
         protected override void Update(GameTime gameTime)
         {
-            Window.Title = DateTime.Now.ToString();
+            Window.Title = GetForm().WindowState.ToString();
 
             try
             {
+                CheckWindowSize();
+
                 base.Update(gameTime);
 
                 InputManager.Update(gameTime);

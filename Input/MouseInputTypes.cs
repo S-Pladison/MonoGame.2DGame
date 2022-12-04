@@ -1,6 +1,6 @@
 ﻿namespace Pladi.Input
 {
-    public enum MouseInput
+    public enum MouseInputTypes
     {
         None,
         LeftButton,

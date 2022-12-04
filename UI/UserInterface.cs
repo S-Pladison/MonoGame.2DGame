@@ -33,7 +33,7 @@ namespace Pladi.UI
         public void Update(GameTime gameTime)
         {
             var mousePosition = Main.InputManager.GetMousePosition();
-            var mouseLeft = Main.InputManager.JustPressed(MouseInput.LeftButton);
+            var mouseLeft = Main.InputManager.JustPressed(MouseInputTypes.LeftButton);
 
             foreach (var elem in elements)
             {

@@ -92,10 +92,10 @@ namespace Pladi.Enitites
 		// ...
 
 		public float AngleTo(Vector2 destination)
-			=> (float)Math.Atan2(destination.Y - Center.Y, destination.X - Center.X);
+			=> MathF.Atan2(destination.Y - Center.Y, destination.X - Center.X);
 
 		public float AngleFrom(Vector2 source)
-			=> (float)Math.Atan2(Center.Y - source.Y, Center.X - source.X);
+			=> MathF.Atan2(Center.Y - source.Y, Center.X - source.X);
 
 		public float Distance(Vector2 other)
 			=> Vector2.Distance(Center, other);
