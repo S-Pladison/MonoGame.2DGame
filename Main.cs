@@ -85,7 +85,7 @@ namespace Pladi
 
         protected override void Update(GameTime gameTime)
         {
-            Window.Title = GetForm().WindowState.ToString();
+            Window.Title = GetForm().WindowState.ToString() + " | " + graphics.PreferredBackBufferWidth + "x" + graphics.PreferredBackBufferHeight + " | " + windowMaximized;
 
             try
             {
@@ -136,8 +136,8 @@ namespace Pladi
             var config = new Config();
 
             var screenConfig = config.Screen;
-            screenConfig.Width = graphics.PreferredBackBufferWidth;
-            screenConfig.Height = graphics.PreferredBackBufferHeight;
+            screenConfig.Width = ScreenSize.X;
+            screenConfig.Height = ScreenSize.Y;
             screenConfig.Fullscreen = graphics.IsFullScreen;
             screenConfig.WindowMaximized = windowMaximized;
 

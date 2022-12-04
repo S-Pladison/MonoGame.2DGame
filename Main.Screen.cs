@@ -23,7 +23,7 @@ namespace Pladi
             width = Math.Max(width, minScreenWidth);
             height = Math.Max(height, minScreenHeight);
 
-            windowMaximized = form.WindowState == FormWindowState.Maximized;
+            windowMaximized = form.WindowState.HasFlag(FormWindowState.Maximized);
 
             if (!graphics.IsFullScreen && fullscreen)
             {
