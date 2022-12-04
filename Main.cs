@@ -23,7 +23,7 @@ namespace Pladi
 
         // ...
 
-        private static readonly string configFilePath = "config.json";
+        private static readonly string configFilePath = AppDomain.CurrentDomain.BaseDirectory + "\\config.json";
         private static readonly int minScreenWidth = 800;
         private static readonly int minScreenHeight = 720;
         private static bool windowMaximized;
@@ -148,12 +148,6 @@ namespace Pladi
 
         public async void LoadConfig()
         {
-            if (!File.Exists(configFilePath))
-            {
-                using var _ = new FileStream(configFilePath, FileMode.Create);
-                return;
-            }
-
             try
             {
                 using var fs = new FileStream(configFilePath, FileMode.Open);
@@ -164,15 +158,8 @@ namespace Pladi
 
                 if (screenConfig.WindowMaximized)
                 {
-                    form.FormBorderStyle = FormBorderStyle.Sizable;
                     form.WindowState = FormWindowState.Maximized;
                 }
-                else
-                {
-                    form.FormBorderStyle = FormBorderStyle.Sizable;
-                }
-
-                form.BringToFront();
 
                 SetDisplayMode(screenConfig.Width, screenConfig.Height, screenConfig.Fullscreen);
             }
