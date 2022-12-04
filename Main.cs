@@ -1,22 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Pladi.Content;
-using Pladi.Enums;
 using Pladi.Input;
 using Pladi.Scenes;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Windows.Forms;
 
 namespace Pladi
 {
-    public class Main : Game
+    public partial class Main : Game
     {
         public static SceneManager SceneManager { get; private set; }
         public static InputManager InputManager { get; private set; }
@@ -25,13 +21,12 @@ namespace Pladi
         public static Random Rand { get; private set; }
         public static Point ScreenSize { get; private set; }
 
-        private static Form Form { get => Form.FromHandle(instance.Window.Handle).FindForm(); }
-
         // ...
 
-        private static readonly string settingsFilePath = "settings.json";
-        private static readonly int minScreenWidth = 1024;
-        private static readonly int minScreenHeight = 768;
+        private static readonly string configFilePath = "config.json";
+        private static readonly int minScreenWidth = 800;
+        private static readonly int minScreenHeight = 720;
+        private static bool windowMaximized;
         private static Main instance;
 
         // ...
@@ -55,18 +50,21 @@ namespace Pladi
 
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
-            Form.MinimumSize = new System.Drawing.Size(minScreenWidth, minScreenHeight);
+            IsFixedTimeStep = false;
+
+            var form = GetForm();
+            form.MinimumSize = new System.Drawing.Size(minScreenWidth, minScreenHeight);
 
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += (obj, args) =>
             {
-                OnResolutionChanged(Window.ClientBounds.Width, Window.ClientBounds.Height);
+                SetDisplayMode(Window.ClientBounds.Width, Window.ClientBounds.Height);
             };
         }
 
         protected override void Initialize()
         {
-            // Не удалять // LoadContent()
+            // Not remove // LoadContent()
             base.Initialize();
 
             LoadConfig();
@@ -134,48 +132,55 @@ namespace Pladi
         }
 
         // ...
-        
+
         public async void SaveConfig()
         {
-            var settings = new Settings
-            {
-                FullScreen = graphics.IsFullScreen,
-                ScreenWidth = GraphicsDevice.Viewport.Width,
-                ScreenHeight = GraphicsDevice.Viewport.Height
-            };
+            var config = new Config();
 
-            using var fs = new FileStream(settingsFilePath, FileMode.Create);
+            var screenConfig = config.Screen;
+            screenConfig.Width = graphics.PreferredBackBufferWidth;
+            screenConfig.Height = graphics.PreferredBackBufferHeight;
+            screenConfig.Fullscreen = graphics.IsFullScreen;
+            screenConfig.WindowMaximized = windowMaximized;
 
-            var options = new JsonSerializerOptions();
-            options.WriteIndented = true;
+            using var fs = new FileStream(configFilePath, FileMode.Create);
 
-            await JsonSerializer.SerializeAsync<Settings>(fs, settings, options);
+            await JsonSerializer.SerializeAsync<Config>(fs, config, new JsonSerializerOptions() { WriteIndented = true });
         }
 
         public async void LoadConfig()
         {
-            if (!File.Exists(settingsFilePath))
+            if (!File.Exists(configFilePath))
             {
-                using var _ = new FileStream(settingsFilePath, FileMode.Create);
+                using var _ = new FileStream(configFilePath, FileMode.Create);
                 return;
             }
 
             try
             {
-                using var fs = new FileStream(settingsFilePath, FileMode.Open);
+                using var fs = new FileStream(configFilePath, FileMode.Open);
 
-                var settings = await JsonSerializer.DeserializeAsync<Settings>(fs);
+                var form = GetForm();
+                var config = await JsonSerializer.DeserializeAsync<Config>(fs);
+                var screenConfig = config.Screen;
 
-                if (settings.FullScreen && !graphics.IsFullScreen)
+                if (screenConfig.WindowMaximized)
                 {
-                    ToggleFullScreen();
+                    form.FormBorderStyle = FormBorderStyle.Sizable;
+                    form.WindowState = FormWindowState.Maximized;
+                }
+                else
+                {
+                    form.FormBorderStyle = FormBorderStyle.Sizable;
                 }
 
-                SetDisplayMode(settings.ScreenWidth, settings.ScreenHeight);
+                form.BringToFront();
+
+                SetDisplayMode(screenConfig.Width, screenConfig.Height, screenConfig.Fullscreen);
             }
             catch
             {
-                File.Delete(settingsFilePath);
+                File.Delete(configFilePath);
             }
         }
 
@@ -188,51 +193,12 @@ namespace Pladi
             spriteBatch.End();
         }
 
-
         // ...
-
-        public static void SetDisplayMode(int width, int height)
-        {
-            var graphics = instance.graphics;
-
-            width = Math.Max(width, minScreenWidth);
-            height = Math.Max(height, height);
-
-            graphics.PreferredBackBufferWidth = width;
-            graphics.PreferredBackBufferHeight = height;
-            graphics.ApplyChanges();
-
-            ScreenSize = new Point(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
-
-            OnResolutionChanged(width, height);
-        }
-
-        public static void ToggleFullScreen()
-            => instance.graphics.ToggleFullScreen();
-
-        public static List<Point> GetSupportedScreenResolutions()
-        {
-            var result = new List<Point>();
-            var displayModes = instance.graphics.GraphicsDevice.Adapter.SupportedDisplayModes;
-
-            foreach (var mode in displayModes)
-            {
-                if (mode.Width < minScreenWidth || mode.Height < minScreenHeight) continue;
-
-                result.Add(new Point(mode.Width, mode.Height));
-            }
-
-            return result.OrderBy(o => o.X).ThenBy(o => o.Y).ToList();
-        }
 
         public static void ExitFromGame()
             => instance.Exit();
 
-        private static void OnResolutionChanged(int width, int height)
-        {
-            if (width <= 0 || height <= 0) return;
-
-            SceneManager.OnResolutionChanged(width, height);
-        }
+        private static Form GetForm()
+            => Form.FromHandle(instance.Window.Handle).FindForm();
     }
 }

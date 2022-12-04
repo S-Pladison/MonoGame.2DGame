@@ -38,22 +38,15 @@ namespace Pladi.Input
 
         private bool IsPressed(MouseState state, MouseInput input)
         {
-            switch (input)
+            return input switch
             {
-                case MouseInput.LeftButton:
-                    return state.LeftButton == ButtonState.Pressed;
-                case MouseInput.MiddleButton:
-                    return state.MiddleButton == ButtonState.Pressed;
-                case MouseInput.RightButton:
-                    return state.RightButton == ButtonState.Pressed;
-                case MouseInput.Button1:
-                    return state.XButton1 == ButtonState.Pressed;
-                case MouseInput.Button2:
-                    return state.XButton2 == ButtonState.Pressed;
-                case MouseInput.None:
-                    break;
-            }
-            return false;
+                MouseInput.LeftButton => state.LeftButton == ButtonState.Pressed,
+                MouseInput.MiddleButton => state.MiddleButton == ButtonState.Pressed,
+                MouseInput.RightButton => state.RightButton == ButtonState.Pressed,
+                MouseInput.Button1 => state.XButton1 == ButtonState.Pressed,
+                MouseInput.Button2 => state.XButton2 == ButtonState.Pressed,
+                _ => false,
+            };
         }
 
         public bool IsHeld(Keys key)

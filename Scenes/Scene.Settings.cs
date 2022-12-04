@@ -45,7 +45,7 @@ namespace Pladi.Scenes
 
                 button = new TextUIElement(FontAssets.DefaultMedium, $"{size.X}x{size.Y}", Color.White);
                 button.Position = new Vector2(10, 70 + i * 30);
-                button.OnMouseClick += (evt, elem) => Main.SetDisplayMode( size.X, size.Y);
+                button.OnMouseClick += (evt, elem) => Main.SetDisplayMode(size.X, size.Y);
                 button.OnPostUpdate += (elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
 
                 userInterface.AddElement(button);

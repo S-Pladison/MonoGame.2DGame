@@ -6,15 +6,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Pladi.Scenes
 {
     public class SplashScene : Scene
     {
+        private readonly float blackScreenTime = 2;
+        private float splashCounter;
+
+        // ...
+
         public override void Update(GameTime gameTime)
         {
-            if (Keyboard.GetState().IsKeyDown(Keys.NumPad1))
+            var delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            splashCounter += 1 * delta;
+
+            if (splashCounter >= blackScreenTime)
             {
                 Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Menu);
             }
@@ -22,7 +33,7 @@ namespace Pladi.Scenes
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.GraphicsDevice.Clear(new Color(36, 34, 41));
+            spriteBatch.GraphicsDevice.Clear(Color.Black);
         }
     }
 }
