@@ -1,0 +1,103 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Pladi.Enums;
+using Pladi.Input;
+using Pladi.Tiles;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Pladi.Enitites
+{
+    public class Player : Entity
+    {
+        public const float MoveSpeed = 32 * 5;
+        public const float JumpSpeed = 32 * 8;
+        public const float GravitySpeed = 32 * 0.3f;
+        public const float MaxFallSpeed = 32 * 16;
+        public const float Scale = 4f;
+
+        // ...
+
+        private bool canJump;
+        private Texture2D texture;
+        private Direction2Types direction;
+
+        // ...
+
+        public Player(Texture2D texture)
+        {
+            this.texture = texture;
+
+            Size = new Vector2(texture.Width, texture.Height) * Scale;
+        }
+
+        // ...
+
+        public void Update(float delta, Tilemap tilemap)
+        {
+            var input = Main.InputManager;
+
+            UpdateMoveVertical(input);
+            UpdateMoveHorizontal(input);
+            UpdatePosition(delta);
+            UpdateGravity();
+
+            tilemap.TileCollisionWithEntity(this, out bool onFloor, 16);
+
+            if (onFloor && !canJump)
+            {
+                canJump = true;
+            }
+        }
+
+        public void UpdateMoveVertical(InputManager input)
+        {
+            if (canJump && input.JustPressed(Keys.Space))
+            {
+                canJump = false;
+                Velocity.Y = -JumpSpeed;
+            }
+        }
+
+        public void UpdateMoveHorizontal(InputManager input)
+        {
+            Velocity.X *= 0.92f;
+
+            if (input.IsPressed(Keys.A))
+            {
+                Velocity.X = -MoveSpeed;
+            }
+
+            if (input.IsPressed(Keys.D))
+            {
+                Velocity.X = MoveSpeed;
+            }
+
+            direction = Velocity.X >= 0 ? Direction2Types.Right : Direction2Types.Left;
+        }
+
+        public void UpdateGravity()
+        {
+            Velocity.Y += GravitySpeed;
+            Velocity.Y = MathF.Min(MaxFallSpeed, Velocity.Y);
+        }
+
+        public void UpdatePosition(float delta)
+        {
+            Position += Velocity * delta;
+        }
+
+        // ...
+
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+            var spriteEffects = direction.Equals(Direction2Types.Left) ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
+            spriteBatch.Draw(texture, Position, null, canJump ? Color.SkyBlue : Color.Red, 0f, Vector2.Zero, Scale, spriteEffects, 0);
+        }
+    }
+}
