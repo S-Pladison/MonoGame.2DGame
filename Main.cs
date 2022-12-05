@@ -4,9 +4,7 @@ using Pladi.Content;
 using Pladi.Input;
 using Pladi.Scenes;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Windows.Forms;
 
@@ -33,7 +31,6 @@ namespace Pladi
 
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
-        private Texture2D mouseTexture;
 
         // ...
 
@@ -70,17 +67,20 @@ namespace Pladi
 
         protected override void LoadContent()
         {
-            FontAssets.Load(Content);
-
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            mouseTexture = Content.Load<Texture2D>("Textures/Cursor");
 
-            SceneManager.LoadContent(Content);
+            FontAssets.Load(Content);
+            TextureAssets.Load(Content);
+            EffectAssets.Load(Content);
         }
 
         protected override void UnloadContent()
         {
-            FontAssets.Unload(Content);
+            EffectAssets.Unload();
+            TextureAssets.Unload();
+            FontAssets.Unload();
+
+            Content.Unload();
         }
 
         protected override void Update(GameTime gameTime)
@@ -131,7 +131,7 @@ namespace Pladi
 
         // ...
 
-        public async void SaveConfig()
+        private async void SaveConfig()
         {
             var config = new Config();
 
@@ -146,7 +146,7 @@ namespace Pladi
             await JsonSerializer.SerializeAsync<Config>(fs, config, new JsonSerializerOptions() { WriteIndented = true });
         }
 
-        public async void LoadConfig()
+        private async void LoadConfig()
         {
             try
             {
@@ -174,7 +174,7 @@ namespace Pladi
             if (!IsActive) return;
 
             spriteBatch.Begin();
-            spriteBatch.Draw(mouseTexture, InputManager.GetMousePosition(), null, Color.White, 0f, Vector2.Zero, 0.35f, SpriteEffects.None, 0);
+            spriteBatch.Draw(TextureAssets.Cursor, InputManager.GetMousePosition(), null, Color.White, 0f, Vector2.Zero, 0.35f, SpriteEffects.None, 0);
             spriteBatch.End();
         }
 

@@ -76,5 +76,5 @@ namespace Pladi
                 SetDisplayMode(width, height);
             }
         }
-}
+    }
 }

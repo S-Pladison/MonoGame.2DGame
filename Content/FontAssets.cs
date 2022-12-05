@@ -16,13 +16,10 @@ namespace Pladi.Content
             DefaultMedium = content.Load<SpriteFont>("Fonts/MainMedium");
         }
 
-        public static void Unload(ContentManager content)
+        public static void Unload()
         {
             DefaultSmall = null;
             DefaultMedium = null;
-
-            content.UnloadAsset("Fonts/Main");
-            content.UnloadAsset("Fonts/MainMedium");
         }
     }
 }

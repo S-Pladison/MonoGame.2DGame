@@ -1,35 +1,24 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Pladi.Content;
 using Pladi.Enitites;
 using Pladi.Tiles;
 using Pladi.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pladi.Scenes
 {
     public class LevelScene : Scene
     {
-        private Texture2D t;
-
         private Tilemap tilemap;
         private Tilemap wallMap;
-        private Texture2D tileTexture;
 
         private Camera camera;
         private Vector2 cameraSmoothVelocity;
 
         private Player player;
-        private Texture2D p;
 
         private GridDrawer grid;
-        private Texture2D pixel;
 
         // ...
 
@@ -37,23 +26,15 @@ namespace Pladi.Scenes
 
         // ...
 
-        public override void LoadContent(ContentManager content)
-        {
-            t = content.Load<Texture2D>("Textures/Bearing");
-            p = content.Load<Texture2D>("Textures/Player");
-            tileTexture = content.Load<Texture2D>("Textures/Tiles");
-            pixel = content.Load<Texture2D>("Textures/Pixel");
-        }
-
         public override void Init()
         {
             grid = new GridDrawer(32, 32);
 
             tilemap = new Tilemap(100, 10, 4f);
-            tilemap.SetTexture(tileTexture, 8, 12);
+            tilemap.SetTexture(TextureAssets.Tilemap, 8, 12);
 
             wallMap = new Tilemap(100, 10, 4f);
-            wallMap.SetTexture(tileTexture, 8, 12);
+            wallMap.SetTexture(TextureAssets.Tilemap, 8, 12);
 
             tilemap.SetTile(0, 3, new Tile() { Type = 9 });
             tilemap.SetTile(1, 3, new Tile() { Type = 9 });
@@ -79,7 +60,7 @@ namespace Pladi.Scenes
             }
 
             camera = new Camera(Main.SpriteBatch.GraphicsDevice.Viewport, 1f);
-            player = new Player(p);
+            player = new Player(TextureAssets.Player);
         }
 
         public override void OnActivate()
@@ -134,13 +115,13 @@ namespace Pladi.Scenes
             for (float x = 0; x < tilemap.Width; x++)
             {
                 Rectangle rectangle = new Rectangle((int)(x * 32) - 1, 0, 2, 1000);
-                spriteBatch.Draw(pixel, rectangle, gridColor);
+                spriteBatch.Draw(TextureAssets.Pixel, rectangle, gridColor);
             }
 
             for (float y = 0; y < tilemap.Height; y++)
             {
                 Rectangle rectangle = new Rectangle(0, (int)(y * 32) - 1, 1000, 2);
-                spriteBatch.Draw(pixel, rectangle, gridColor);
+                spriteBatch.Draw(TextureAssets.Pixel, rectangle, gridColor);
             }
 
             player.Draw(gameTime, spriteBatch);

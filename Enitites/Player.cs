@@ -5,10 +5,6 @@ using Pladi.Enums;
 using Pladi.Input;
 using Pladi.Tiles;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pladi.Enitites
 {

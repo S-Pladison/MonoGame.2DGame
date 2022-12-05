@@ -1,11 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Pladi.Content;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pladi.Scenes
 {
@@ -28,8 +25,6 @@ namespace Pladi.Scenes
         private Dictionary<GameScenes, Scene> scenes;
         private Scene current;
 
-        private Texture2D pixel;
-        private Effect effect;
         private float initSceneProgress;
         private GameScenes? expectedScene;
 
@@ -56,19 +51,6 @@ namespace Pladi.Scenes
             }
         }
 
-        public void LoadContent(ContentManager content)
-        {
-            var e = content.Load<Texture2D>("Textures/Background");
-            pixel = content.Load<Texture2D>("Textures/Pixel");
-            effect = content.Load<Effect>("Effects/Background");
-            //effect.Parameters["Texture1"].SetValue(e);
-
-            foreach (var (_, scene) in scenes)
-            {
-                scene.LoadContent(content);
-            }
-        }
-
         public void Update(GameTime gameTime)
         {
             var delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -80,7 +62,7 @@ namespace Pladi.Scenes
                 if (initSceneProgress >= 1f)
                 {
                     expectedScene = null;
-                } 
+                }
                 else if (initSceneProgress > 0.5f)
                 {
                     current = scenes[expectedScene.Value];
@@ -115,8 +97,8 @@ namespace Pladi.Scenes
 
             var x = Width * (1 - initSceneProgress) * 2 - Width;
 
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullCounterClockwise, effect);
-            spriteBatch.Draw(pixel, new Rectangle((int)x, 0, Width, Height), Color.Black);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullCounterClockwise, EffectAssets.Background);
+            spriteBatch.Draw(TextureAssets.Pixel, new Rectangle((int)x, 0, Width, Height), Color.Black);
             spriteBatch.End();
         }
 
