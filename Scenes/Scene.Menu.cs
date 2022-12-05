@@ -23,15 +23,22 @@ namespace Pladi.Scenes
 
             userInterface.AddElement(button);
 
-            button = new TextUIElement(FontAssets.DefaultMedium, "Settings", Color.White);
+            button = new TextUIElement(FontAssets.DefaultMedium, "Editor", Color.White);
             button.Position = new Vector2(10, 40);
+            button.OnMouseClick += (evt, elem) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Editor);
+            button.OnPostUpdate += (elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
+
+            userInterface.AddElement(button);
+
+            button = new TextUIElement(FontAssets.DefaultMedium, "Settings", Color.White);
+            button.Position = new Vector2(10, 70);
             button.OnMouseClick += (evt, elem) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Settings);
             button.OnPostUpdate += (elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
 
             userInterface.AddElement(button);
 
             button = new TextUIElement(FontAssets.DefaultMedium, "Exit", Color.White);
-            button.Position = new Vector2(10, 70);
+            button.Position = new Vector2(10, 100);
             button.OnMouseClick += (evt, elem) => Main.ExitFromGame();
             button.OnPostUpdate += (elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
 

@@ -13,7 +13,8 @@ namespace Pladi.Scenes
             Splash,
             Menu,
             Settings,
-            Game
+            Game,
+            Editor
         }
 
         // ...
@@ -37,6 +38,7 @@ namespace Pladi.Scenes
             scenes.Add(GameScenes.Menu, new MenuScene());
             scenes.Add(GameScenes.Settings, new SettingsScene());
             scenes.Add(GameScenes.Game, new LevelScene());
+            scenes.Add(GameScenes.Editor, new EditorScene());
 
             current = scenes[GameScenes.Splash];
         }

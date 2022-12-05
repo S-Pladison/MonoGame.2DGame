@@ -47,7 +47,7 @@ namespace Pladi.Scenes
 
         public override void Update(GameTime gameTime)
         {
-            if (Keyboard.GetState().IsKeyDown(Keys.NumPad1))
+            if (Main.InputManager.JustPressed(Keys.Escape))
             {
                 Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Menu);
             }

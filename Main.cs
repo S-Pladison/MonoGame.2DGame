@@ -55,6 +55,15 @@ namespace Pladi
             Window.AllowUserResizing = true;
         }
 
+        protected override void LoadContent()
+        {
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            FontAssets.Load(Content);
+            TextureAssets.Load(Content);
+            EffectAssets.Load(Content);
+        }
+
         protected override void Initialize()
         {
             // Not remove // LoadContent()
@@ -63,15 +72,6 @@ namespace Pladi
             LoadConfig();
 
             SceneManager.Init();
-        }
-
-        protected override void LoadContent()
-        {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            FontAssets.Load(Content);
-            TextureAssets.Load(Content);
-            EffectAssets.Load(Content);
         }
 
         protected override void UnloadContent()
