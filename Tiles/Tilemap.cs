@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Enitites;
 using System;
+using System.IO;
+using RectangleF = System.Drawing.RectangleF;
 
 namespace Pladi.Tiles
 {
@@ -12,12 +14,15 @@ namespace Pladi.Tiles
         public int Height => y;
         public int RenderedTileCount { get; private set; }
 
+        private float ScaledTileSizeX => tileSizeX * scale;
+        private float ScaledTileSizeY => tileSizeY * scale;
+
         // ...
 
-        private readonly int x;
-        private readonly int y;
-        private readonly float scale;
-        private readonly Tile[,] tiles;
+        private int x;
+        private int y;
+        private float scale;
+        private Tile[,] tiles;
 
         private RenderTarget2D target;
         private Texture2D texture;
@@ -65,29 +70,20 @@ namespace Pladi.Tiles
         {
             if (texture is null || target is null) return;
 
-            var device = spriteBatch.GraphicsDevice;
-            var cameraBounds = camera.VisibleArea;
+            RenderedTileCount = 0;
 
+            var device = spriteBatch.GraphicsDevice;
             device.SetRenderTarget(target);
             device.Clear(Color.Transparent);
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, camera.TransformMatrix);
 
-            RenderedTileCount = 0;
+            GetTilesCoordsIntersectsWithRect(camera.VisibleArea, out Point leftTop, out Point rightBottom);
 
-            var scaledTileSizeX = tileSizeX * scale;
-            var scaledTileSizeY = tileSizeY * scale;
-
-            var offset = new Point((int)(cameraBounds.X / scaledTileSizeX), (int)(cameraBounds.Y / scaledTileSizeY));
-            var xMin = Math.Clamp(offset.X, 0, x);
-            var yMin = Math.Clamp(offset.Y, 0, y);
-            var xMax = (int)Math.Clamp((cameraBounds.X + cameraBounds.Width) / scaledTileSizeX + 1, 0, x);
-            var yMax = (int)Math.Clamp((cameraBounds.Y + cameraBounds.Height) / scaledTileSizeY + 1, 0, y);
-
-            for (int i = xMin; i < xMax; i++)
+            for (int i = leftTop.X; i <= rightBottom.X; i++)
             {
-                for (int j = yMin; j < yMax; j++)
+                for (int j = leftTop.Y; j <= rightBottom.Y; j++)
                 {
-                    var position = new Vector2(i * scaledTileSizeX, j * scaledTileSizeY);
+                    var position = new Vector2(i * ScaledTileSizeX, j * ScaledTileSizeY);
                     var tile = tiles[i, j];
                     var rectangle = new Rectangle(tile.Type % textureFrameCountX * tileSizeX, tile.Type / textureFrameCountX * tileSizeY, tileSizeX, tileSizeY);
 
@@ -101,35 +97,30 @@ namespace Pladi.Tiles
             device.SetRenderTarget(null);
         }
 
+        public bool IsTileCollision(int positionX, int positionY, int width, int height)
+            => IsTileCollision(new Rectangle(positionX, positionY, width, height));
+
         public bool IsTileCollision(Vector2 position, int width, int height)
+            => IsTileCollision(new Rectangle((int)position.X, (int)position.Y, width, height));
+
+        public bool IsTileCollision(Rectangle rectangle)
         {
-            var scaledTileSizeX = scale * tileSizeX;
-            var scaledTileSizeY = scale * tileSizeY;
+            GetTilesCoordsIntersectsWithRect(rectangle, out Point leftTop, out Point rightBottom);
 
-            var leftTile = (int)(position.X / scaledTileSizeX);
-            var rightTile = (int)((position.X + width) / scaledTileSizeX) + 1;
-            var topTile = (int)(position.Y / scaledTileSizeY);
-            var bottomTile = (int)((position.Y + height) / scaledTileSizeY) + 1;
-
-            leftTile = Math.Clamp(leftTile, 0, x - 1);
-            rightTile = Math.Clamp(rightTile, 0, x - 1);
-            topTile = Math.Clamp(topTile, 0, y - 1);
-            bottomTile = Math.Clamp(bottomTile, 0, y - 1);
-
-            for (int i = leftTile; i < rightTile; i++)
+            for (int i = leftTop.X; i <= rightBottom.X; i++)
             {
-                for (int j = topTile; j < bottomTile; j++)
+                for (int j = leftTop.Y; j <= rightBottom.Y; j++)
                 {
                     var tile = tiles[i, j];
 
                     if (tile.IsAir) continue;
 
-                    var vector = new Vector2(i * scaledTileSizeX, j * scaledTileSizeY);
+                    var tilePosition = new Vector2(i * ScaledTileSizeX, j * ScaledTileSizeY);
 
-                    if (position.X + width > vector.X
-                        && position.X < vector.X + scaledTileSizeX
-                        && position.Y + height > vector.Y
-                        && position.Y < vector.Y + scaledTileSizeY)
+                    if (rectangle.X + rectangle.Width > tilePosition.X
+                        && rectangle.X < tilePosition.X + ScaledTileSizeX
+                        && rectangle.Y + rectangle.Height > tilePosition.Y
+                        && rectangle.Y < tilePosition.Y + ScaledTileSizeY)
                         return true;
                 }
             }
@@ -137,74 +128,119 @@ namespace Pladi.Tiles
             return false;
         }
 
-        public void TileCollisionWithEntity(Entity entity, out bool onFloor, int minIntersArea = 0, float offset = 1f)
+        public void TileCollisionWithEntity(Entity entity, out bool onFloor, float minIntersectionArea = 0f)
         {
             onFloor = false;
 
-            var position = entity.Position;
-            var width = entity.Width;
-            var height = entity.Height;
-            var hitbox = entity.Hitbox;
+            GetTilesCoordsIntersectsWithRect(entity.Hitbox, out Point leftTop, out Point rightBottom);
 
-            var scaledTileSizeX = scale * tileSizeX;
-            var scaledTileSizeY = scale * tileSizeY;
+            var entityRectangle = new RectangleF(entity.Position.X, entity.Position.Y, entity.Width, entity.Height);
 
-            var leftTile = (int)(position.X / scaledTileSizeX) - 1;
-            var rightTile = (int)((position.X + width) / scaledTileSizeX) + 1;
-            var topTile = (int)(position.Y / scaledTileSizeY) - 1;
-            var bottomTile = (int)((position.Y + height) / scaledTileSizeY) + 1;
-
-            leftTile = Math.Clamp(leftTile, 0, x - 1);
-            rightTile = Math.Clamp(rightTile, 0, x);
-            topTile = Math.Clamp(topTile, 0, y - 1);
-            bottomTile = Math.Clamp(bottomTile, 0, y);
-
-            for (int i = leftTile; i < rightTile; i++)
+            for (int i = leftTop.X; i <= rightBottom.X; i++)
             {
-                for (int j = topTile; j < bottomTile; j++)
+                for (int j = leftTop.Y; j <= rightBottom.Y; j++)
                 {
                     ref var tile = ref tiles[i, j];
 
                     if (tile.IsAir) continue;
 
-                    var tileRectangle = new Rectangle(i * (int)scaledTileSizeX, j * (int)scaledTileSizeY, (int)scaledTileSizeX, (int)scaledTileSizeY);
-                    var intersection = Rectangle.Intersect(hitbox, tileRectangle);
+                    var tileRectangle = new RectangleF(i * ScaledTileSizeX, j * ScaledTileSizeY, ScaledTileSizeX, ScaledTileSizeY);
+                    var intersection = RectangleF.Intersect(entityRectangle, tileRectangle);
 
-                    if (intersection.Width * intersection.Height < minIntersArea) continue;
+                    if (intersection.Width * intersection.Height < minIntersectionArea) continue;
 
-                    if (intersection.Width < intersection.Height)
-                    {
-                        if (entity.Position.X > tileRectangle.X)
-                        {
-                            // Ограничение слева
-                            entity.Position.X = tileRectangle.X + tileRectangle.Width - offset;
-                        }
-                        else
-                        {
-                            // Ограничение справа
-                            entity.Position.X = tileRectangle.X - hitbox.Width + offset;
-                        }
-
-                        entity.Velocity.X = 0;
-                    }
-                    else
+                    if (intersection.Width > intersection.Height)
                     {
                         if (entity.Position.Y > tileRectangle.Y)
                         {
                             // Ограничение свехру
-                            entity.Position.Y = tileRectangle.Y + tileRectangle.Height - offset;
+                            entity.Position.Y = tileRectangle.Y + tileRectangle.Height;
                         }
                         else
                         {
                             // Ограничение под
-                            entity.Position.Y = tileRectangle.Y - hitbox.Height + offset;
+                            entity.Position.Y = tileRectangle.Y - entity.Hitbox.Height;
                             onFloor = true;
                         }
 
                         entity.Velocity.Y = 0;
                     }
+                    else
+                    {
+                        if (entity.Position.X > tileRectangle.X)
+                        {
+                            // Ограничение слева
+                            entity.Position.X = tileRectangle.X + tileRectangle.Width;
+                        }
+                        else
+                        {
+                            // Ограничение справа
+                            entity.Position.X = tileRectangle.X - entity.Hitbox.Width;
+                        }
+
+                        entity.Velocity.X = 0;
+                    }
                 }
             }
+        }
+
+        public void SaveToFile(string path)
+        {
+            using var writer = new BinaryWriter(File.Create(path));
+
+            writer.Write(x);
+            writer.Write(y);
+            writer.Write(scale);
+
+            for (int i = 0; i < x; i++)
+            {
+                for (int j = 0; j < y; j++)
+                {
+                    writer.Write((int)tiles[i, j].Type);
+                }
+            }
+        }
+
+        private void GetTilesCoordsIntersectsWithRect(Rectangle rectangle, out Point leftTop, out Point rightBottom)
+        {
+            var leftTile = (int)(rectangle.X / ScaledTileSizeX) - 1;
+            var rightTile = (int)((rectangle.X + rectangle.Width) / ScaledTileSizeX) + 1;
+            var topTile = (int)(rectangle.Y / ScaledTileSizeY) - 1;
+            var bottomTile = (int)((rectangle.Y + rectangle.Height) / ScaledTileSizeY) + 1;
+
+            var xMax = x - 1;
+            var yMax = y - 1;
+
+            leftTile = Math.Clamp(leftTile, 0, xMax);
+            rightTile = Math.Clamp(rightTile, 0, xMax);
+            topTile = Math.Clamp(topTile, 0, yMax);
+            bottomTile = Math.Clamp(bottomTile, 0, yMax);
+
+            leftTop = new Point(leftTile, topTile);
+            rightBottom = new Point(rightTile, bottomTile);
+        }
+
+        // ...
+
+        public static Tilemap LoadFromFile(string path)
+        {
+            using var reader = new BinaryReader(File.Open(path, FileMode.Open));
+
+            var x = reader.ReadInt32();
+            var y = reader.ReadInt32();
+            var scale = reader.ReadSingle();
+
+            var tilemap = new Tilemap(x, y, scale);
+
+            for (int i = 0; i < x; i++)
+            {
+                for (int j = 0; j < y; j++)
+                {
+                    tilemap.tiles[i, j].Type = (ushort)reader.ReadInt32();
+                }
+            }
+
+            return tilemap;
         }
     }
 }

@@ -57,7 +57,7 @@ namespace Pladi.Scenes
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.GraphicsDevice.Clear(new Color(36, 34, 41));
+            spriteBatch.GraphicsDevice.Clear(Color.Gray);
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
             userInterface.Draw(gameTime, spriteBatch);

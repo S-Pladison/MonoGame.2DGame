@@ -10,6 +10,7 @@ namespace Pladi.UI
 
         private string text;
         private float scale;
+        private float spread;
 
         private Vector2 textOrigin;
         private Vector2 textSize;
@@ -17,28 +18,29 @@ namespace Pladi.UI
 
         // ...
 
-        public TextUIElement(SpriteFont font, string text, Color textColor, float scale = 1f)
+        public TextUIElement(SpriteFont font, string text, Color textColor, float scale = 1f, float spread = 2f)
         {
             this.font = font;
             this.color = textColor;
             this.textOrigin = new Vector2(0, 0.5f);
 
-            SetText(text, scale);
+            SetText(text, scale, spread);
         }
 
         // ...
 
         protected override void OnDraw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawStringWithShadow(font, $"{text}", Position, color, 0, textOrigin, scale, 1f);
+            spriteBatch.DrawStringWithShadow(font, $"{text}", Position, color, 0, textOrigin, scale, spread);
         }
 
         // ...
 
-        public void SetText(string text, float scale)
+        public void SetText(string text, float scale = 1f, float spread = 2f)
         {
             this.text = text;
             this.scale = scale;
+            this.spread = spread;
 
             var vector = font.MeasureString(text);
             var vector2 = textSize = vector * scale;

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using RectangleF = System.Drawing.RectangleF;
 
 namespace Pladi.Utils
 {
@@ -29,5 +30,8 @@ namespace Pladi.Utils
 
             return result;
         }
+
+        public static RectangleF ToRectangleF(this Rectangle rect)
+            => new(rect.X, rect.Y, rect.Width, rect.Height);
     }
 }

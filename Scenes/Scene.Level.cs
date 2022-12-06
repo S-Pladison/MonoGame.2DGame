@@ -11,7 +11,6 @@ namespace Pladi.Scenes
     public class LevelScene : Scene
     {
         private Tilemap tilemap;
-        private Tilemap wallMap;
 
         private Camera camera;
         private Vector2 cameraSmoothVelocity;
@@ -30,33 +29,38 @@ namespace Pladi.Scenes
         {
             grid = new Grid(32, 32);
 
-            tilemap = new Tilemap(100, 10, 4f);
-            tilemap.SetTexture(TextureAssets.Tilemap, 8, 12);
+            try
+            {
+                tilemap = Tilemap.LoadFromFile("Editor.pll");
+                tilemap.SetTexture(TextureAssets.Tilemap, 8, 12);
+            }
+            catch
+            {
+                tilemap = new Tilemap(100, 10, 4f);
+                tilemap.SetTexture(TextureAssets.Tilemap, 8, 12);
 
-            wallMap = new Tilemap(100, 10, 4f);
-            wallMap.SetTexture(TextureAssets.Tilemap, 8, 12);
-
-            tilemap.SetTile(0, 3, new Tile() { Type = 9 });
-            tilemap.SetTile(1, 3, new Tile() { Type = 9 });
-            for (int i = 5; i < 90; i++)
-            {
-                tilemap.SetTile(i, 4, new Tile() { Type = 9 });
-            }
-            for (int i = 19; i < 90; i++)
-            {
-                tilemap.SetTile(i, 3, new Tile() { Type = 10 });
-            }
-            for (int i = 20; i < 90; i++)
-            {
-                tilemap.SetTile(i, 2, new Tile() { Type = 12 });
-            }
-            for (int i = 20; i < 90; i++)
-            {
-                tilemap.SetTile(i, 1, new Tile() { Type = 12 });
-            }
-            for (int i = 20; i < 90; i++)
-            {
-                tilemap.SetTile(i, 0, new Tile() { Type = 12 });
+                tilemap.SetTile(0, 3, new Tile() { Type = 9 });
+                tilemap.SetTile(1, 3, new Tile() { Type = 9 });
+                for (int i = 5; i < 90; i++)
+                {
+                    tilemap.SetTile(i, 4, new Tile() { Type = 9 });
+                }
+                for (int i = 19; i < 90; i++)
+                {
+                    tilemap.SetTile(i, 3, new Tile() { Type = 10 });
+                }
+                for (int i = 20; i < 90; i++)
+                {
+                    tilemap.SetTile(i, 2, new Tile() { Type = 12 });
+                }
+                for (int i = 20; i < 90; i++)
+                {
+                    tilemap.SetTile(i, 1, new Tile() { Type = 12 });
+                }
+                for (int i = 20; i < 90; i++)
+                {
+                    tilemap.SetTile(i, 0, new Tile() { Type = 12 });
+                }
             }
 
             camera = new Camera(Main.SpriteBatch.GraphicsDevice.Viewport, 1f);
@@ -65,7 +69,41 @@ namespace Pladi.Scenes
 
         public override void OnActivate()
         {
-            player.Position = new Vector2(32 * 7, 32 * 2);
+            try
+            {
+                tilemap = Tilemap.LoadFromFile("Editor.pll");
+                tilemap.SetTexture(TextureAssets.Tilemap, 8, 12);
+            }
+            catch
+            {
+                tilemap = new Tilemap(100, 10, 4f);
+                tilemap.SetTexture(TextureAssets.Tilemap, 8, 12);
+
+                tilemap.SetTile(0, 3, new Tile() { Type = 9 });
+                tilemap.SetTile(1, 3, new Tile() { Type = 9 });
+                for (int i = 5; i < 90; i++)
+                {
+                    tilemap.SetTile(i, 4, new Tile() { Type = 9 });
+                }
+                for (int i = 19; i < 90; i++)
+                {
+                    tilemap.SetTile(i, 3, new Tile() { Type = 10 });
+                }
+                for (int i = 20; i < 90; i++)
+                {
+                    tilemap.SetTile(i, 2, new Tile() { Type = 12 });
+                }
+                for (int i = 20; i < 90; i++)
+                {
+                    tilemap.SetTile(i, 1, new Tile() { Type = 12 });
+                }
+                for (int i = 20; i < 90; i++)
+                {
+                    tilemap.SetTile(i, 0, new Tile() { Type = 12 });
+                }
+            }
+
+            player.Position = new Vector2(0, 0);
             camera.Location = player.Center;
         }
 
@@ -100,7 +138,6 @@ namespace Pladi.Scenes
 
         public override void PreDraw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            wallMap.Render(spriteBatch, camera);
             tilemap.Render(spriteBatch, camera);
         }
 
@@ -119,7 +156,9 @@ namespace Pladi.Scenes
             spriteBatch.End();
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
-            spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Rendered tiles: {tilemap.RenderedTileCount}", new Vector2(5, 5), Color.White, 0, Vector2.Zero, 1f, 1f);
+            spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Rendered tiles: {tilemap.RenderedTileCount}", new Vector2(5, 5), Color.White, 0, Vector2.Zero, 1f, 2f);
+            spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Player position: {player.Position}", new Vector2(5, 20), Color.White, 0, Vector2.Zero, 1f, 2f);
+            spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Player velocity: {player.Velocity}", new Vector2(5, 35), Color.White, 0, Vector2.Zero, 1f, 2f);
             spriteBatch.End();
         }
     }

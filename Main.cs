@@ -15,6 +15,7 @@ namespace Pladi
         public static SceneManager SceneManager { get; private set; }
         public static InputManager InputManager { get; private set; }
 
+        public static bool IsGameActive { get => instance.IsActive; }
         public static SpriteBatch SpriteBatch { get => instance.spriteBatch; }
         public static Random Rand { get; private set; }
         public static Point ScreenSize { get; private set; }

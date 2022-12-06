@@ -67,6 +67,7 @@ namespace Pladi.Scenes
                 }
                 else if (initSceneProgress > 0.5f)
                 {
+                    current.OnDeactivate();
                     current = scenes[expectedScene.Value];
                     current.OnActivate();
                 }

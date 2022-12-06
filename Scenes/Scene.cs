@@ -7,6 +7,7 @@ namespace Pladi.Scenes
     {
         public virtual void Init() { }
         public virtual void OnActivate() { }
+        public virtual void OnDeactivate() { }
         public virtual void Update(GameTime gameTime) { }
         public virtual void OnResolutionChanged(int width, int height) { }
         public virtual void PreDraw(GameTime gameTime, SpriteBatch spriteBatch) { }

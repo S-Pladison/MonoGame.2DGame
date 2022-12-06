@@ -31,13 +31,15 @@ namespace Pladi.Input
         }
 
         public bool IsPressed(Keys key)
-            => currentKeyboardState.IsKeyDown(key);
+            => Main.IsGameActive && currentKeyboardState.IsKeyDown(key);
 
         public bool IsPressed(MouseInputTypes input)
             => IsPressed(currentMouseState, input);
 
         private bool IsPressed(MouseState state, MouseInputTypes input)
         {
+            if (!Main.IsGameActive) return false;
+
             return input switch
             {
                 MouseInputTypes.LeftButton => state.LeftButton == ButtonState.Pressed,
@@ -50,19 +52,19 @@ namespace Pladi.Input
         }
 
         public bool IsHeld(Keys key)
-            => currentKeyboardState.IsKeyDown(key) && previousKeyboardState.IsKeyDown(key);
+            => Main.IsGameActive && currentKeyboardState.IsKeyDown(key) && previousKeyboardState.IsKeyDown(key);
 
         public bool IsHeld(MouseInputTypes input)
             => IsPressed(currentMouseState, input) && IsPressed(previousMouseState, input);
 
         public bool JustPressed(Keys key)
-            => currentKeyboardState.IsKeyDown(key) && !previousKeyboardState.IsKeyDown(key);
+            => Main.IsGameActive && currentKeyboardState.IsKeyDown(key) && !previousKeyboardState.IsKeyDown(key);
 
         public bool JustPressed(MouseInputTypes input)
             => IsPressed(currentMouseState, input) && !IsPressed(previousMouseState, input);
 
         public bool JustReleased(Keys key)
-            => !currentKeyboardState.IsKeyDown(key) && previousKeyboardState.IsKeyDown(key);
+            => Main.IsGameActive && !currentKeyboardState.IsKeyDown(key) && previousKeyboardState.IsKeyDown(key);
         public bool JustReleased(MouseInputTypes input)
             => !IsPressed(currentMouseState, input) && IsPressed(previousMouseState, input);
 

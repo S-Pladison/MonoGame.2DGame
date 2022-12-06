@@ -39,10 +39,10 @@ namespace Pladi.Enitites
 
             UpdateMoveVertical(input);
             UpdateMoveHorizontal(input);
-            UpdatePosition(delta);
             UpdateGravity();
+            UpdatePosition(delta);
 
-            tilemap.TileCollisionWithEntity(this, out bool onFloor, 16);
+            tilemap.TileCollisionWithEntity(this, out bool onFloor, 8);
 
             if (onFloor && !canJump)
             {
