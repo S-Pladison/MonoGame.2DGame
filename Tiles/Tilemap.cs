@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Enitites;
+using Pladi.Enums;
 using System;
 using System.IO;
 using RectangleF = System.Drawing.RectangleF;
@@ -128,9 +129,9 @@ namespace Pladi.Tiles
             return false;
         }
 
-        public void TileCollisionWithEntity(Entity entity, out bool onFloor, float minIntersectionArea = 0f)
+        public void TileCollisionWithEntity(Entity entity, out CollisionSides collisionFlags, float minIntersectionArea = 0f)
         {
-            onFloor = false;
+            collisionFlags = CollisionSides.None;
 
             GetTilesCoordsIntersectsWithRect(entity.Hitbox, out Point leftTop, out Point rightBottom);
 
@@ -151,31 +152,34 @@ namespace Pladi.Tiles
 
                     if (intersection.Width > intersection.Height)
                     {
+                        // Top
                         if (entity.Position.Y > tileRectangle.Y)
                         {
-                            // Ограничение свехру
                             entity.Position.Y = tileRectangle.Y + tileRectangle.Height;
+                            collisionFlags |= CollisionSides.Top;
                         }
+                        // Buttom
                         else
                         {
-                            // Ограничение под
                             entity.Position.Y = tileRectangle.Y - entity.Hitbox.Height;
-                            onFloor = true;
+                            collisionFlags |= CollisionSides.Buttom;
                         }
 
                         entity.Velocity.Y = 0;
                     }
                     else
                     {
+                        // Left
                         if (entity.Position.X > tileRectangle.X)
                         {
-                            // Ограничение слева
                             entity.Position.X = tileRectangle.X + tileRectangle.Width;
+                            collisionFlags |= CollisionSides.Left;
                         }
+                        // Right
                         else
                         {
-                            // Ограничение справа
                             entity.Position.X = tileRectangle.X - entity.Hitbox.Width;
+                            collisionFlags |= CollisionSides.Right;
                         }
 
                         entity.Velocity.X = 0;

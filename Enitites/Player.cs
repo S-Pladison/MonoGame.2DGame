@@ -11,7 +11,7 @@ namespace Pladi.Enitites
     public class Player : Entity
     {
         public const float MoveSpeed = 32 * 5;
-        public const float JumpSpeed = 32 * 8;
+        public const float JumpSpeed = 32 * 10;
         public const float GravitySpeed = 32 * 0.3f;
         public const float MaxFallSpeed = 32 * 32;
         public const float Scale = 4f;
@@ -42,9 +42,9 @@ namespace Pladi.Enitites
             UpdateGravity();
             UpdatePosition(delta);
 
-            tilemap.TileCollisionWithEntity(this, out bool onFloor, 8);
+            tilemap.TileCollisionWithEntity(this, out CollisionSides collisionFlags, 8);
 
-            if (onFloor && !canJump)
+            if (collisionFlags.HasFlag(CollisionSides.Buttom) && !canJump)
             {
                 canJump = true;
             }

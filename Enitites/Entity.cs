@@ -112,38 +112,6 @@ namespace Pladi.Enitites
         public bool WithinRange(Vector2 target, float range)
             => Vector2.DistanceSquared(Center, target) <= range * range;
 
-        public bool IsTouchingLeft(Rectangle rect)
-        {
-            return Hitbox.Right > rect.Left &&
-                Hitbox.Left < rect.Left &&
-                Hitbox.Bottom > rect.Top &&
-                Hitbox.Top < rect.Bottom;
-        }
-
-        public bool IsTouchingRight(Rectangle rect)
-        {
-            return Hitbox.Left < rect.Right &&
-                Hitbox.Right > rect.Right &&
-                Hitbox.Bottom > rect.Top &&
-                Hitbox.Top < rect.Bottom;
-        }
-
-        public bool IsTouchingTop(Rectangle rect)
-        {
-            return Hitbox.Bottom > rect.Top &&
-                Hitbox.Top < rect.Top &&
-                Hitbox.Right > rect.Left &&
-                Hitbox.Left < rect.Right;
-        }
-
-        public bool IsTouchingBottom(Rectangle rect)
-        {
-            return Hitbox.Top < rect.Bottom &&
-                Hitbox.Bottom > rect.Bottom &&
-                Hitbox.Right > rect.Left &&
-                Hitbox.Left < rect.Right;
-        }
-
         // ...
 
         public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch) { }

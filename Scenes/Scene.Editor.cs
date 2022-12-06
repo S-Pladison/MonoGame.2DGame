@@ -96,14 +96,9 @@ namespace Pladi.Scenes
             var tileCoordsX = (int)(mousePosition.X / 32);
             var tileCoordsY = (int)(mousePosition.Y / 32);
 
-            /*if (tileCoordsX < 0 || tileCoordsX >= tilemap.Width || tileCoordsY < 0 || tileCoordsY >= tilemap.Height) return;
+            if (tileCoordsX < 0 || tileCoordsX >= tilemap.Width || tileCoordsY < 0 || tileCoordsY >= tilemap.Height) return;
 
-            tilemap.SetTile(tileCoordsX, tileCoordsY, new Tile() { Type = (ushort)currentTileType });*/
-
-            if (tilemap.IsTileCollision(new Vector2((int)(mousePosition.X / 32) * 32, (int)(mousePosition.Y / 32) * 32), 64, 64))
-            {
-                tilemap.SetTile(tileCoordsX, tileCoordsY, new Tile() { Type = (ushort)currentTileType });
-            }
+            tilemap.SetTile(tileCoordsX, tileCoordsY, new Tile() { Type = (ushort)currentTileType });
         }
 
         public override void OnResolutionChanged(int width, int height)
