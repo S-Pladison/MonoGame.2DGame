@@ -10,6 +10,7 @@ namespace Pladi.Tiles
         public Texture2D RenderedTexture => target;
         public int Width => x;
         public int Height => y;
+        public int RenderedTileCount { get; private set; }
 
         // ...
 
@@ -65,30 +66,34 @@ namespace Pladi.Tiles
             if (texture is null || target is null) return;
 
             var device = spriteBatch.GraphicsDevice;
+            var cameraBounds = camera.VisibleArea;
 
             device.SetRenderTarget(target);
             device.Clear(Color.Transparent);
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, camera.TransformMatrix);
 
-            var cameraBounds = camera.Viewport.Bounds;
-            var x4TileSizeX = tileSizeX * 4;
-            var x4TileSizeY = tileSizeY * 4;
-            var x8TileSizeX = tileSizeX * 8;
-            var x8TileSizeY = tileSizeY * 8;
+            RenderedTileCount = 0;
 
-            for (int i = 0; i < x; i++)
+            var scaledTileSizeX = tileSizeX * scale;
+            var scaledTileSizeY = tileSizeY * scale;
+
+            var offset = new Point((int)(cameraBounds.X / scaledTileSizeX), (int)(cameraBounds.Y / scaledTileSizeY));
+            var xMin = Math.Clamp(offset.X, 0, x);
+            var yMin = Math.Clamp(offset.Y, 0, y);
+            var xMax = (int)Math.Clamp((cameraBounds.X + cameraBounds.Width) / scaledTileSizeX + 1, 0, x);
+            var yMax = (int)Math.Clamp((cameraBounds.Y + cameraBounds.Height) / scaledTileSizeY + 1, 0, y);
+
+            for (int i = xMin; i < xMax; i++)
             {
-                for (int j = 0; j < y; j++)
+                for (int j = yMin; j < yMax; j++)
                 {
-                    var pos = new Vector2(i * tileSizeX, j * tileSizeY) * scale;
-                    var screenRect = new Rectangle((int)(pos.X - camera.Position.X + x4TileSizeX), (int)(pos.Y - camera.Position.Y + x4TileSizeY), tileSizeX - x8TileSizeX, tileSizeY - x8TileSizeY);
-
-                    if (!cameraBounds.Contains(screenRect)) continue;
-
+                    var position = new Vector2(i * scaledTileSizeX, j * scaledTileSizeY);
                     var tile = tiles[i, j];
-                    var rect = new Rectangle(tile.Type % textureFrameCountX * tileSizeX, tile.Type / textureFrameCountX * tileSizeY, tileSizeX, tileSizeY);
+                    var rectangle = new Rectangle(tile.Type % textureFrameCountX * tileSizeX, tile.Type / textureFrameCountX * tileSizeY, tileSizeX, tileSizeY);
 
-                    spriteBatch.Draw(texture, pos, rect, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
+                    spriteBatch.Draw(texture, position, rectangle, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
+
+                    RenderedTileCount++;
                 }
             }
 
@@ -150,9 +155,9 @@ namespace Pladi.Tiles
             var bottomTile = (int)((position.Y + height) / scaledTileSizeY) + 1;
 
             leftTile = Math.Clamp(leftTile, 0, x - 1);
-            rightTile = Math.Clamp(rightTile, 0, x - 1);
+            rightTile = Math.Clamp(rightTile, 0, x);
             topTile = Math.Clamp(topTile, 0, y - 1);
-            bottomTile = Math.Clamp(bottomTile, 0, y - 1);
+            bottomTile = Math.Clamp(bottomTile, 0, y);
 
             for (int i = leftTile; i < rightTile; i++)
             {

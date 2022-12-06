@@ -23,7 +23,7 @@ namespace Pladi
 
         private static readonly string configFilePath = AppDomain.CurrentDomain.BaseDirectory + "\\config.json";
         private static readonly int minScreenWidth = 800;
-        private static readonly int minScreenHeight = 720;
+        private static readonly int minScreenHeight = 500;
         private static bool windowMaximized;
         private static Main instance;
 
