@@ -5,6 +5,8 @@ namespace Pladi.Content
 {
     public static class TextureAssets
     {
+        public static Texture2D Collision { get; private set; }
+        public static Texture2D CollisionTilemap { get; private set; }
         public static Texture2D Cursor { get; private set; }
         public static Texture2D Pixel { get; private set; }
         public static Texture2D Player { get; private set; }
@@ -16,6 +18,8 @@ namespace Pladi.Content
         {
             Texture2D Load(string name) => content.Load<Texture2D>("Textures/" + name);
 
+            Collision = Load("Collision");
+            CollisionTilemap = Load("CollisionTilemap");
             Cursor = Load("Cursor");
             Pixel = Load("Pixel");
             Player = Load("Player");
@@ -28,6 +32,8 @@ namespace Pladi.Content
             Player = null;
             Pixel = null;
             Cursor = null;
+            CollisionTilemap = null;
+            Collision = null;
         }
     }
 }

@@ -13,6 +13,7 @@ namespace Pladi.Tiles
         public Texture2D RenderedTexture => target;
         public int Width => x;
         public int Height => y;
+        public float Scale => scale;
         public int RenderedTileCount { get; private set; }
 
         private float ScaledTileSizeX => tileSizeX * scale;
@@ -76,7 +77,7 @@ namespace Pladi.Tiles
             var device = spriteBatch.GraphicsDevice;
             device.SetRenderTarget(target);
             device.Clear(Color.Transparent);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, camera.TransformMatrix);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
 
             GetTilesCoordsIntersectsWithRect(camera.VisibleArea, out Point leftTop, out Point rightBottom);
 
@@ -84,11 +85,11 @@ namespace Pladi.Tiles
             {
                 for (int j = leftTop.Y; j <= rightBottom.Y; j++)
                 {
-                    var position = new Vector2(i * ScaledTileSizeX, j * ScaledTileSizeY);
+                    var position = new Vector2(i * tileSizeX, j * tileSizeY);
                     var tile = tiles[i, j];
                     var rectangle = new Rectangle(tile.Type % textureFrameCountX * tileSizeX, tile.Type / textureFrameCountX * tileSizeY, tileSizeX, tileSizeY);
 
-                    spriteBatch.Draw(texture, position, rectangle, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
+                    spriteBatch.Draw(texture, position, rectangle, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0);
 
                     RenderedTileCount++;
                 }
@@ -97,6 +98,9 @@ namespace Pladi.Tiles
             spriteBatch.End();
             device.SetRenderTarget(null);
         }
+
+        public void Draw(SpriteBatch spriteBatch, Vector2 position)
+            => spriteBatch.Draw(target, position, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
 
         public bool IsTileCollision(int positionX, int positionY, int width, int height)
             => IsTileCollision(new Rectangle(positionX, positionY, width, height));

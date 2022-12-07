@@ -19,6 +19,7 @@ namespace Pladi
         public static SpriteBatch SpriteBatch { get => instance.spriteBatch; }
         public static Random Rand { get; private set; }
         public static Point ScreenSize { get; private set; }
+        public static float GlobalTimeWrappedHourly { get; private set; }
 
         // ...
 
@@ -87,6 +88,7 @@ namespace Pladi
         protected override void Update(GameTime gameTime)
         {
             Window.Title = GetForm().WindowState.ToString() + " | " + graphics.PreferredBackBufferWidth + "x" + graphics.PreferredBackBufferHeight + " | " + windowMaximized;
+            GlobalTimeWrappedHourly = (float)(gameTime.TotalGameTime.TotalSeconds % 3600.0);
 
             try
             {

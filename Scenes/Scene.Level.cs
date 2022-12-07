@@ -147,11 +147,8 @@ namespace Pladi.Scenes
 
             device.Clear(Color.DarkGray);
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
-            spriteBatch.Draw(tilemap.RenderedTexture, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0);
-            spriteBatch.End();
-
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, camera.TransformMatrix);
+            tilemap.Draw(spriteBatch, Vector2.Zero);
             player.Draw(gameTime, spriteBatch);
             spriteBatch.End();
 
