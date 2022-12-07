@@ -5,15 +5,10 @@ namespace Pladi
 {
     public sealed class Camera
     {
+        public Vector2 Location { get; set; }
         public float Zoom { get; set; }
         public float Rotation { get; set; }
         public Viewport Viewport { get; set; }
-
-        public Vector2 Location
-        {
-            get => location;
-            set => location = new Vector2((int)value.X, (int)value.Y);
-        }
 
         public Matrix TransformMatrix
         {

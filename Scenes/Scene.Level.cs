@@ -21,7 +21,7 @@ namespace Pladi.Scenes
 
         // ...
 
-        private const float CameraSmoothTime = 0.1f;
+        private const float CameraSmoothTime = 0.5f;
 
         // ...
 
