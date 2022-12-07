@@ -10,7 +10,7 @@ namespace Pladi.Scenes
 {
     public class LevelScene : Scene
     {
-        private Tilemap tilemap;
+        private GameLevel level;
 
         private Camera camera;
         private Vector2 cameraSmoothVelocity;
@@ -21,7 +21,7 @@ namespace Pladi.Scenes
 
         // ...
 
-        private const float CameraSmoothTime = 0.33f;
+        private const float CameraSmoothTime = 0.1f;
 
         // ...
 
@@ -29,39 +29,26 @@ namespace Pladi.Scenes
         {
             grid = new Grid(32, 32);
 
-            try
+            /*try
             {
-                tilemap = Tilemap.LoadFromFile("Editor.pll");
+                /*tilemap = Tilemap.LoadFromFile("Editor.pll");
                 tilemap.SetTexture(TextureAssets.Tilemap, 8, 12);
             }
             catch
-            {
-                tilemap = new Tilemap(100, 10, 4f);
-                tilemap.SetTexture(TextureAssets.Tilemap, 8, 12);
+            {*/
 
-                tilemap.SetTile(0, 3, new Tile() { Type = 9 });
-                tilemap.SetTile(1, 3, new Tile() { Type = 9 });
-                for (int i = 5; i < 90; i++)
-                {
-                    tilemap.SetTile(i, 4, new Tile() { Type = 9 });
-                }
-                for (int i = 19; i < 90; i++)
-                {
-                    tilemap.SetTile(i, 3, new Tile() { Type = 10 });
-                }
-                for (int i = 20; i < 90; i++)
-                {
-                    tilemap.SetTile(i, 2, new Tile() { Type = 12 });
-                }
-                for (int i = 20; i < 90; i++)
-                {
-                    tilemap.SetTile(i, 1, new Tile() { Type = 12 });
-                }
-                for (int i = 20; i < 90; i++)
-                {
-                    tilemap.SetTile(i, 0, new Tile() { Type = 12 });
-                }
+            try
+            {
+                level = GameLevel.LoadFromFile("Editor.pgm");
+                level.BackTilemap.SetTexture(TextureAssets.Tilemap, 8, 12);
+                level.CollisionTilemap.SetTexture(TextureAssets.CollisionTilemap, 2, 1);
             }
+            catch
+            {
+                level = new GameLevel(100, 100, 4f);
+            }
+
+            /*}*/
 
             camera = new Camera(Main.SpriteBatch.GraphicsDevice.Viewport, 1f);
             player = new Player(TextureAssets.Player);
@@ -71,36 +58,13 @@ namespace Pladi.Scenes
         {
             try
             {
-                tilemap = Tilemap.LoadFromFile("Editor.pll");
-                tilemap.SetTexture(TextureAssets.Tilemap, 8, 12);
+                level = GameLevel.LoadFromFile("Editor.pgm");
+                level.BackTilemap.SetTexture(TextureAssets.Tilemap, 8, 12);
+                level.CollisionTilemap.SetTexture(TextureAssets.CollisionTilemap, 2, 1);
             }
             catch
             {
-                tilemap = new Tilemap(100, 10, 4f);
-                tilemap.SetTexture(TextureAssets.Tilemap, 8, 12);
-
-                tilemap.SetTile(0, 3, new Tile() { Type = 9 });
-                tilemap.SetTile(1, 3, new Tile() { Type = 9 });
-                for (int i = 5; i < 90; i++)
-                {
-                    tilemap.SetTile(i, 4, new Tile() { Type = 9 });
-                }
-                for (int i = 19; i < 90; i++)
-                {
-                    tilemap.SetTile(i, 3, new Tile() { Type = 10 });
-                }
-                for (int i = 20; i < 90; i++)
-                {
-                    tilemap.SetTile(i, 2, new Tile() { Type = 12 });
-                }
-                for (int i = 20; i < 90; i++)
-                {
-                    tilemap.SetTile(i, 1, new Tile() { Type = 12 });
-                }
-                for (int i = 20; i < 90; i++)
-                {
-                    tilemap.SetTile(i, 0, new Tile() { Type = 12 });
-                }
+                level = new GameLevel(100, 100, 4f);
             }
 
             player.Position = new Vector2(0, 0);
@@ -126,19 +90,19 @@ namespace Pladi.Scenes
                 camera.Zoom -= 0.5f * delta;
             }
 
-            player.Update(delta, tilemap);
+            player.Update(delta, level.CollisionTilemap);
             camera.Location = PladiUtils.SmoothDamp(camera.Location, player.Center, ref cameraSmoothVelocity, CameraSmoothTime, delta);
         }
 
         public override void OnResolutionChanged(int width, int height)
         {
             camera.Viewport = Main.SpriteBatch.GraphicsDevice.Viewport;
-            tilemap.RecreateRenderTarget(Main.SpriteBatch.GraphicsDevice, width, height);
+            level.RecreateRenderTargets(Main.SpriteBatch.GraphicsDevice, width, height);
         }
 
         public override void PreDraw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            tilemap.Render(spriteBatch, camera);
+            level.Render(spriteBatch, camera);
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -148,14 +112,8 @@ namespace Pladi.Scenes
             device.Clear(Color.DarkGray);
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, camera.TransformMatrix);
-            tilemap.Draw(spriteBatch, Vector2.Zero);
+            level.BackTilemap.Draw(spriteBatch, Vector2.Zero);
             player.Draw(gameTime, spriteBatch);
-            spriteBatch.End();
-
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
-            spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Rendered tiles: {tilemap.RenderedTileCount}", new Vector2(5, 5), Color.White, 0, Vector2.Zero, 1f, 2f);
-            spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Player position: {player.Position}", new Vector2(5, 20), Color.White, 0, Vector2.Zero, 1f, 2f);
-            spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Player velocity: {player.Velocity}", new Vector2(5, 35), Color.White, 0, Vector2.Zero, 1f, 2f);
             spriteBatch.End();
         }
     }

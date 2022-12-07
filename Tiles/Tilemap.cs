@@ -10,6 +10,8 @@ namespace Pladi.Tiles
 {
     public class Tilemap
     {
+        public Tile[,] Tiles => tiles;
+
         public Texture2D RenderedTexture => target;
         public int Width => x;
         public int Height => y;
@@ -118,7 +120,7 @@ namespace Pladi.Tiles
                 {
                     var tile = tiles[i, j];
 
-                    if (tile.IsAir) continue;
+                    if (!tile.IsCollidable) continue;
 
                     var tilePosition = new Vector2(i * ScaledTileSizeX, j * ScaledTileSizeY);
 
@@ -147,7 +149,7 @@ namespace Pladi.Tiles
                 {
                     ref var tile = ref tiles[i, j];
 
-                    if (tile.IsAir) continue;
+                    if (!tile.IsCollidable) continue;
 
                     var tileRectangle = new RectangleF(i * ScaledTileSizeX, j * ScaledTileSizeY, ScaledTileSizeX, ScaledTileSizeY);
                     var intersection = RectangleF.Intersect(entityRectangle, tileRectangle);
@@ -192,23 +194,6 @@ namespace Pladi.Tiles
             }
         }
 
-        public void SaveToFile(string path)
-        {
-            using var writer = new BinaryWriter(File.Create(path));
-
-            writer.Write(x);
-            writer.Write(y);
-            writer.Write(scale);
-
-            for (int i = 0; i < x; i++)
-            {
-                for (int j = 0; j < y; j++)
-                {
-                    writer.Write((int)tiles[i, j].Type);
-                }
-            }
-        }
-
         private void GetTilesCoordsIntersectsWithRect(Rectangle rectangle, out Point leftTop, out Point rightBottom)
         {
             var leftTile = (int)(rectangle.X / ScaledTileSizeX) - 1;
@@ -226,29 +211,6 @@ namespace Pladi.Tiles
 
             leftTop = new Point(leftTile, topTile);
             rightBottom = new Point(rightTile, bottomTile);
-        }
-
-        // ...
-
-        public static Tilemap LoadFromFile(string path)
-        {
-            using var reader = new BinaryReader(File.Open(path, FileMode.Open));
-
-            var x = reader.ReadInt32();
-            var y = reader.ReadInt32();
-            var scale = reader.ReadSingle();
-
-            var tilemap = new Tilemap(x, y, scale);
-
-            for (int i = 0; i < x; i++)
-            {
-                for (int j = 0; j < y; j++)
-                {
-                    tilemap.tiles[i, j].Type = (ushort)reader.ReadInt32();
-                }
-            }
-
-            return tilemap;
         }
     }
 }
