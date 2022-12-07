@@ -42,12 +42,9 @@ namespace Pladi.Enitites
             UpdateGravity();
             UpdatePosition(delta);
 
-            tilemap.TileCollisionWithEntity(this, out CollisionSides collisionFlags, 8);
+            tilemap.TileCollisionWithEntity(this, out CollisionSides collisionFlags);
 
-            if (collisionFlags.HasFlag(CollisionSides.Buttom) && !canJump)
-            {
-                canJump = true;
-            }
+            canJump = collisionFlags.HasFlag(CollisionSides.Buttom);
         }
 
         public void UpdateMoveVertical(InputManager input)

@@ -31,6 +31,9 @@ namespace Pladi.Utils
             return result;
         }
 
+        public static Rectangle ToRectangle(this RectangleF rectF)
+            => new((int)rectF.X, (int)rectF.Y, (int)rectF.Width, (int)rectF.Height);
+
         public static RectangleF ToRectangleF(this Rectangle rect)
             => new(rect.X, rect.Y, rect.Width, rect.Height);
     }

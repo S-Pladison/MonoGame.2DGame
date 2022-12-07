@@ -2,8 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Enitites;
 using Pladi.Enums;
+using Pladi.Utils;
 using System;
-using System.IO;
 using RectangleF = System.Drawing.RectangleF;
 
 namespace Pladi.Tiles
@@ -135,13 +135,13 @@ namespace Pladi.Tiles
             return false;
         }
 
-        public void TileCollisionWithEntity(Entity entity, out CollisionSides collisionFlags, float minIntersectionArea = 0f)
+        public void TileCollisionWithEntity(Entity entity, out CollisionSides collisionFlags, float minIntersectionArea = 0.01f)
         {
             collisionFlags = CollisionSides.None;
 
-            GetTilesCoordsIntersectsWithRect(entity.Hitbox, out Point leftTop, out Point rightBottom);
-
             var entityRectangle = new RectangleF(entity.Position.X, entity.Position.Y, entity.Width, entity.Height);
+
+            GetTilesCoordsIntersectsWithRect(entityRectangle, out Point leftTop, out Point rightBottom);
 
             for (int i = leftTop.X; i <= rightBottom.X; i++)
             {
@@ -159,47 +159,50 @@ namespace Pladi.Tiles
                     if (intersection.Width > intersection.Height)
                     {
                         // Top
-                        if (entity.Position.Y > tileRectangle.Y)
+                        if (entity.Velocity.Y < 0 && entity.Position.Y > tileRectangle.Y)
                         {
                             entity.Position.Y = tileRectangle.Y + tileRectangle.Height;
+                            entity.Velocity.Y = 0;
                             collisionFlags |= CollisionSides.Top;
                         }
                         // Buttom
-                        else
+                        else if (entity.Velocity.Y > 0 && entity.Position.Y < tileRectangle.Y)
                         {
                             entity.Position.Y = tileRectangle.Y - entity.Hitbox.Height;
+                            entity.Velocity.Y = 0;
                             collisionFlags |= CollisionSides.Buttom;
                         }
-
-                        entity.Velocity.Y = 0;
                     }
                     else
                     {
                         // Left
-                        if (entity.Position.X > tileRectangle.X)
+                        if (entity.Velocity.X < 0 && entity.Position.X > tileRectangle.X)
                         {
                             entity.Position.X = tileRectangle.X + tileRectangle.Width;
+                            entity.Velocity.X = 0;
                             collisionFlags |= CollisionSides.Left;
                         }
                         // Right
-                        else
+                        else if (entity.Velocity.X > 0 && entity.Position.X < tileRectangle.X)
                         {
                             entity.Position.X = tileRectangle.X - entity.Hitbox.Width;
+                            entity.Velocity.X = 0;
                             collisionFlags |= CollisionSides.Right;
                         }
-
-                        entity.Velocity.X = 0;
                     }
                 }
             }
         }
 
         private void GetTilesCoordsIntersectsWithRect(Rectangle rectangle, out Point leftTop, out Point rightBottom)
+            => GetTilesCoordsIntersectsWithRect(rectangle.ToRectangleF(), out leftTop, out rightBottom);
+
+        private void GetTilesCoordsIntersectsWithRect(RectangleF rectangleF, out Point leftTop, out Point rightBottom)
         {
-            var leftTile = (int)(rectangle.X / ScaledTileSizeX) - 1;
-            var rightTile = (int)((rectangle.X + rectangle.Width) / ScaledTileSizeX) + 1;
-            var topTile = (int)(rectangle.Y / ScaledTileSizeY) - 1;
-            var bottomTile = (int)((rectangle.Y + rectangle.Height) / ScaledTileSizeY) + 1;
+            var leftTile = (int)(rectangleF.X / ScaledTileSizeX) - 1;
+            var rightTile = (int)((rectangleF.X + rectangleF.Width) / ScaledTileSizeX) + 1;
+            var topTile = (int)(rectangleF.Y / ScaledTileSizeY) - 1;
+            var bottomTile = (int)((rectangleF.Y + rectangleF.Height) / ScaledTileSizeY) + 1;
 
             var xMax = x - 1;
             var yMax = y - 1;
