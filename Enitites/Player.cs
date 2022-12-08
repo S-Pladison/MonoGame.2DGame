@@ -14,7 +14,7 @@ namespace Pladi.Enitites
         public const float JumpSpeed = 32 * 10;
         public const float GravitySpeed = 32 * 0.3f;
         public const float MaxFallSpeed = 32 * 32;
-        public const float Scale = 4f;
+        public const float Scale = 2f;
 
         // ...
 

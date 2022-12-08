@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using RectangleF = System.Drawing.RectangleF;
 
 namespace Pladi.Utils
@@ -36,5 +37,35 @@ namespace Pladi.Utils
 
         public static RectangleF ToRectangleF(this Rectangle rect)
             => new(rect.X, rect.Y, rect.Width, rect.Height);
+
+        public static float GetHorizontalIntersectionDepth(this RectangleF rectA, RectangleF rectB)
+        {
+            float halfWidthA = rectA.Width / 2.0f;
+            float halfWidthB = rectB.Width / 2.0f;
+
+            float centerA = rectA.Left + halfWidthA;
+            float centerB = rectB.Left + halfWidthB;
+
+            float distanceX = centerA - centerB;
+            float minDistanceX = halfWidthA + halfWidthB;
+
+            if (Math.Abs(distanceX) >= minDistanceX) return 0f;
+            return distanceX > 0 ? minDistanceX - distanceX : -minDistanceX - distanceX;
+        }
+
+        public static float GetVerticalIntersectionDepth(this RectangleF rectA, RectangleF rectB)
+        {
+            float halfHeightA = rectA.Height / 2.0f;
+            float halfHeightB = rectB.Height / 2.0f;
+
+            float centerA = rectA.Top + halfHeightA;
+            float centerB = rectB.Top + halfHeightB;
+
+            float distanceY = centerA - centerB;
+            float minDistanceY = halfHeightA + halfHeightB;
+
+            if (Math.Abs(distanceY) >= minDistanceY) return 0f;
+            return distanceY > 0 ? minDistanceY - distanceY : -minDistanceY - distanceY;
+        }
     }
 }

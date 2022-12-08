@@ -135,12 +135,16 @@ namespace Pladi.Tiles
             return false;
         }
 
-        public void TileCollisionWithEntity(Entity entity, out CollisionSides collisionFlags, float minIntersectionArea = 0.01f)
+        public void TileCollisionWithEntity(Entity entity, out CollisionSides collisionFlags, float minIntersectionArea = 0.1f)
         {
             collisionFlags = CollisionSides.None;
 
-            var entityRectangle = new RectangleF(entity.Position.X, entity.Position.Y, entity.Width, entity.Height);
+            RectangleF entityRectangle;
 
+            void UpdateEntityRectangle()
+                => entityRectangle = new RectangleF(entity.Position.X, entity.Position.Y, entity.Width, entity.Height);
+
+            UpdateEntityRectangle();
             GetTilesCoordsIntersectsWithRect(entityRectangle, out Point leftTop, out Point rightBottom);
 
             for (int i = leftTop.X; i <= rightBottom.X; i++)
@@ -149,46 +153,49 @@ namespace Pladi.Tiles
                 {
                     ref var tile = ref tiles[i, j];
 
-                    if (!tile.IsCollidable) continue;
+                    if (!tile.IsCollidable)
+                    {
+                        continue;
+                    }
 
                     var tileRectangle = new RectangleF(i * ScaledTileSizeX, j * ScaledTileSizeY, ScaledTileSizeX, ScaledTileSizeY);
                     var intersection = RectangleF.Intersect(entityRectangle, tileRectangle);
 
-                    if (intersection.Width * intersection.Height < minIntersectionArea) continue;
-
-                    if (intersection.Width > intersection.Height)
+                    if (intersection.Width * intersection.Height < minIntersectionArea)
                     {
-                        // Top
-                        if (entity.Velocity.Y < 0 && entity.Position.Y > tileRectangle.Y)
-                        {
-                            entity.Position.Y = tileRectangle.Y + tileRectangle.Height;
-                            entity.Velocity.Y = 0;
-                            collisionFlags |= CollisionSides.Top;
-                        }
-                        // Buttom
-                        else if (entity.Velocity.Y > 0 && entity.Position.Y < tileRectangle.Y)
-                        {
-                            entity.Position.Y = tileRectangle.Y - entity.Hitbox.Height;
-                            entity.Velocity.Y = 0;
-                            collisionFlags |= CollisionSides.Buttom;
-                        }
+                        continue;
                     }
-                    else
+
+                    if (intersection.Width > intersection.Height && entity.Velocity.Y > 0 && entityRectangle.Y < tileRectangle.Y)
                     {
-                        // Left
-                        if (entity.Velocity.X < 0 && entity.Position.X > tileRectangle.X)
-                        {
-                            entity.Position.X = tileRectangle.X + tileRectangle.Width;
-                            entity.Velocity.X = 0;
-                            collisionFlags |= CollisionSides.Left;
-                        }
-                        // Right
-                        else if (entity.Velocity.X > 0 && entity.Position.X < tileRectangle.X)
-                        {
-                            entity.Position.X = tileRectangle.X - entity.Hitbox.Width;
-                            entity.Velocity.X = 0;
-                            collisionFlags |= CollisionSides.Right;
-                        }
+                        entity.Position.Y = tileRectangle.Y - entityRectangle.Height;
+                        entity.Velocity.Y = 0;
+                        collisionFlags |= CollisionSides.Buttom;
+
+                        UpdateEntityRectangle();
+                        continue;
+                    }
+
+                    // Left
+                    if (entity.Velocity.X < 0 && entityRectangle.X > tileRectangle.X)
+                    {
+                        entity.Position.X = tileRectangle.X + tileRectangle.Width;
+                        entity.Velocity.X = 0;
+                        collisionFlags |= CollisionSides.Left;
+
+                        UpdateEntityRectangle();
+                        continue;
+                    }
+
+                    // Right
+                    if (entity.Velocity.X > 0 && entityRectangle.X < tileRectangle.X)
+                    {
+                        entity.Position.X = tileRectangle.X - entityRectangle.Width;
+                        entity.Velocity.X = 0;
+                        collisionFlags |= CollisionSides.Right;
+
+                        UpdateEntityRectangle();
+                        continue;
                     }
                 }
             }

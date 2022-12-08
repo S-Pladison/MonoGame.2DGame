@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using RectangleF = System.Drawing.RectangleF;
 
 namespace Pladi.Enitites
 {
@@ -89,6 +90,17 @@ namespace Pladi.Enitites
             }
         }
 
+        public RectangleF HitboxF
+        {
+            get => new(Position.X, Position.Y, Width, Height);
+            set
+            {
+                Position = new Vector2((int)value.X, (int)value.Y);
+                Width = (int)value.Width;
+                Height = (int)value.Height;
+            }
+        }
+
         // ...
 
         public float AngleTo(Vector2 destination)
@@ -111,6 +123,7 @@ namespace Pladi.Enitites
 
         public bool WithinRange(Vector2 target, float range)
             => Vector2.DistanceSquared(Center, target) <= range * range;
+
 
         // ...
 

@@ -114,6 +114,18 @@ namespace Pladi.Scenes
             level.BackTilemap.Draw(spriteBatch, Vector2.Zero);
             player.Draw(gameTime, spriteBatch);
             spriteBatch.End();
+
+            DrawTempInfo(spriteBatch);
+        }
+
+        private void DrawTempInfo(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
+
+            spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Position: {player.Position}", new Vector2(5, 5), Color.White, 0, Vector2.Zero, 1f, 1f);
+            spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Velocity: {player.Velocity}", new Vector2(5, 20), Color.White, 0, Vector2.Zero, 1f, 1f);
+
+            spriteBatch.End();
         }
     }
 }
