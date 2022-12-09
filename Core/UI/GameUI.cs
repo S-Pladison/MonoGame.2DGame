@@ -43,6 +43,11 @@ namespace Pladi.Core.UI
             coreElement.Draw(gameTime, spriteBatch);
         }
 
+        public void OnResolutionChanged(int width, int height)
+        {
+            coreElement.ResolutionChanged(new UIResolutionChangeEvent(coreElement, width, height));
+        }
+
         private void UpdateMouseHover(UIElement mouseElement, Vector2 mousePosition)
         {
             if (mouseElement == lastElementHover) return;

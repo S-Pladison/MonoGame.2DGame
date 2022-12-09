@@ -8,6 +8,7 @@ namespace Pladi.Core.UI.Elements
 {
     public abstract class UIElement
     {
+        public delegate void ResolutionChangeEvent(UIResolutionChangeEvent evt, UIElement affectedElement);
         public delegate void MouseEvent(UIMouseEvent evt, UIElement listeningElement);
         public delegate void ElementEvent(UIElement affectedElement);
 
@@ -182,6 +183,16 @@ namespace Pladi.Core.UI.Elements
             OnMouseClick(evt, this);
         }
 
+        public void ResolutionChanged(UIResolutionChangeEvent evt)
+        {
+            OnResolutionChanged(evt, this);
+
+            foreach (var child in children)
+            {
+                child.ResolutionChanged(evt);
+            }
+        }
+
         public bool ContainsPoint(Vector2 point)
         {
             return BoundingRectangle.Contains(point);
@@ -209,9 +220,16 @@ namespace Pladi.Core.UI.Elements
 
         // ...
 
-        public event MouseEvent OnMouseOver = (evt, elem) => { };
-        public event MouseEvent OnMouseOut = (evt, elem) => { };
-        public event MouseEvent OnMouseClick = (evt, elem) => { };
-        public event ElementEvent OnPostUpdate = (elem) => { };
+        public event MouseEvent OnMouseOver = Null_MouseEvent;
+        public event MouseEvent OnMouseOut = Null_MouseEvent;
+        public event MouseEvent OnMouseClick = Null_MouseEvent;
+        public event ElementEvent OnPostUpdate = Null_ElementEvent;
+        public event ResolutionChangeEvent OnResolutionChanged = Null_ResolutionChangeEvent;
+
+        // ...
+
+        private static readonly MouseEvent Null_MouseEvent = (evt, elem) => { };
+        private static readonly ElementEvent Null_ElementEvent = (elem) => { };
+        private static readonly ResolutionChangeEvent Null_ResolutionChangeEvent = (evt, elem) => { };
     }
 }

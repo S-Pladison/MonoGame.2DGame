@@ -170,6 +170,8 @@ namespace Pladi
             {
                 File.Delete(configFilePath);
             }
+
+            ScreenSize = new Point(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
         }
 
         private void DrawMouse()

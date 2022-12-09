@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using Pladi.Content;
 using Pladi.Core.UI;
 using Pladi.Core.UI.Elements;
+using Pladi.Utilities.DataStructures;
 
 namespace Pladi.Scenes
 {
@@ -14,38 +15,49 @@ namespace Pladi.Scenes
 
         // ...
 
-        public override void Init()
+        public override void OnActivate()
         {
             coreUIElement = new CoreUIElement();
             userInterface = new GameUI(coreUIElement);
 
+            var panel = new PanelUIElement(new Color(0, 0, 0, 90));
+            panel.BoundingRectangle = new RectangleF(5, 5, 500, Main.ScreenSize.Y - 10);
+            panel.OnResolutionChanged += (evt, elem) => elem.BoundingRectangle = new RectangleF(5, 5, 500, evt.Height - 10);
+
+            coreUIElement.Append(panel);
+
             var button = new TextUIElement(FontAssets.DefaultMedium, "Start", Color.White);
-            button.Position = new Vector2(10, 10);
+            button.Position = new Vector2(15, 10);
             button.OnMouseClick += (evt, elem) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Game);
             button.OnPostUpdate += (elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
 
-            coreUIElement.Append(button);
+            panel.Append(button);
 
             button = new TextUIElement(FontAssets.DefaultMedium, "Editor", Color.White);
-            button.Position = new Vector2(10, 40);
+            button.Position = new Vector2(15, 40);
             button.OnMouseClick += (evt, elem) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Editor);
             button.OnPostUpdate += (elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
 
-            coreUIElement.Append(button);
+            panel.Append(button);
 
             button = new TextUIElement(FontAssets.DefaultMedium, "Settings", Color.White);
-            button.Position = new Vector2(10, 70);
+            button.Position = new Vector2(15, 70);
             button.OnMouseClick += (evt, elem) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Settings);
             button.OnPostUpdate += (elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
 
-            coreUIElement.Append(button);
+            panel.Append(button);
 
             button = new TextUIElement(FontAssets.DefaultMedium, "Exit", Color.White);
-            button.Position = new Vector2(10, 100);
+            button.Position = new Vector2(15, 100);
             button.OnMouseClick += (evt, elem) => Main.ExitFromGame();
             button.OnPostUpdate += (elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
 
-            coreUIElement.Append(button);
+            panel.Append(button);
+        }
+
+        public override void OnResolutionChanged(int width, int height)
+        {
+            userInterface?.OnResolutionChanged(width, height);
         }
 
         public override void Update(GameTime gameTime)
