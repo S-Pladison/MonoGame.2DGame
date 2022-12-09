@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Pladi.Utils
+namespace Pladi.Utilities
 {
     public static partial class PladiUtils
     {

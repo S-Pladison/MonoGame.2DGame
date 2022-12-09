@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Pladi.Content;
 using Pladi.Tiles;
-using Pladi.Utils;
+using Pladi.Utilities;
 using System;
 
 namespace Pladi.Scenes

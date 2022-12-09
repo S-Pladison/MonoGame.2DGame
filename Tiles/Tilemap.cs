@@ -2,9 +2,9 @@
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Enitites;
 using Pladi.Enums;
-using Pladi.Utils;
+using Pladi.Utilities;
+using Pladi.Utilities.DataStructures;
 using System;
-using RectangleF = System.Drawing.RectangleF;
 
 namespace Pladi.Tiles
 {

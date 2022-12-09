@@ -29,8 +29,6 @@ namespace Pladi
             );
         }
 
-        private Vector2 location;
-
         // ...
 
         public Camera(Viewport viewport, float zoom = 1f, float rotation = 0f)

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Pladi.Utilities.DataStructures;
 using System;
-using RectangleF = System.Drawing.RectangleF;
 
-namespace Pladi.Utils
+namespace Pladi.Utilities
 {
     public static partial class PladiUtils
     {

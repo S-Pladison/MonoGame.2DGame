@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Pladi.Utils;
+using Pladi.Utilities;
 
 namespace Pladi.UI
 {
