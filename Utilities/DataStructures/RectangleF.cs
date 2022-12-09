@@ -99,9 +99,7 @@ namespace Pladi.Utilities.DataStructures
         }
 
         public static bool operator !=(RectangleF a, RectangleF b)
-        {
-            return !(a == b);
-        }
+            => !(a == b);
 
         public bool Contains(int x, int y)
         {
@@ -115,7 +113,7 @@ namespace Pladi.Utilities.DataStructures
 
         public bool Contains(float x, float y)
         {
-            if ((float)X <= x && x < (float)(X + Width) && (float)Y <= y)
+            if (X <= x && x < (float)(X + Width) && Y <= y)
             {
                 return y < (float)(Y + Height);
             }
@@ -134,9 +132,7 @@ namespace Pladi.Utilities.DataStructures
         }
 
         public void Contains(ref Vector2 value, out bool result)
-        {
-            result = (X <= value.X && value.X < X + Width && Y <= value.Y && value.Y < Y + Height);
-        }
+            => result = (X <= value.X && value.X < X + Width && Y <= value.Y && value.Y < Y + Height);
 
         public bool Contains(RectangleF value)
         {
@@ -149,9 +145,7 @@ namespace Pladi.Utilities.DataStructures
         }
 
         public void Contains(ref RectangleF value, out bool result)
-        {
-            result = (X <= value.X && value.X + value.Width <= X + Width && Y <= value.Y && value.Y + value.Height <= Y + Height);
-        }
+            => result = (X <= value.X && value.X + value.Width <= X + Width && Y <= value.Y && value.Y + value.Height <= Y + Height);
 
         public bool IsInside(RectangleF value)
             => value.Contains(this);
@@ -167,14 +161,10 @@ namespace Pladi.Utilities.DataStructures
         }
 
         public bool Equals(RectangleF other)
-        {
-            return this == other;
-        }
+            => this == other;
 
         public override int GetHashCode()
-        {
-            return (((17 * 23 + X.GetHashCode()) * 23 + Y.GetHashCode()) * 23 + Width.GetHashCode()) * 23 + Height.GetHashCode();
-        }
+            => (((17 * 23 + X.GetHashCode()) * 23 + Y.GetHashCode()) * 23 + Width.GetHashCode()) * 23 + Height.GetHashCode();
 
         public void Inflate(float horizontalAmount, float verticalAmount)
         {
@@ -195,9 +185,24 @@ namespace Pladi.Utilities.DataStructures
         }
 
         public void Intersects(ref RectangleF value, out bool result)
+            => result = (value.Left < Right && Left < value.Right && value.Top < Bottom && Top < value.Bottom);
+
+        public void Offset(float offsetX, float offsetY)
         {
-            result = (value.Left < Right && Left < value.Right && value.Top < Bottom && Top < value.Bottom);
+            X += offsetX;
+            Y += offsetY;
         }
+
+        public void Offset(Vector2 amount)
+        {
+            X += amount.X;
+            Y += amount.Y;
+        }
+
+        public override string ToString()
+            => "{X:" + X + " Y:" + Y + " Width:" + Width + " Height:" + Height + "}";
+
+        // ...
 
         public static RectangleF Intersect(RectangleF value1, RectangleF value2)
         {
@@ -219,23 +224,6 @@ namespace Pladi.Utilities.DataStructures
             {
                 result = new RectangleF(0, 0, 0, 0);
             }
-        }
-
-        public void Offset(float offsetX, float offsetY)
-        {
-            X += offsetX;
-            Y += offsetY;
-        }
-
-        public void Offset(Vector2 amount)
-        {
-            X += amount.X;
-            Y += amount.Y;
-        }
-
-        public override string ToString()
-        {
-            return "{X:" + X + " Y:" + Y + " Width:" + Width + " Height:" + Height + "}";
         }
 
         public static RectangleF Union(RectangleF value1, RectangleF value2)
