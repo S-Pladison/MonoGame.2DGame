@@ -1,19 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Pladi.Core.UI.Elements;
 
-namespace Pladi.UI
+namespace Pladi.Core.UI.Events
 {
-    public class UIEvent
-    {
-        public readonly UIElement Target;
-
-        // ...
-
-        public UIEvent(UIElement target)
-        {
-            Target = target;
-        }
-    }
-
     public class UIMouseEvent : UIEvent
     {
         public readonly Vector2 MousePosition;

@@ -1,7 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Pladi.Core.UI.Events;
+using Pladi.Utilities.DataStructures;
+using System.Collections.Generic;
 
-namespace Pladi.UI
+namespace Pladi.Core.UI.Elements
 {
     public abstract class UIElement
     {
@@ -14,7 +17,12 @@ namespace Pladi.UI
         public int Width;
         public int Height;
 
+        protected List<UIElement> children;
+
         // ...
+
+        public IReadOnlyCollection<UIElement> Children => children;
+        public UIElement Parent { get; private set; }
 
         public Vector2 Center
         {
@@ -80,14 +88,14 @@ namespace Pladi.UI
             }
         }
 
-        public Rectangle Hitbox
+        public RectangleF BoundingRectangle
         {
-            get => new((int)Position.X, (int)Position.Y, Width, Height);
+            get => new(Position.X, Position.Y, Width, Height);
             set
             {
-                Position = new Vector2(value.X, value.Y);
-                Width = value.Width;
-                Height = value.Height;
+                Position = new Vector2((int)value.X, (int)value.Y);
+                Width = (int)value.Width;
+                Height = (int)value.Height;
             }
         }
 
@@ -95,24 +103,78 @@ namespace Pladi.UI
 
         // ...
 
+        public UIElement()
+        {
+            children = new();
+        }
+
+        // ...
+
         public void Update(GameTime gameTime)
         {
             OnUpdate(gameTime);
+
             OnPostUpdate(this);
+
+            foreach (var child in children)
+            {
+                child.Update(gameTime);
+            }
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             OnDraw(gameTime, spriteBatch);
+
+            foreach (var child in children)
+            {
+                child.Draw(gameTime, spriteBatch);
+            }
         }
 
         protected virtual void OnUpdate(GameTime gameTime) { }
         protected virtual void OnDraw(GameTime gameTime, SpriteBatch spriteBatch) { }
 
+        public void Append(UIElement element)
+        {
+            element.Remove();
+            element.Parent = this;
+            children.Add(element);
+        }
+
+        public void Remove()
+        {
+            if (Parent is null) return;
+            
+            Parent.RemoveChild(this);
+        }
+
+        public void RemoveChild(UIElement child)
+        {
+            children.Remove(child);
+            child.Parent = null;
+        }
+
+        public void RemoveAllChildren()
+        {
+            foreach (var child in children)
+            {
+                child.Parent = null;
+            }
+
+            children.Clear();
+        }
+
         public void MouseOver(UIMouseEvent evt)
         {
             IsMouseHovering = true;
             OnMouseOver(evt, this);
+        }
+
+        public void MouseOut(UIMouseEvent evt)
+        {
+            IsMouseHovering = false;
+            OnMouseOut(evt, this);
         }
 
         public void Click(UIMouseEvent evt)
@@ -122,20 +184,33 @@ namespace Pladi.UI
 
         public bool ContainsPoint(Vector2 point)
         {
-            var rectangle = Hitbox;
+            return BoundingRectangle.Contains(point);
+        }
 
-            if (point.X > rectangle.X
-                && point.Y > rectangle.Y
-                && point.X < rectangle.X + rectangle.Width)
+        public UIElement GetElementAt(Vector2 position)
+        {
+            UIElement uIElement = null;
 
-                return point.Y < rectangle.Y + rectangle.Height;
+            for (int i = children.Count - 1; i >= 0; i--)
+            {
+                UIElement uIElement2 = children[i];
 
-            return false;
+                if (uIElement2.ContainsPoint(position))
+                {
+                    uIElement = uIElement2;
+                    break;
+                }
+            }
+
+            if (uIElement != null) return uIElement.GetElementAt(position);
+            if (!ContainsPoint(position)) return null;
+            return this;
         }
 
         // ...
 
         public event MouseEvent OnMouseOver = (evt, elem) => { };
+        public event MouseEvent OnMouseOut = (evt, elem) => { };
         public event MouseEvent OnMouseClick = (evt, elem) => { };
         public event ElementEvent OnPostUpdate = (elem) => { };
     }

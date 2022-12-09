@@ -1,10 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Pladi.Content;
 using Pladi.Tiles;
 using Pladi.Utilities;
+using Pladi.Core.Input;
 using System;
+using Pladi.Utilities.Enums;
+using Microsoft.Xna.Framework.Input;
 
 namespace Pladi.Scenes
 {
@@ -99,7 +101,7 @@ namespace Pladi.Scenes
                 camera.Zoom += Math.Sign(scroll) * 5f * delta;
             }
 
-            if (!input.JustPressed(Input.MouseInputTypes.LeftButton)) return;
+            if (!input.JustPressed(MouseInputTypes.LeftButton)) return;
 
             var mousePosition = camera.ScreenToWorldSpace(Main.InputManager.GetMousePosition());
             var tileCoordsX = (int)(mousePosition.X / 32);

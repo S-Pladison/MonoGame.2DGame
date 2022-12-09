@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Utilities;
 
-namespace Pladi.UI
+namespace Pladi.Core.UI.Elements
 {
     public class TextUIElement : UIElement
     {

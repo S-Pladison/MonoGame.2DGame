@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Content;
-using Pladi.Input;
+using Pladi.Core.Input;
 using Pladi.Scenes;
 using System;
 using System.IO;

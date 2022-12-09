@@ -1,7 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Pladi.Utilities.Enums;
 
-namespace Pladi.Input
+namespace Pladi.Core.Input
 {
     public class InputManager
     {

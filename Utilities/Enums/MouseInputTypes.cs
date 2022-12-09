@@ -1,4 +1,4 @@
-﻿namespace Pladi.Input
+﻿namespace Pladi.Utilities.Enums
 {
     public enum MouseInputTypes
     {

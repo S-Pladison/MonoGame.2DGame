@@ -2,33 +2,36 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Pladi.Content;
-using Pladi.UI;
+using Pladi.Core.UI;
+using Pladi.Core.UI.Elements;
 
 namespace Pladi.Scenes
 {
     public class SettingsScene : Scene
     {
-        private UserInterface userInterface;
+        private GameUI userInterface;
+        private CoreUIElement coreUIElement;
 
         // ...
 
         public override void Init()
         {
-            userInterface = new UserInterface();
+            coreUIElement = new CoreUIElement();
+            userInterface = new GameUI(coreUIElement);
 
             var button = new TextUIElement(FontAssets.DefaultMedium, "Fullscreen", Color.White);
             button.Position = new Vector2(10, 10);
             button.OnMouseClick += (evt, elem) => Main.ToggleFullScreen();
-            button.OnPostUpdate += (elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
+            button.OnMouseOver += (evt, elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
 
-            userInterface.AddElement(button);
+            coreUIElement.Append(button);
 
             button = new TextUIElement(FontAssets.DefaultMedium, "Return", Color.White);
             button.Position = new Vector2(10, 40);
             button.OnMouseClick += (evt, elem) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Menu);
             button.OnPostUpdate += (elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
 
-            userInterface.AddElement(button);
+            coreUIElement.Append(button);
 
             var screenResolutions = Main.GetSupportedScreenResolutions();
 
@@ -41,7 +44,7 @@ namespace Pladi.Scenes
                 button.OnMouseClick += (evt, elem) => Main.SetDisplayMode(size.X, size.Y);
                 button.OnPostUpdate += (elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
 
-                userInterface.AddElement(button);
+                coreUIElement.Append(button);
             }
         }
 
