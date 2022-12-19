@@ -14,94 +14,20 @@ namespace Pladi.Core.UI.Elements
 
         // ...
 
-        public Vector2 Position;
-        public int Width;
-        public int Height;
         public bool ClippingOutsideRectangle;
 
         protected List<UIElement> children;
+        protected Vector2 position;
+        protected float width;
+        protected float height;
+        protected RectangleF boundingRectangle;
 
         // ...
 
-        public IReadOnlyCollection<UIElement> Children => children;
+        public IReadOnlyCollection<UIElement> Children { get => children; }
         public UIElement Parent { get; private set; }
-
-        public Vector2 Center
-        {
-            get => new(Position.X + (float)(Width / 2), Position.Y + (float)(Height / 2));
-            set => Position = new Vector2(value.X - (float)(Width / 2), value.Y - (float)(Height / 2));
-        }
-
-        public Vector2 Left
-        {
-            get => new(Position.X, Position.Y + (float)(Height / 2));
-            set => Position = new Vector2(value.X, value.Y - (float)(Height / 2));
-        }
-
-        public Vector2 Right
-        {
-            get => new(Position.X + (float)Width, Position.Y + (float)(Height / 2));
-            set => Position = new Vector2(value.X - (float)Width, value.Y - (float)(Height / 2));
-        }
-
-        public Vector2 Top
-        {
-            get => new(Position.X + (float)(Width / 2), Position.Y);
-            set => Position = new Vector2(value.X - (float)(Width / 2), value.Y);
-        }
-
-        public Vector2 TopLeft
-        {
-            get => Position;
-            set => Position = value;
-        }
-
-        public Vector2 TopRight
-        {
-            get => new(Position.X + (float)Width, Position.Y);
-            set => Position = new Vector2(value.X - (float)Width, value.Y);
-        }
-
-        public Vector2 Bottom
-        {
-            get => new(Position.X + (float)(Width / 2), Position.Y + (float)Height);
-            set => Position = new Vector2(value.X - (float)(Width / 2), value.Y - (float)Height);
-        }
-
-        public Vector2 BottomLeft
-        {
-            get => new(Position.X, Position.Y + (float)Height);
-            set => Position = new Vector2(value.X, value.Y - (float)Height);
-        }
-
-        public Vector2 BottomRight
-        {
-            get => new(Position.X + (float)Width, Position.Y + (float)Height);
-            set => Position = new Vector2(value.X - (float)Width, value.Y - (float)Height);
-        }
-
-        public Vector2 Size
-        {
-            get => new(Width, Height);
-            set
-            {
-                Width = (int)value.X;
-                Height = (int)value.Y;
-            }
-        }
-
-        public RectangleF BoundingRectangle
-        {
-            get => new(Position.X, Position.Y, Width, Height);
-            set
-            {
-                Position = new Vector2((int)value.X, (int)value.Y);
-                Width = (int)value.Width;
-                Height = (int)value.Height;
-            }
-        }
-
-        public bool IsMouseHovering { get; set; }
+        public Vector2 Size { get => new(width, height); }
+        public bool IsMouseHovering { get; protected set; }
 
         // ...
 
@@ -111,6 +37,28 @@ namespace Pladi.Core.UI.Elements
         }
 
         // ...
+
+        public void SetPosition(float x, float y)
+        {
+            position.X = x;
+            position.Y = y;
+
+            Recalculate();
+        }
+
+        public void SetRectangle(RectangleF rectangle)
+            => SetRectangle(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+
+        public void SetRectangle(float x, float y, float width, float height)
+        {
+            position.X = x;
+            position.Y = y;
+
+            this.width = width;
+            this.height = height;
+
+            Recalculate();
+        }
 
         public void Update(GameTime gameTime)
         {
@@ -173,6 +121,7 @@ namespace Pladi.Core.UI.Elements
         {
             element.Remove();
             element.Parent = this;
+            element.Recalculate();
             children.Add(element);
         }
 
@@ -199,27 +148,27 @@ namespace Pladi.Core.UI.Elements
             children.Clear();
         }
 
-        public void MouseOver(UIMouseEvent evt)
+        public virtual void MouseOver(UIMouseEvent evt)
         {
             IsMouseHovering = true;
             OnMouseOver(evt, this);
             Parent?.MouseOver(evt);
         }
 
-        public void MouseOut(UIMouseEvent evt)
+        public virtual void MouseOut(UIMouseEvent evt)
         {
             IsMouseHovering = false;
             OnMouseOut(evt, this);
             Parent?.MouseOut(evt);
         }
 
-        public void Click(UIMouseEvent evt)
+        public virtual void Click(UIMouseEvent evt)
         {
             OnMouseClick(evt, this);
             Parent?.Click(evt);
         }
 
-        public void ResolutionChanged(UIResolutionChangeEvent evt)
+        public virtual void ResolutionChanged(UIResolutionChangeEvent evt)
         {
             OnResolutionChanged(evt, this);
 
@@ -229,8 +178,23 @@ namespace Pladi.Core.UI.Elements
             }
         }
 
-        public bool ContainsPoint(Vector2 point)
-            => BoundingRectangle.Contains(point);
+        public virtual void Recalculate()
+        {
+            var parrentPosition = Parent?.boundingRectangle.Location ?? Vector2.Zero;
+
+            boundingRectangle.X = position.X + parrentPosition.X;
+            boundingRectangle.Y = position.Y + parrentPosition.Y;
+            boundingRectangle.Width = width;
+            boundingRectangle.Height = height;
+
+            foreach (var child in children)
+            {
+                child.Recalculate();
+            }
+        }
+
+        public virtual bool ContainsPoint(Vector2 point)
+            => boundingRectangle.Contains(point);
 
         public UIElement GetElementAt(Vector2 position)
         {
@@ -254,8 +218,8 @@ namespace Pladi.Core.UI.Elements
 
         private Rectangle GetClippingRectangle(SpriteBatchData spriteBatchData, Rectangle scissorRectangle)
         {
-            var vector = new Vector2(Position.X, Position.Y);
-            var position = new Vector2(Width, Height) + vector;
+            var vector = this.position;
+            var position = new Vector2(this.width, this.height) + vector;
             var matrix = spriteBatchData.GetTransformMatrixOrIdentity();
 
             vector = Vector2.Transform(vector, matrix);

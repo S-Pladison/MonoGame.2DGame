@@ -7,7 +7,7 @@ namespace Pladi.Core.UI.Elements
 {
     public class PanelUIElement : UIElement
     {
-        private Color backgroundColor;
+        protected Color backgroundColor;
 
         // ...
 
@@ -20,7 +20,7 @@ namespace Pladi.Core.UI.Elements
 
         protected override void DrawThis(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(TextureAssets.Pixel, BoundingRectangle.ToRectangle(), backgroundColor);
+            spriteBatch.Draw(TextureAssets.Pixel, boundingRectangle.ToRectangle(), backgroundColor);
         }
     }
 }
