@@ -53,6 +53,7 @@ namespace Pladi.Scenes
             menuPanel.SetRectangle(20, 0, 200, Main.ScreenSize.Y);
             menuPanel.SetBackgroundColor(new Color(0, 0, 0, 90));
             menuPanel.AddButtons(
+                ("Reset to Defaults", (_, _) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Game)),
                 ("Apply", (_, _) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Game)),
                 ("Return", (_, _) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Menu))
             );
@@ -63,16 +64,34 @@ namespace Pladi.Scenes
             settingsPanel.SetRectangle(240, 0, Main.ScreenSize.X - 260, Main.ScreenSize.Y);
             userInterface.Append(settingsPanel);
 
+            var line = new PanelUIElement(new Color(0, 0, 0, 40));
+            line.OnResolutionChanged += (evt, elem) => elem.SetRectangle(0, 0, evt.Width - 260, 40);
+            line.SetRectangle(0, 0, Main.ScreenSize.X - 260, 40);
+            settingsPanel.Append(line);
+
             var text = new TextUIElement(FontAssets.DefaultMedium, "Video Settings", Color.White);
             text.SetPosition(10, 10);
             settingsPanel.Append(text);
 
-            text = new TextUIElement(FontAssets.DefaultMedium, "Fullscreen", new Color(210, 210, 210), 0.8f);
+            text = new TextUIElement(FontAssets.DefaultMedium, "Fullscreen", Color.Gray, 0.8f);
             text.SetPosition(10, 50);
             settingsPanel.Append(text);
 
-            text = new TextUIElement(FontAssets.DefaultMedium, "Resolution", new Color(210, 210, 210), 0.8f);
+            text = new TextUIElement(FontAssets.DefaultMedium, "Resolution", Color.Gray, 0.8f);
             text.SetPosition(10, 80);
+            settingsPanel.Append(text);
+
+            line = new PanelUIElement(new Color(0, 0, 0, 40));
+            line.OnResolutionChanged += (evt, elem) => elem.SetRectangle(0, 110, evt.Width - 260, 40);
+            line.SetRectangle(0, 110, Main.ScreenSize.X - 260, 40);
+            settingsPanel.Append(line);
+
+            text = new TextUIElement(FontAssets.DefaultMedium, "Audio Settings", Color.White);
+            text.SetPosition(10, 120);
+            settingsPanel.Append(text);
+
+            text = new TextUIElement(FontAssets.DefaultMedium, "Volume", Color.Gray, 0.8f);
+            text.SetPosition(10, 160);
             settingsPanel.Append(text);
         }
 
@@ -93,7 +112,7 @@ namespace Pladi.Scenes
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.GraphicsDevice.Clear(Color.Gray);
+            spriteBatch.GraphicsDevice.Clear(new Color(50, 80, 80));
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
             userInterface.Draw(gameTime, spriteBatch);
