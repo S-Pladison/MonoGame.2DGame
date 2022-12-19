@@ -1,12 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Pladi.Content;
 using Pladi.Tiles;
 using Pladi.Utilities;
-using Pladi.Core.Input;
-using System;
 using Pladi.Utilities.Enums;
-using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace Pladi.Scenes
 {

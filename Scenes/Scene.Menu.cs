@@ -10,21 +10,20 @@ namespace Pladi.Scenes
 {
     public class MenuScene : Scene
     {
-        private GameUI userInterface;
-        private CoreUIElement coreUIElement;
+        private GraphicalUI userInterface;
 
         // ...
 
         public override void OnActivate()
         {
-            coreUIElement = new CoreUIElement();
-            userInterface = new GameUI(coreUIElement);
+            userInterface = new GraphicalUI();
 
             var panel = new PanelUIElement(new Color(0, 0, 0, 90));
+            panel.ClippingOutsideRectangle = true;
             panel.BoundingRectangle = new RectangleF(5, 5, 500, Main.ScreenSize.Y - 10);
             panel.OnResolutionChanged += (evt, elem) => elem.BoundingRectangle = new RectangleF(5, 5, 500, evt.Height - 10);
 
-            coreUIElement.Append(panel);
+            userInterface.CoreElement.Append(panel);
 
             var button = new TextUIElement(FontAssets.DefaultMedium, "Start", Color.White);
             button.Position = new Vector2(15, 10);

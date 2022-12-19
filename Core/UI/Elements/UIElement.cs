@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Pladi.Core.UI.Elements
 {
-    public abstract class UIElement
+    public class UIElement
     {
         public delegate void ResolutionChangeEvent(UIResolutionChangeEvent evt, UIElement affectedElement);
         public delegate void MouseEvent(UIMouseEvent evt, UIElement listeningElement);
@@ -17,6 +17,7 @@ namespace Pladi.Core.UI.Elements
         public Vector2 Position;
         public int Width;
         public int Height;
+        public bool ClippingOutsideRectangle;
 
         protected List<UIElement> children;
 
@@ -113,10 +114,17 @@ namespace Pladi.Core.UI.Elements
 
         public void Update(GameTime gameTime)
         {
-            OnUpdate(gameTime);
+            UpdateThis(gameTime);
 
             OnPostUpdate(this);
 
+            UpdateChildren(gameTime);
+        }
+
+        protected virtual void UpdateThis(GameTime gameTime) { }
+
+        protected virtual void UpdateChildren(GameTime gameTime)
+        {
             foreach (var child in children)
             {
                 child.Update(gameTime);
@@ -125,16 +133,41 @@ namespace Pladi.Core.UI.Elements
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            OnDraw(gameTime, spriteBatch);
+            DrawThis(gameTime, spriteBatch);
 
+            if (!ClippingOutsideRectangle)
+            {
+                DrawChildren(gameTime, spriteBatch);
+                return;
+            }
+
+            spriteBatch.End();
+
+            var spriteBatchData = new SpriteBatchData(spriteBatch);
+            var rasterizerState = spriteBatchData.RasterizerState;
+            var scissorRectangle = spriteBatch.GraphicsDevice.ScissorRectangle;
+
+            spriteBatchData.RasterizerState = ClippingRasterizerState;
+            spriteBatch.GraphicsDevice.ScissorRectangle = Rectangle.Intersect(GetClippingRectangle(spriteBatchData, scissorRectangle), scissorRectangle);
+            spriteBatchData.Begin(spriteBatch);
+
+            DrawChildren(gameTime, spriteBatch);
+
+            spriteBatch.End();
+            spriteBatchData.RasterizerState = rasterizerState;
+            spriteBatch.GraphicsDevice.ScissorRectangle = scissorRectangle;
+            spriteBatchData.Begin(spriteBatch);
+        }
+
+        protected virtual void DrawThis(GameTime gameTime, SpriteBatch spriteBatch) { }
+
+        protected virtual void DrawChildren(GameTime gameTime, SpriteBatch spriteBatch)
+        {
             foreach (var child in children)
             {
                 child.Draw(gameTime, spriteBatch);
             }
         }
-
-        protected virtual void OnUpdate(GameTime gameTime) { }
-        protected virtual void OnDraw(GameTime gameTime, SpriteBatch spriteBatch) { }
 
         public void Append(UIElement element)
         {
@@ -146,7 +179,7 @@ namespace Pladi.Core.UI.Elements
         public void Remove()
         {
             if (Parent is null) return;
-            
+
             Parent.RemoveChild(this);
         }
 
@@ -170,17 +203,20 @@ namespace Pladi.Core.UI.Elements
         {
             IsMouseHovering = true;
             OnMouseOver(evt, this);
+            Parent?.MouseOver(evt);
         }
 
         public void MouseOut(UIMouseEvent evt)
         {
             IsMouseHovering = false;
             OnMouseOut(evt, this);
+            Parent?.MouseOut(evt);
         }
 
         public void Click(UIMouseEvent evt)
         {
             OnMouseClick(evt, this);
+            Parent?.Click(evt);
         }
 
         public void ResolutionChanged(UIResolutionChangeEvent evt)
@@ -194,9 +230,7 @@ namespace Pladi.Core.UI.Elements
         }
 
         public bool ContainsPoint(Vector2 point)
-        {
-            return BoundingRectangle.Contains(point);
-        }
+            => BoundingRectangle.Contains(point);
 
         public UIElement GetElementAt(Vector2 position)
         {
@@ -218,6 +252,24 @@ namespace Pladi.Core.UI.Elements
             return this;
         }
 
+        private Rectangle GetClippingRectangle(SpriteBatchData spriteBatchData, Rectangle scissorRectangle)
+        {
+            var vector = new Vector2(Position.X, Position.Y);
+            var position = new Vector2(Width, Height) + vector;
+            var matrix = spriteBatchData.GetTransformMatrixOrIdentity();
+
+            vector = Vector2.Transform(vector, matrix);
+            position = Vector2.Transform(position, matrix);
+
+            var rectangle = new Rectangle((int)vector.X, (int)vector.Y, (int)(position.X - vector.X), (int)(position.Y - vector.Y));
+            var x = MathHelper.Clamp(rectangle.Left, scissorRectangle.Left, scissorRectangle.Right);
+            var y = MathHelper.Clamp(rectangle.Top, scissorRectangle.Top, scissorRectangle.Bottom);
+            var width = MathHelper.Clamp(rectangle.Right, scissorRectangle.Left, scissorRectangle.Right);
+            var height = MathHelper.Clamp(rectangle.Bottom, scissorRectangle.Top, scissorRectangle.Bottom);
+
+            return new(x, y, width - x, height - y);
+        }
+
         // ...
 
         public event MouseEvent OnMouseOver = Null_MouseEvent;
@@ -231,5 +283,6 @@ namespace Pladi.Core.UI.Elements
         private static readonly MouseEvent Null_MouseEvent = (evt, elem) => { };
         private static readonly ElementEvent Null_ElementEvent = (elem) => { };
         private static readonly ResolutionChangeEvent Null_ResolutionChangeEvent = (evt, elem) => { };
+        private static readonly RasterizerState ClippingRasterizerState = new() { CullMode = CullMode.None, ScissorTestEnable = true };
     }
 }

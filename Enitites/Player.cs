@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Pladi.Enums;
 using Pladi.Core.Input;
+using Pladi.Enums;
 using Pladi.Tiles;
 using System;
 

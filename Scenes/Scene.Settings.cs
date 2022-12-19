@@ -9,29 +9,27 @@ namespace Pladi.Scenes
 {
     public class SettingsScene : Scene
     {
-        private GameUI userInterface;
-        private CoreUIElement coreUIElement;
+        private GraphicalUI userInterface;
 
         // ...
 
         public override void Init()
         {
-            coreUIElement = new CoreUIElement();
-            userInterface = new GameUI(coreUIElement);
+            userInterface = new GraphicalUI();
 
             var button = new TextUIElement(FontAssets.DefaultMedium, "Fullscreen", Color.White);
             button.Position = new Vector2(10, 10);
             button.OnMouseClick += (evt, elem) => Main.ToggleFullScreen();
             button.OnMouseOver += (evt, elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
 
-            coreUIElement.Append(button);
+            userInterface.CoreElement.Append(button);
 
             button = new TextUIElement(FontAssets.DefaultMedium, "Return", Color.White);
             button.Position = new Vector2(10, 40);
             button.OnMouseClick += (evt, elem) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Menu);
             button.OnPostUpdate += (elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
 
-            coreUIElement.Append(button);
+            userInterface.CoreElement.Append(button);
 
             var screenResolutions = Main.GetSupportedScreenResolutions();
 
@@ -44,7 +42,7 @@ namespace Pladi.Scenes
                 button.OnMouseClick += (evt, elem) => Main.SetDisplayMode(size.X, size.Y);
                 button.OnPostUpdate += (elem) => (elem as TextUIElement).SetColor(elem.IsMouseHovering ? Color.Gold : Color.White);
 
-                coreUIElement.Append(button);
+                userInterface.CoreElement.Append(button);
             }
         }
 

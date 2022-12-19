@@ -6,46 +6,42 @@ using Pladi.Utilities.Enums;
 
 namespace Pladi.Core.UI
 {
-    public class GameUI
+    public class GraphicalUI
     {
-        private CoreUIElement coreElement;
+        public UIElement CoreElement { get; private set; }
+
         private UIElement lastElementHover;
 
         // ...
 
-        public GameUI(CoreUIElement element)
+        public GraphicalUI()
         {
-            SetCoreElement(element);
+            CoreElement = new UIElement();
         }
 
         // ...
-
-        public void SetCoreElement(CoreUIElement element)
-        {
-            coreElement = element;
-        }
 
         public void Update(GameTime gameTime)
         {
             var input = Main.InputManager;
             var mousePosition = input.GetMousePosition();
             var mouseLeft = input.JustPressed(MouseInputTypes.LeftButton);
-            var mouseElement = coreElement.GetElementAt(mousePosition);
+            var mouseElement = CoreElement.GetElementAt(mousePosition);
 
             UpdateMouseHover(mouseElement, mousePosition);
             UpdateMouseClick(mouseElement, mousePosition, mouseLeft);
 
-            coreElement.Update(gameTime);
+            CoreElement.Update(gameTime);
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            coreElement.Draw(gameTime, spriteBatch);
+            CoreElement.Draw(gameTime, spriteBatch);
         }
 
         public void OnResolutionChanged(int width, int height)
         {
-            coreElement.ResolutionChanged(new UIResolutionChangeEvent(coreElement, width, height));
+            CoreElement.ResolutionChanged(new UIResolutionChangeEvent(CoreElement, width, height));
         }
 
         private void UpdateMouseHover(UIElement mouseElement, Vector2 mousePosition)
