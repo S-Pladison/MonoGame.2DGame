@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Content;
 using Pladi.Core.Input;
-using Pladi.Scenes;
+using Pladi.Core.Scenes;
 using System;
 using System.IO;
 using System.Text.Json;
@@ -39,12 +39,6 @@ namespace Pladi
         public Main()
         {
             instance = this;
-
-            SceneManager ??= new SceneManager();
-            InputManager ??= new InputManager();
-
-            Rand ??= new Random((int)DateTime.Now.Ticks);
-
             graphics = new GraphicsDeviceManager(this);
 
             Content.RootDirectory = "Content";
@@ -55,6 +49,10 @@ namespace Pladi
             form.MinimumSize = new System.Drawing.Size(minScreenWidth, minScreenHeight);
 
             Window.AllowUserResizing = true;
+
+            Rand = new Random((int)DateTime.Now.Ticks);
+            InputManager = new InputManager();
+            SceneManager = new SceneManager();
         }
 
         protected override void LoadContent()
@@ -72,8 +70,6 @@ namespace Pladi
             base.Initialize();
 
             LoadConfig();
-
-            SceneManager.Init();
         }
 
         protected override void UnloadContent()
@@ -99,10 +95,10 @@ namespace Pladi
                 InputManager.Update(gameTime);
                 SceneManager.Update(gameTime);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // TODO: ...
-                throw;
+                throw new Exception(ex.Message);
             }
         }
 

@@ -11,12 +11,15 @@ namespace Pladi.Core.UI.Elements
 
         // ...
 
-        public PanelUIElement(Color backgroundColor)
+        public PanelUIElement()
         {
-            this.backgroundColor = backgroundColor;
+            backgroundColor = Color.White;
         }
 
         // ...
+
+        public void SetBackgroundColor(Color color)
+            => backgroundColor = color;
 
         protected override void DrawThis(GameTime gameTime, SpriteBatch spriteBatch)
         {

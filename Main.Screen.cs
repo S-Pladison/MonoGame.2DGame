@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Pladi.Scenes;
+using Pladi.Core.Scenes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,8 +68,8 @@ namespace Pladi
 
         private static void CheckWindowSize()
         {
-            var width = instance.graphics.PreferredBackBufferWidth;
-            var height = instance.graphics.PreferredBackBufferHeight;
+            int width = instance.graphics.PreferredBackBufferWidth;
+            int height = instance.graphics.PreferredBackBufferHeight;
 
             if (ScreenSize.X != width || ScreenSize.Y != height)
             {
