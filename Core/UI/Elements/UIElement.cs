@@ -34,19 +34,6 @@ namespace Pladi.Core.UI.Elements
         public UIElement Parent { get; private set; }
         public bool IsMouseHovering { get; protected set; }
         public RectangleF HitboxRectangle { get => new(Position.X, Position.Y, Size.X, Size.Y); }
-        public RectangleF ClippingOutsideRectangle
-        {
-            get
-            {
-                var vector = Position + Size;
-                return new() {
-                    X = Position.X,
-                    Y = Position.Y,
-                    Width = MathF.Max(vector.X - Position.X, 0.0f),
-                    Height = MathF.Max(vector.Y - Position.Y, 0.0f)
-                };
-            }
-        }
 
         // ...
 
@@ -93,7 +80,7 @@ namespace Pladi.Core.UI.Elements
             var scissorRectangle = spriteBatch.GraphicsDevice.ScissorRectangle;
 
             spriteBatchData.RasterizerState = ClippingRasterizerState;
-            spriteBatch.GraphicsDevice.ScissorRectangle = Rectangle.Intersect(scissorRectangle, ClippingOutsideRectangle.ToRectangle());
+            spriteBatch.GraphicsDevice.ScissorRectangle = Rectangle.Intersect(scissorRectangle, HitboxRectangle.ToRectangle());
             spriteBatchData.Begin(spriteBatch);
 
             DrawChildren(gameTime, spriteBatch);
