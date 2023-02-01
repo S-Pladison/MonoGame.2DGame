@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Core.UI.Events;
+using Pladi.Utilities;
 using Pladi.Utilities.DataStructures;
+using System;
 using System.Collections.Generic;
 
 namespace Pladi.Core.UI.Elements
@@ -14,20 +16,37 @@ namespace Pladi.Core.UI.Elements
 
         // ...
 
-        public bool ClippingOutsideRectangle;
+        public bool ReqClippingOutsideRectangle;
 
         protected List<UIElement> children;
-        protected Vector2 position;
-        protected float width;
-        protected float height;
-        protected RectangleF boundingRectangle;
+
+        public PositionStyle Left;
+        public PositionStyle Top;
+        public PositionStyle Width;
+        public PositionStyle Height;
+
+        public Vector2 Size;
+        public Vector2 Position;
 
         // ...
 
         public IReadOnlyCollection<UIElement> Children { get => children; }
         public UIElement Parent { get; private set; }
-        public Vector2 Size { get => new(width, height); }
         public bool IsMouseHovering { get; protected set; }
+        public RectangleF HitboxRectangle { get => new(Position.X, Position.Y, Size.X, Size.Y); }
+        public RectangleF ClippingOutsideRectangle
+        {
+            get
+            {
+                var vector = Position + Size;
+                return new() {
+                    X = Position.X,
+                    Y = Position.Y,
+                    Width = MathF.Max(vector.X - Position.X, 0.0f),
+                    Height = MathF.Max(vector.Y - Position.Y, 0.0f)
+                };
+            }
+        }
 
         // ...
 
@@ -37,28 +56,6 @@ namespace Pladi.Core.UI.Elements
         }
 
         // ...
-
-        public void SetPosition(float x, float y)
-        {
-            position.X = x;
-            position.Y = y;
-
-            Recalculate();
-        }
-
-        public void SetRectangle(RectangleF rectangle)
-            => SetRectangle(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
-
-        public void SetRectangle(float x, float y, float width, float height)
-        {
-            position.X = x;
-            position.Y = y;
-
-            this.width = width;
-            this.height = height;
-
-            Recalculate();
-        }
 
         public void Update(GameTime gameTime)
         {
@@ -83,7 +80,7 @@ namespace Pladi.Core.UI.Elements
         {
             DrawThis(gameTime, spriteBatch);
 
-            if (!ClippingOutsideRectangle)
+            if (!ReqClippingOutsideRectangle)
             {
                 DrawChildren(gameTime, spriteBatch);
                 return;
@@ -96,7 +93,7 @@ namespace Pladi.Core.UI.Elements
             var scissorRectangle = spriteBatch.GraphicsDevice.ScissorRectangle;
 
             spriteBatchData.RasterizerState = ClippingRasterizerState;
-            spriteBatch.GraphicsDevice.ScissorRectangle = Rectangle.Intersect(GetClippingRectangle(spriteBatchData, scissorRectangle), scissorRectangle);
+            spriteBatch.GraphicsDevice.ScissorRectangle = Rectangle.Intersect(scissorRectangle, ClippingOutsideRectangle.ToRectangle());
             spriteBatchData.Begin(spriteBatch);
 
             DrawChildren(gameTime, spriteBatch);
@@ -180,12 +177,27 @@ namespace Pladi.Core.UI.Elements
 
         public virtual void Recalculate()
         {
-            var parrentPosition = Parent?.boundingRectangle.Location ?? Vector2.Zero;
+            float parentPosX, parentPosY, parentSizeX, parentSizeY;
 
-            boundingRectangle.X = position.X + parrentPosition.X;
-            boundingRectangle.Y = position.Y + parrentPosition.Y;
-            boundingRectangle.Width = width;
-            boundingRectangle.Height = height;
+            if (Parent is null)
+            {
+                parentPosX = 0;
+                parentPosY = 0;
+                parentSizeX = Main.ScreenSize.X;
+                parentSizeY = Main.ScreenSize.Y;
+            }
+            else
+            {
+                parentPosX = Parent.Position.X;
+                parentPosY = Parent.Position.Y;
+                parentSizeX = Parent.Size.X;
+                parentSizeY = Parent.Size.Y;
+            }
+
+            Position.X = parentPosX + Left.GetPixelBaseParent(parentSizeX);
+            Position.Y = parentPosY + Top.GetPixelBaseParent(parentSizeY);
+            Size.X = Width.GetPixelBaseParent(parentSizeX);
+            Size.Y = Height.GetPixelBaseParent(parentSizeY);
 
             foreach (var child in children)
             {
@@ -194,7 +206,7 @@ namespace Pladi.Core.UI.Elements
         }
 
         public virtual bool ContainsPoint(Vector2 point)
-            => boundingRectangle.Contains(point);
+            => HitboxRectangle.Contains(point);
 
         public UIElement GetElementAt(Vector2 position)
         {
@@ -214,24 +226,6 @@ namespace Pladi.Core.UI.Elements
             if (uIElement != null) return uIElement.GetElementAt(position);
             if (!ContainsPoint(position)) return null;
             return this;
-        }
-
-        private Rectangle GetClippingRectangle(SpriteBatchData spriteBatchData, Rectangle scissorRectangle)
-        {
-            var vector = this.position;
-            var position = new Vector2(this.width, this.height) + vector;
-            var matrix = spriteBatchData.GetTransformMatrixOrIdentity();
-
-            vector = Vector2.Transform(vector, matrix);
-            position = Vector2.Transform(position, matrix);
-
-            var rectangle = new Rectangle((int)vector.X, (int)vector.Y, (int)(position.X - vector.X), (int)(position.Y - vector.Y));
-            var x = MathHelper.Clamp(rectangle.Left, scissorRectangle.Left, scissorRectangle.Right);
-            var y = MathHelper.Clamp(rectangle.Top, scissorRectangle.Top, scissorRectangle.Bottom);
-            var width = MathHelper.Clamp(rectangle.Right, scissorRectangle.Left, scissorRectangle.Right);
-            var height = MathHelper.Clamp(rectangle.Bottom, scissorRectangle.Top, scissorRectangle.Bottom);
-
-            return new(x, y, width - x, height - y);
         }
 
         // ...

@@ -1,8 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Pladi.Content;
 using Pladi.Core.UI;
 using Pladi.Core.UI.Elements;
+using System.Collections.Generic;
 
 namespace Pladi.Core.Scenes
 {
@@ -16,7 +18,7 @@ namespace Pladi.Core.Scenes
         {
             userInterface = new GraphicalUI();
 
-            var menuPanel = new MenuPanelUIElement(FontAssets.DefaultMedium);
+            /*var menuPanel = new MenuPanelUIElement(FontAssets.DefaultMedium);
             menuPanel.OnResolutionChanged += (evt, elem) => elem.SetRectangle(20, 0, 200, evt.Height);
             menuPanel.SetRectangle(20, 0, 200, Main.ScreenSize.Y);
             menuPanel.SetBackgroundColor(new Color(0, 0, 0, 90));
@@ -27,7 +29,32 @@ namespace Pladi.Core.Scenes
                 ("Exit", (_, _) => Main.ExitFromGame())
             );
 
-            userInterface.Append(menuPanel);
+            userInterface.Append(menuPanel);*/
+
+            /*var menuPanel = new MenuPanelUIElement(FontAssets.DefaultMedium);
+            menuPanel.OnResolutionChanged += (evt, elem) => elem.SetRectangle(20, 0, 200, evt.Height);
+            menuPanel.SetRectangle(20, 0, 200, Main.ScreenSize.Y);
+            menuPanel.SetBackgroundColor(new Color(0, 0, 0, 90));
+            menuPanel.AddButtons(
+                ("Start", (_, _) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Game)),
+                ("Editor", (_, _) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Editor)),
+                ("Settings", (_, _) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Settings)),
+                ("Exit", (_, _) => Main.ExitFromGame())
+            );*/
+
+            /*var panel = new PanelUIElement();
+            panel.Left.SetValue(0, 0.5f);
+            panel.Top.SetValue(0, 0.5f);
+            panel.Width.SetValue(50, 0);
+            panel.Height.SetValue(50, 0);
+            panel.OnMouseClick += (a, b) => { MessageBox.Show("1", "2", new List<string>() { "3" }); };*/
+
+            var text = new TextUIElement(FontAssets.DefaultMedium, "01.02.2023", Color.White);
+            text.Left.SetPercent(0.5f);
+            text.Top.SetPercent(0.5f);
+            text.OnMouseClick += (a, b) => { MessageBox.Show("1", "2", new List<string>() { "3" }); };
+
+            userInterface.Append(text);
         }
 
         public override void OnResolutionChanged(int width, int height)

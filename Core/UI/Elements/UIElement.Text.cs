@@ -13,7 +13,6 @@ namespace Pladi.Core.UI.Elements
         private float spread;
 
         private Vector2 textOrigin;
-        private Vector2 textSize;
         private Color color;
 
         // ...
@@ -31,7 +30,7 @@ namespace Pladi.Core.UI.Elements
 
         protected override void DrawThis(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawStringWithShadow(font, $"{text}", boundingRectangle.Location, color, 0, textOrigin, scale, spread);
+            spriteBatch.DrawStringWithShadow(font, $"{text}", Position, color, 0, textOrigin, scale, spread);
         }
 
         // ...
@@ -43,10 +42,10 @@ namespace Pladi.Core.UI.Elements
             this.spread = spread;
 
             var vector = font.MeasureString(text);
-            var vector2 = textSize = vector * scale;
+            var vector2 = vector * scale;
 
-            width = (int)vector2.X;
-            height = (int)vector2.Y;
+            Width.SetPixel(vector2.X);
+            Height.SetPixel(vector2.Y);
 
             Recalculate();
         }

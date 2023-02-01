@@ -102,7 +102,9 @@ namespace Pladi.Tiles
         }
 
         public void Draw(SpriteBatch spriteBatch, Vector2 position)
-            => spriteBatch.Draw(target, position, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
+        {
+            spriteBatch.Draw(target, position, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0);
+        }
 
         public bool IsTileCollision(int positionX, int positionY, int width, int height)
             => IsTileCollision(new Rectangle(positionX, positionY, width, height));

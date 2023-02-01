@@ -15,7 +15,7 @@ namespace Pladi.Core.UI.Elements
 
         public MenuPanelUIElement(SpriteFont font) : base()
         {
-            ClippingOutsideRectangle = true;
+            //ClippingOutsideRectangle = true;
 
             this.font = font;
         }
@@ -25,7 +25,8 @@ namespace Pladi.Core.UI.Elements
         public void AddButton(string text, MouseEvent onClick)
         {
             var button = new MenuButtonUIElement(font, text);
-            button.SetRectangle(0, 0, width, 40);
+            //button.SetRectangle(0, 0, width, 40);
+            button.Width.SetValue(40, 0);
             button.OnMouseClick += onClick;
 
             Append(button);
@@ -43,11 +44,11 @@ namespace Pladi.Core.UI.Elements
         {
             var buttons = children.Where(x => x is MenuButtonUIElement).ToList();
             var buttonCount = buttons.Count;
-            var offsetY = height / 2f - buttonCount / 2f * 40;
+            var offsetY = Height.Pixel / 2f - buttonCount / 2f * 40;
 
             for (int i = 0; i < buttonCount; i++)
             {
-                buttons[i].SetPosition(0, offsetY + i * 40);
+                //buttons[i].SetPosition(0, offsetY + i * 40);
             }
 
             base.Recalculate();
@@ -88,7 +89,7 @@ namespace Pladi.Core.UI.Elements
 
             public override void Recalculate()
             {
-                TextUIElement.SetPosition((width - TextUIElement.Size.X) / 2f, (height - TextUIElement.Size.Y) / 2f);
+                //TextUIElement.SetPosition((width - TextUIElement.Size.X) / 2f, (height - TextUIElement.Size.Y) / 2f);
 
                 base.Recalculate();
             }
@@ -97,7 +98,7 @@ namespace Pladi.Core.UI.Elements
             {
                 if (!IsMouseHovering) return;
 
-                spriteBatch.Draw(TextureAssets.Pixel, boundingRectangle.ToRectangle(), new Color(0, 0, 0, 40));
+                //spriteBatch.Draw(TextureAssets.Pixel, boundingRectangle.ToRectangle(), new Color(0, 0, 0, 40));
             }
         }
     }

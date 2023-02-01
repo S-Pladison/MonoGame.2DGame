@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Content;
 using Pladi.Utilities;
+using Pladi.Utilities.DataStructures;
 
 namespace Pladi.Core.UI.Elements
 {
@@ -23,7 +24,7 @@ namespace Pladi.Core.UI.Elements
 
         protected override void DrawThis(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(TextureAssets.Pixel, boundingRectangle.ToRectangle(), backgroundColor);
+            spriteBatch.Draw(TextureAssets.Pixel, HitboxRectangle.ToRectangle(), backgroundColor);
         }
     }
 }

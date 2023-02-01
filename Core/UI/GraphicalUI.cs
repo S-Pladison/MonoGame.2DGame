@@ -1,8 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Pladi.Core.UI.Elements;
 using Pladi.Core.UI.Events;
 using Pladi.Utilities.Enums;
+using SharpDX.Direct3D9;
 
 namespace Pladi.Core.UI
 {
@@ -17,7 +19,13 @@ namespace Pladi.Core.UI
         public GraphicalUI()
         {
             Core = new UIElement();
-            Core.SetRectangle(0, 0, Main.ScreenSize.X, Main.ScreenSize.Y);
+
+            Core.Left.SetValue(0, 0);
+            Core.Top.SetValue(0, 0);
+            Core.Width.SetValue(Main.ScreenSize.X, 0);
+            Core.Height.SetValue(Main.ScreenSize.Y, 0);
+
+            Core.Recalculate();
         }
 
         // ...
@@ -45,6 +53,12 @@ namespace Pladi.Core.UI
 
         public void OnResolutionChanged(int width, int height)
         {
+            Core.Left.SetValue(0, 0);
+            Core.Top.SetValue(0, 0);
+            Core.Width.SetValue(Main.ScreenSize.X, 0);
+            Core.Height.SetValue(Main.ScreenSize.Y, 0);
+
+            Core.Recalculate();
             Core.ResolutionChanged(new UIResolutionChangeEvent(Core, width, height));
         }
 

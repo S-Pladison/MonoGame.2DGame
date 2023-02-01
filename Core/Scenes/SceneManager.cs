@@ -19,6 +19,7 @@ namespace Pladi.Core.Scenes
         // ...
 
         public bool CanChangeScene => expectedScene is null;
+        public bool CanUpdateAndDrawScene => initSceneProgress >= 1f;
 
         // ...
 

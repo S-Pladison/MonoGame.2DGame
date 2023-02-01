@@ -48,7 +48,7 @@ namespace Pladi.Core.Scenes
         {
             userInterface = new GraphicalUI();
 
-            var menuPanel = new MenuPanelUIElement(FontAssets.DefaultMedium);
+            /*var menuPanel = new MenuPanelUIElement(FontAssets.DefaultMedium);
             menuPanel.OnResolutionChanged += (evt, elem) => elem.SetRectangle(20, 0, 200, evt.Height);
             menuPanel.SetRectangle(20, 0, 200, Main.ScreenSize.Y);
             menuPanel.SetBackgroundColor(new Color(0, 0, 0, 90));
@@ -95,7 +95,7 @@ namespace Pladi.Core.Scenes
 
             text = new TextUIElement(FontAssets.DefaultMedium, "Volume", Color.Gray, 0.8f);
             text.SetPosition(10, 160);
-            settingsPanel.Append(text);
+            settingsPanel.Append(text);*/
         }
 
         public override void OnResolutionChanged(int width, int height)
