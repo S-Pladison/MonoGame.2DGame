@@ -16,24 +16,23 @@ namespace Pladi.Core.UI.Elements
 
         // ...
 
-        public bool ReqClippingOutsideRectangle;
-
         protected List<UIElement> children;
+        protected Vector2 position;
+        protected Vector2 size;
 
-        public PositionStyle Left;
-        public PositionStyle Top;
-        public PositionStyle Width;
-        public PositionStyle Height;
+        public StyleDimension Left;
+        public StyleDimension Top;
+        public StyleDimension Width;
+        public StyleDimension Height;
 
-        public Vector2 Size;
-        public Vector2 Position;
+        public bool ClippingOutsideRectangle;
 
         // ...
 
         public IReadOnlyCollection<UIElement> Children { get => children; }
         public UIElement Parent { get; private set; }
         public bool IsMouseHovering { get; protected set; }
-        public RectangleF HitboxRectangle { get => new(Position.X, Position.Y, Size.X, Size.Y); }
+        public RectangleF Dimensions { get => new(position.X, position.Y, size.X, size.Y); }
 
         // ...
 
@@ -67,7 +66,7 @@ namespace Pladi.Core.UI.Elements
         {
             DrawThis(gameTime, spriteBatch);
 
-            if (!ReqClippingOutsideRectangle)
+            if (!ClippingOutsideRectangle)
             {
                 DrawChildren(gameTime, spriteBatch);
                 return;
@@ -80,7 +79,7 @@ namespace Pladi.Core.UI.Elements
             var scissorRectangle = spriteBatch.GraphicsDevice.ScissorRectangle;
 
             spriteBatchData.RasterizerState = ClippingRasterizerState;
-            spriteBatch.GraphicsDevice.ScissorRectangle = Rectangle.Intersect(scissorRectangle, HitboxRectangle.ToRectangle());
+            spriteBatch.GraphicsDevice.ScissorRectangle = Rectangle.Intersect(scissorRectangle, Dimensions.ToRectangle());
             spriteBatchData.Begin(spriteBatch);
 
             DrawChildren(gameTime, spriteBatch);
@@ -162,7 +161,13 @@ namespace Pladi.Core.UI.Elements
             }
         }
 
-        public virtual void Recalculate()
+        public void Recalculate()
+        {
+            RecalculateThis();
+            RecalculateChildren();
+        }
+
+        protected virtual void RecalculateThis()
         {
             float parentPosX, parentPosY, parentSizeX, parentSizeY;
 
@@ -175,17 +180,20 @@ namespace Pladi.Core.UI.Elements
             }
             else
             {
-                parentPosX = Parent.Position.X;
-                parentPosY = Parent.Position.Y;
-                parentSizeX = Parent.Size.X;
-                parentSizeY = Parent.Size.Y;
+                parentPosX = Parent.position.X;
+                parentPosY = Parent.position.Y;
+                parentSizeX = Parent.size.X;
+                parentSizeY = Parent.size.Y;
             }
 
-            Position.X = parentPosX + Left.GetPixelBaseParent(parentSizeX);
-            Position.Y = parentPosY + Top.GetPixelBaseParent(parentSizeY);
-            Size.X = Width.GetPixelBaseParent(parentSizeX);
-            Size.Y = Height.GetPixelBaseParent(parentSizeY);
+            position.X = parentPosX + Left.GetPixelBaseParent(parentSizeX);
+            position.Y = parentPosY + Top.GetPixelBaseParent(parentSizeY);
+            size.X = Width.GetPixelBaseParent(parentSizeX);
+            size.Y = Height.GetPixelBaseParent(parentSizeY);
+        }
 
+        protected virtual void RecalculateChildren()
+        {
             foreach (var child in children)
             {
                 child.Recalculate();
@@ -193,7 +201,7 @@ namespace Pladi.Core.UI.Elements
         }
 
         public virtual bool ContainsPoint(Vector2 point)
-            => HitboxRectangle.Contains(point);
+            => Dimensions.Contains(point);
 
         public UIElement GetElementAt(Vector2 position)
         {

@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pladi.Core.UI
+﻿namespace Pladi.Core.UI
 {
-    public struct PositionStyle
+    public struct StyleDimension
     {
         public float Pixel;
         public float Percent;
 
         // ...
 
-        public PositionStyle()
+        public StyleDimension()
         {
             Pixel = 0f;
             Percent = 0f;

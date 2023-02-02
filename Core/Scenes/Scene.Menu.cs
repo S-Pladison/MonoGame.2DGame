@@ -42,19 +42,40 @@ namespace Pladi.Core.Scenes
                 ("Exit", (_, _) => Main.ExitFromGame())
             );*/
 
-            /*var panel = new PanelUIElement();
-            panel.Left.SetValue(0, 0.5f);
-            panel.Top.SetValue(0, 0.5f);
-            panel.Width.SetValue(50, 0);
-            panel.Height.SetValue(50, 0);
-            panel.OnMouseClick += (a, b) => { MessageBox.Show("1", "2", new List<string>() { "3" }); };*/
+            var panel = new PanelUIElement();
+            panel.Left.SetValue(-50, 0.5f);
+            panel.Top.SetValue(-50, 0.5f);
+            panel.Width.SetValue(100, 0);
+            panel.Height.SetValue(100, 0);
 
-            var text = new TextUIElement(FontAssets.DefaultMedium, "01.02.2023", Color.White);
+            var panel2 = new PanelUIElement();
+            panel2.Left.SetValue(50, 0);
+            panel2.Top.SetValue(50, 0);
+            panel2.Width.SetValue(50, 0);
+            panel2.Height.SetValue(50, 0);
+            panel2.ClippingOutsideRectangle = true;
+            panel2.SetBackgroundColor(Color.Red);
+            panel.Append(panel2);
+
+            var panel3 = new PanelUIElement();
+            panel3.Width.SetValue(100, 0);
+            panel3.Height.SetValue(25, 0);
+            panel3.SetBackgroundColor(Color.Blue);
+            panel3.OnMouseClick += (a, b) => { MessageBox.Show("1", "2", new List<string>() { "3" }); };
+            panel2.Append(panel3);
+
+            /*var text = new TextUIElement(FontAssets.DefaultMedium, "01.02.2023", Color.White);
+            text.OnMouseClick += (a, b) => { MessageBox.Show("1", "2", new List<string>() { "3" }); };
+            panel.Append(text);
+            */
+            //panel.OnMouseClick += (a, b) => { MessageBox.Show("1", "2", new List<string>() { "3" }); };
+
+            /*var text = new TextUIElement(FontAssets.DefaultMedium, "01.02.2023", Color.White);
             text.Left.SetPercent(0.5f);
             text.Top.SetPercent(0.5f);
-            text.OnMouseClick += (a, b) => { MessageBox.Show("1", "2", new List<string>() { "3" }); };
+            text.OnMouseClick += (a, b) => { MessageBox.Show("1", "2", new List<string>() { "3" }); };*/
 
-            userInterface.Append(text);
+            userInterface.Append(panel);
         }
 
         public override void OnResolutionChanged(int width, int height)

@@ -40,7 +40,7 @@ namespace Pladi.Core.UI.Elements
             }
         }
 
-        public override void Recalculate()
+        /*public override void Recalculate()
         {
             var buttons = children.Where(x => x is MenuButtonUIElement).ToList();
             var buttonCount = buttons.Count;
@@ -52,7 +52,7 @@ namespace Pladi.Core.UI.Elements
             }
 
             base.Recalculate();
-        }
+        }*/
 
         // ...
 
@@ -87,12 +87,12 @@ namespace Pladi.Core.UI.Elements
                 base.MouseOut(evt);
             }
 
-            public override void Recalculate()
+            /*public override void Recalculate()
             {
                 //TextUIElement.SetPosition((width - TextUIElement.Size.X) / 2f, (height - TextUIElement.Size.Y) / 2f);
 
                 base.Recalculate();
-            }
+            }*/
 
             protected override void DrawThis(GameTime gameTime, SpriteBatch spriteBatch)
             {

@@ -30,7 +30,7 @@ namespace Pladi.Core.UI.Elements
 
         protected override void DrawThis(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawStringWithShadow(font, $"{text}", Position, color, 0, textOrigin, scale, spread);
+            spriteBatch.DrawStringWithShadow(font, $"{text}", position, color, 0, textOrigin, scale, spread);
         }
 
         // ...

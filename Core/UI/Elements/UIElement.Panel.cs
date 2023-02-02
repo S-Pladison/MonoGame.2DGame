@@ -24,7 +24,7 @@ namespace Pladi.Core.UI.Elements
 
         protected override void DrawThis(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(TextureAssets.Pixel, HitboxRectangle.ToRectangle(), backgroundColor);
+            spriteBatch.Draw(TextureAssets.Pixel, Dimensions.ToRectangle(), backgroundColor);
         }
     }
 }
