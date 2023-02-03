@@ -73,7 +73,7 @@ namespace Pladi.Core.UI.Elements
                 Append(TextUIElement);
             }
 
-            public override void MouseOver(UIMouseEvent evt)
+            /*public override void MouseOver(UIMouseEvent evt)
             {
                 TextUIElement.SetColor(HoverColor);
 
@@ -85,7 +85,7 @@ namespace Pladi.Core.UI.Elements
                 TextUIElement.SetColor(DefaultColor);
 
                 base.MouseOut(evt);
-            }
+            }*/
 
             /*public override void Recalculate()
             {

@@ -24,6 +24,8 @@ namespace Pladi.Core.UI.Elements
         public StyleDimension Top;
         public StyleDimension Width;
         public StyleDimension Height;
+        public float HorizontalAlign;
+        public float VerticalAlign;
 
         public bool ClippingOutsideRectangle;
 
@@ -31,7 +33,7 @@ namespace Pladi.Core.UI.Elements
 
         public IReadOnlyCollection<UIElement> Children { get => children; }
         public UIElement Parent { get; private set; }
-        public bool IsMouseHovering { get; protected set; }
+        public bool IsMouseHovering { get; private set; }
         public RectangleF Dimensions { get => new(position.X, position.Y, size.X, size.Y); }
 
         // ...
@@ -54,7 +56,7 @@ namespace Pladi.Core.UI.Elements
 
         protected virtual void UpdateThis(GameTime gameTime) { }
 
-        protected virtual void UpdateChildren(GameTime gameTime)
+        private void UpdateChildren(GameTime gameTime)
         {
             foreach (var child in children)
             {
@@ -92,7 +94,7 @@ namespace Pladi.Core.UI.Elements
 
         protected virtual void DrawThis(GameTime gameTime, SpriteBatch spriteBatch) { }
 
-        protected virtual void DrawChildren(GameTime gameTime, SpriteBatch spriteBatch)
+        private void DrawChildren(GameTime gameTime, SpriteBatch spriteBatch)
         {
             foreach (var child in children)
             {
@@ -131,27 +133,27 @@ namespace Pladi.Core.UI.Elements
             children.Clear();
         }
 
-        public virtual void MouseOver(UIMouseEvent evt)
+        public void MouseOver(UIMouseEvent evt)
         {
             IsMouseHovering = true;
             OnMouseOver(evt, this);
             Parent?.MouseOver(evt);
         }
 
-        public virtual void MouseOut(UIMouseEvent evt)
+        public void MouseOut(UIMouseEvent evt)
         {
             IsMouseHovering = false;
             OnMouseOut(evt, this);
             Parent?.MouseOut(evt);
         }
 
-        public virtual void Click(UIMouseEvent evt)
+        public void Click(UIMouseEvent evt)
         {
             OnMouseClick(evt, this);
             Parent?.Click(evt);
         }
 
-        public virtual void ResolutionChanged(UIResolutionChangeEvent evt)
+        public void ResolutionChanged(UIResolutionChangeEvent evt)
         {
             OnResolutionChanged(evt, this);
 
@@ -167,7 +169,7 @@ namespace Pladi.Core.UI.Elements
             RecalculateChildren();
         }
 
-        protected virtual void RecalculateThis()
+        private void RecalculateThis()
         {
             float parentPosX, parentPosY, parentSizeX, parentSizeY;
 
@@ -192,7 +194,7 @@ namespace Pladi.Core.UI.Elements
             size.Y = Height.GetPixelBaseParent(parentSizeY);
         }
 
-        protected virtual void RecalculateChildren()
+        private void RecalculateChildren()
         {
             foreach (var child in children)
             {
@@ -200,7 +202,7 @@ namespace Pladi.Core.UI.Elements
             }
         }
 
-        public virtual bool ContainsPoint(Vector2 point)
+        public bool ContainsPoint(Vector2 point)
             => Dimensions.Contains(point);
 
         public UIElement GetElementAt(Vector2 position)

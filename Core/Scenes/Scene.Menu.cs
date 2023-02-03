@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using Pladi.Content;
 using Pladi.Core.UI;
 using Pladi.Core.UI.Elements;
+using System;
 using System.Collections.Generic;
 
 namespace Pladi.Core.Scenes
@@ -17,6 +18,25 @@ namespace Pladi.Core.Scenes
         public override void OnActivate()
         {
             userInterface = new GraphicalUI();
+
+            var panel = new PanelUIElement();
+            panel.SetBackgroundColor(new Color(0, 0, 0, 50));
+            panel.Width.SetPixel(250f);
+            panel.Height.SetPercent(1f);
+            userInterface.Append(panel);
+
+            /*var cTime = new TextUIElement(FontAssets.DefaultSmall, string.Empty, Color.White);
+            cTime.OnPostUpdate += (e) => cTime.SetText(DateTime.Now.ToString() + "\nVersion: D.0.0.0.1");
+            cTime.Left.SetValue(20f, 0f);
+            cTime.Width.SetPercent(0f);
+            panel.Append(cTime);*/
+
+            var otherPanel = new PanelUIElement();
+            otherPanel.Width.SetPixel(100f);
+            otherPanel.Height.SetPixel(100f);
+            otherPanel.HorizontalAlign = 0.5f;
+            otherPanel.VerticalAlign = 0.5f;
+            panel.Append(otherPanel);
 
             /*var menuPanel = new MenuPanelUIElement(FontAssets.DefaultMedium);
             menuPanel.OnResolutionChanged += (evt, elem) => elem.SetRectangle(20, 0, 200, evt.Height);
@@ -42,7 +62,7 @@ namespace Pladi.Core.Scenes
                 ("Exit", (_, _) => Main.ExitFromGame())
             );*/
 
-            var panel = new PanelUIElement();
+            /*var panel = new PanelUIElement();
             panel.Left.SetValue(-50, 0.5f);
             panel.Top.SetValue(-50, 0.5f);
             panel.Width.SetValue(100, 0);
@@ -73,9 +93,9 @@ namespace Pladi.Core.Scenes
             /*var text = new TextUIElement(FontAssets.DefaultMedium, "01.02.2023", Color.White);
             text.Left.SetPercent(0.5f);
             text.Top.SetPercent(0.5f);
-            text.OnMouseClick += (a, b) => { MessageBox.Show("1", "2", new List<string>() { "3" }); };*/
+            text.OnMouseClick += (a, b) => { MessageBox.Show("1", "2", new List<string>() { "3" }); };
 
-            userInterface.Append(panel);
+            userInterface.Append(panel);*/
         }
 
         public override void OnResolutionChanged(int width, int height)
