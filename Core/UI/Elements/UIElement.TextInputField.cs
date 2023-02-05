@@ -14,7 +14,9 @@ namespace Pladi.Core.UI.Elements
 {
     public class TextInputFieldUIElement : UIElement
     {
+        private readonly int blinkingCursorStateTime;
         private readonly SpriteFont font;
+        private int blinkingCursorTime;
 
         // ...
 
@@ -25,6 +27,7 @@ namespace Pladi.Core.UI.Elements
 
         public TextInputFieldUIElement()
         {
+            blinkingCursorStateTime = 60;
             font = FontAssets.DefaultMedium;
 
             OnMouseClick += Click;
@@ -43,10 +46,21 @@ namespace Pladi.Core.UI.Elements
             if (!ContainsPoint(mousePosition) && input.JustPressed(MouseInputTypes.LeftButton))
             {
                 IsFocused = false;
+                blinkingCursorTime = 0;
                 return;
             }
 
             Text = input.GetInputText(Text);
+
+            UpdateBlinkingCursor();
+        }
+
+        private void UpdateBlinkingCursor()
+        {
+            if (--blinkingCursorTime <= 0)
+            {
+                blinkingCursorTime = blinkingCursorStateTime;
+            }
         }
 
         private void Click(UIMouseEvent evt, UIElement elem)
@@ -56,7 +70,8 @@ namespace Pladi.Core.UI.Elements
 
         protected override void DrawThis(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawStringWithShadow(font, $"{Text ?? ""}", position, Color.White, 0, Vector2.Zero, 1f, 2f);
+            var text = Text + (blinkingCursorTime > (blinkingCursorStateTime / 2) ? "|" : "");
+            spriteBatch.DrawStringWithShadow(font, $"{text}", position, Color.White, 0, Vector2.Zero, 1f, 2f);
         }
     }
 }
