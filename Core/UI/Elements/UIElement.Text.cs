@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Pladi.Content;
 using Pladi.Utilities;
 
 namespace Pladi.Core.UI.Elements
@@ -7,50 +8,66 @@ namespace Pladi.Core.UI.Elements
     public class TextUIElement : UIElement
     {
         private readonly SpriteFont font;
-
         private string text;
         private float scale;
-        private float spread;
-
-        private Vector2 textOrigin;
-        private Color color;
 
         // ...
 
-        public TextUIElement(SpriteFont font, string text, Color textColor, float scale = 1f, float spread = 2f)
+        public string Text
         {
-            this.font = font;
-            this.color = textColor;
-            this.textOrigin = new Vector2(0, 0.5f);
+            get => text;
+            set
+            {
+                text = value;
+                RecreateText();
+            }
+        }
 
-            SetText(text, scale, spread);
+        public float FontScale
+        {
+            get => scale;
+            set
+            {
+                scale = value;
+                RecreateText();
+            }
+        }
+
+        public Color FontColor { get; set; }
+        public float ShadowSpread { get; set; }
+
+        // ...
+
+        public TextUIElement() : this(string.Empty) { }
+
+        public TextUIElement(string text)
+        {
+            this.font = FontAssets.DefaultMedium;
+            this.text = text;
+            this.scale = 1f;
+
+            FontColor = Color.White;
+            ShadowSpread = 2f;
+
+            RecreateText();
         }
 
         // ...
 
         protected override void DrawThis(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawStringWithShadow(font, $"{text}", position, color, 0, textOrigin, scale, spread);
+            spriteBatch.DrawStringWithShadow(font, $"{text}", position, FontColor, 0, Vector2.Zero, FontScale, ShadowSpread);
         }
 
-        // ...
-
-        public void SetText(string text, float scale = 1f, float spread = 2f)
+        private void RecreateText()
         {
-            this.text = text;
-            this.scale = scale;
-            this.spread = spread;
-
             var vector = font.MeasureString(text);
-            var vector2 = vector * scale;
+            var vector2 = vector * FontScale;
 
             Width.SetPixel(vector2.X);
             Height.SetPixel(vector2.Y);
 
             Recalculate();
         }
-
-        public void SetColor(Color color)
-            => this.color = color;
     }
 }

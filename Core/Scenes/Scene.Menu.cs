@@ -25,18 +25,36 @@ namespace Pladi.Core.Scenes
             panel.Height.SetPercent(1f);
             userInterface.Append(panel);
 
+            var startGameButton = new TextUIElement("Start");
+            startGameButton.HorizontalAlign = 0.5f;
+            startGameButton.VerticalAlign = 0.5f;
+            startGameButton.OnMouseOver += (_, e) =>
+            {
+                var text = (e as TextUIElement);
+                text.FontScale = 1.1f;
+                text.FontColor = Color.Gold;
+            };
+            startGameButton.OnMouseOut += (_, e) =>
+            {
+                var text = (e as TextUIElement);
+                text.FontScale = 1.0f;
+                text.FontColor = Color.White;
+            };
+            startGameButton.OnMouseClick += (_, _) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Game);
+            panel.Append(startGameButton);
+
             /*var cTime = new TextUIElement(FontAssets.DefaultSmall, string.Empty, Color.White);
             cTime.OnPostUpdate += (e) => cTime.SetText(DateTime.Now.ToString() + "\nVersion: D.0.0.0.1");
             cTime.Left.SetValue(20f, 0f);
             cTime.Width.SetPercent(0f);
             panel.Append(cTime);*/
 
-            var otherPanel = new PanelUIElement();
+            /*var otherPanel = new PanelUIElement();
             otherPanel.Width.SetPixel(100f);
             otherPanel.Height.SetPixel(100f);
             otherPanel.HorizontalAlign = 0.5f;
             otherPanel.VerticalAlign = 0.5f;
-            panel.Append(otherPanel);
+            panel.Append(otherPanel);*/
 
             /*var menuPanel = new MenuPanelUIElement(FontAssets.DefaultMedium);
             menuPanel.OnResolutionChanged += (evt, elem) => elem.SetRectangle(20, 0, 200, evt.Height);
