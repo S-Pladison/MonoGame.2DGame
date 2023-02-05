@@ -1,24 +1,45 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Pladi.Utilities.Enums;
+using SharpDX.MediaFoundation;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Mail;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Pladi.Core.Input
 {
     public class InputManager
     {
+        private static readonly HashSet<Keys> blackListKeys;
+
+        static InputManager()
+        {
+            blackListKeys = new() { Keys.Back };
+        }
+
+        // ...
+
         private KeyboardState currentKeyboardState;
         private KeyboardState previousKeyboardState;
         private MouseState currentMouseState;
         private MouseState previousMouseState;
+        private List<char> textInputChars;
+        private float backSpaceTime;
+        private float backSpaceSpeed;
 
         // ...
 
-        public InputManager()
+        public InputManager(GameWindow window)
         {
             currentKeyboardState = Keyboard.GetState();
             previousKeyboardState = currentKeyboardState;
             currentMouseState = Mouse.GetState();
             previousMouseState = currentMouseState;
+            textInputChars = new List<char>();
+
+            window.TextInput += ProcessTextInput;
         }
 
         // ...
@@ -77,5 +98,43 @@ namespace Pladi.Core.Input
 
         public int GetMouseScroll()
             => currentMouseState.ScrollWheelValue - previousMouseState.ScrollWheelValue;
+
+        public string GetInputText(string oldString)
+        {
+            foreach (var ch in textInputChars)
+            {
+                oldString += ch;
+            }
+
+            textInputChars.Clear();
+
+            GetInputText_BackSpace(ref oldString);
+
+            return oldString;
+        }
+
+        private void GetInputText_BackSpace(ref string oldText)
+        {
+            if (!IsHeld(Keys.Back))
+            {
+                backSpaceTime = backSpaceSpeed = 0;
+                return;
+            }
+
+            backSpaceSpeed = Math.Min(backSpaceSpeed += 0.005f, 1.0f);
+            backSpaceTime = Math.Max(backSpaceTime -= backSpaceSpeed, 0);
+
+            if (backSpaceTime is not 0) return;
+            
+            oldText = oldText[..Math.Max(oldText.Length - 1, 0)];
+            backSpaceTime = 1f;
+        }
+
+        private void ProcessTextInput(object sender, TextInputEventArgs e)
+        {
+            if (blackListKeys.Contains(e.Key)) return;
+
+            textInputChars.Add(e.Character);
+        }
     }
 }

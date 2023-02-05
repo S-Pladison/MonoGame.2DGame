@@ -45,6 +45,13 @@ namespace Pladi.Core.Scenes
             startGameButton.OnMouseClick += (_, _) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Game);
             panel.Append(startGameButton);
 
+            var inputField = new TextInputFieldUIElement();
+            inputField.Left.SetPixel(10f);
+            inputField.Top.SetPixel(10f);
+            inputField.Width.SetPercent(1f);
+            inputField.Height.SetPixel(50f);
+            panel.Append(inputField);
+
             /*var cTime = new TextUIElement(FontAssets.DefaultSmall, string.Empty, Color.White);
             cTime.OnPostUpdate += (e) => cTime.SetText(DateTime.Now.ToString() + "\nVersion: D.0.0.0.1");
             cTime.Left.SetValue(20f, 0f);

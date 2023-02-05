@@ -51,7 +51,7 @@ namespace Pladi
             Window.AllowUserResizing = true;
 
             Rand = new Random((int)DateTime.Now.Ticks);
-            InputManager = new InputManager();
+            InputManager = new InputManager(Window);
             SceneManager = new SceneManager();
         }
 
