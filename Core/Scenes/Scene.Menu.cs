@@ -20,14 +20,16 @@ namespace Pladi.Core.Scenes
             userInterface = new GraphicalUI();
 
             var panel = new PanelUIElement();
-            panel.SetBackgroundColor(new Color(0, 0, 0, 50));
+            panel.BackgroundColor = new Color(0, 0, 0, 50);
             panel.Width.SetPixel(250f);
             panel.Height.SetPercent(1f);
             userInterface.Append(panel);
 
-            var startGameButton = new TextUIElement("Start");
-            startGameButton.HorizontalAlign = 0.5f;
-            startGameButton.VerticalAlign = 0.5f;
+            var startGameButton = new TextUIElement("Start")
+            {
+                HorizontalAlign = 0.5f,
+                VerticalAlign = 0.5f
+            };
             startGameButton.OnMouseOver += (_, e) =>
             {
                 var text = (e as TextUIElement);

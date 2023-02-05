@@ -1,18 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Pladi.Core.UI.Elements;
 using Pladi.Core.UI.Events;
 using Pladi.Utilities.Enums;
-using SharpDX.Direct3D9;
 
 namespace Pladi.Core.UI
 {
     public class GraphicalUI
     {
-        public UIElement Core { get; private set; }
-
         private UIElement lastElementHover;
+
+        // ...
+
+        public UIElement Core { get; private set; }
 
         // ...
 
