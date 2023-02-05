@@ -26,6 +26,7 @@ namespace Pladi.Core.Input
         private MouseState currentMouseState;
         private MouseState previousMouseState;
         private List<char> textInputChars;
+        private bool writingText;
         private float backSpaceTime;
         private float backSpaceSpeed;
 
@@ -50,6 +51,7 @@ namespace Pladi.Core.Input
             currentKeyboardState = Keyboard.GetState();
             previousMouseState = currentMouseState;
             currentMouseState = Mouse.GetState();
+            writingText = false;
         }
 
         public bool IsPressed(Keys key)
@@ -115,6 +117,8 @@ namespace Pladi.Core.Input
 
         private void GetInputText_BackSpace(ref string oldText)
         {
+            writingText = true;
+
             if (!IsHeld(Keys.Back))
             {
                 backSpaceTime = backSpaceSpeed = 0;
@@ -132,7 +136,7 @@ namespace Pladi.Core.Input
 
         private void ProcessTextInput(object sender, TextInputEventArgs e)
         {
-            if (blackListKeys.Contains(e.Key)) return;
+            if (!writingText || blackListKeys.Contains(e.Key)) return;
 
             textInputChars.Add(e.Character);
         }
