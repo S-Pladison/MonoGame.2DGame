@@ -188,10 +188,12 @@ namespace Pladi.Core.UI.Elements
                 parentSizeY = Parent.size.Y;
             }
 
-            position.X = parentPosX + Left.GetPixelBaseParent(parentSizeX);
-            position.Y = parentPosY + Top.GetPixelBaseParent(parentSizeY);
+            position.X = parentPosX + Left.GetPixelBaseParent(parentSizeX) + parentSizeX * HorizontalAlign;
+            position.Y = parentPosY + Top.GetPixelBaseParent(parentSizeY) + parentSizeY * VerticalAlign;
             size.X = Width.GetPixelBaseParent(parentSizeX);
             size.Y = Height.GetPixelBaseParent(parentSizeY);
+            position.X -= size.X * HorizontalAlign;
+            position.Y -= size.Y * VerticalAlign;
         }
 
         private void RecalculateChildren()
