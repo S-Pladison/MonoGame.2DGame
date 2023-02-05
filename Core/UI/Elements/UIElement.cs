@@ -16,9 +16,9 @@ namespace Pladi.Core.UI.Elements
 
         // ...
 
-        protected List<UIElement> children;
-        protected Vector2 position;
-        protected Vector2 size;
+        private List<UIElement> children;
+        private Vector2 position;
+        private Vector2 size;
 
         public StyleDimension Left;
         public StyleDimension Top;
@@ -34,6 +34,8 @@ namespace Pladi.Core.UI.Elements
         public IReadOnlyCollection<UIElement> Children { get => children; }
         public UIElement Parent { get; private set; }
         public bool IsMouseHovering { get; private set; }
+        public Vector2 Position { get => position; }
+        public Vector2 Size { get => size; }
         public RectangleF Dimensions { get => new(position.X, position.Y, size.X, size.Y); }
 
         // ...

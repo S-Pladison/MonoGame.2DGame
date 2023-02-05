@@ -56,7 +56,7 @@ namespace Pladi.Core.UI.Elements
 
         protected override void DrawThis(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawStringWithShadow(font, $"{text}", position, FontColor, 0, Vector2.Zero, FontScale, ShadowSpread);
+            spriteBatch.DrawStringWithShadow(font, $"{text}", Position, FontColor, 0, Vector2.Zero, FontScale, ShadowSpread);
         }
 
         private void RecreateText()

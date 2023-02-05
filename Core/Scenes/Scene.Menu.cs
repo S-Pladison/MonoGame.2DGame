@@ -20,9 +20,11 @@ namespace Pladi.Core.Scenes
             userInterface = new GraphicalUI();
 
             var panel = new PanelUIElement();
-            panel.BackgroundColor = new Color(0, 0, 0, 50);
-            panel.Width.SetPixel(250f);
-            panel.Height.SetPercent(1f);
+            panel.BackgroundColor = new Color(255, 255, 255, 255);
+            panel.HorizontalAlign = 0.5f;
+            panel.VerticalAlign = 0.5f;
+            panel.Width.SetPercent(0.5f);
+            panel.Height.SetPercent(0.5f);
             userInterface.Append(panel);
 
             var startGameButton = new TextUIElement("Start")
@@ -52,6 +54,14 @@ namespace Pladi.Core.Scenes
             inputField.Height.SetPixel(50f);
             inputField.HintText = "...";
             panel.Append(inputField);
+
+            var panel2 = new PanelUIElement();
+            panel2.BackgroundColor = new Color(0, 0, 255, 255);
+            panel2.HorizontalAlign = 0.1f;
+            panel2.VerticalAlign = 0.5f;
+            panel2.Width.SetPercent(0.2f);
+            panel2.Height.SetPercent(0.2f);
+            panel.Append(panel2);
 
             /*var cTime = new TextUIElement(FontAssets.DefaultSmall, string.Empty, Color.White);
             cTime.OnPostUpdate += (e) => cTime.SetText(DateTime.Now.ToString() + "\nVersion: D.0.0.0.1");

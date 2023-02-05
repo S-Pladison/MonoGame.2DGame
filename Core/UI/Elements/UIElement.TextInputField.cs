@@ -76,12 +76,12 @@ namespace Pladi.Core.UI.Elements
 
             if (Text is null || Text is "")
             {
-                spriteBatch.DrawStringWithShadow(font, $"{HintText ?? ""}", position + Vector2.UnitX * 4, Color.Gray, 0, Vector2.Zero, 1f, 2f);
-                spriteBatch.DrawStringWithShadow(font, $"{cursor}", position, Color.White, 0, Vector2.Zero, 1f, 2f);
+                spriteBatch.DrawStringWithShadow(font, $"{HintText ?? ""}", Position + Vector2.UnitX * 4, Color.Gray, 0, Vector2.Zero, 1f, 2f);
+                spriteBatch.DrawStringWithShadow(font, $"{cursor}", Position, Color.White, 0, Vector2.Zero, 1f, 2f);
             }
             else
             {
-                spriteBatch.DrawStringWithShadow(font, $"{Text + cursor}", position, Color.White, 0, Vector2.Zero, 1f, 2f);
+                spriteBatch.DrawStringWithShadow(font, $"{Text + cursor}", Position, Color.White, 0, Vector2.Zero, 1f, 2f);
             }
         }
     }
