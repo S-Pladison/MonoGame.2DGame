@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Pladi.Core.UI.Elements
 {
@@ -22,6 +23,7 @@ namespace Pladi.Core.UI.Elements
 
         public bool IsFocused { get; private set; }
         public string Text { get; private set; }
+        public string HintText { get; set; }
 
         // ...
 
@@ -70,8 +72,17 @@ namespace Pladi.Core.UI.Elements
 
         protected override void DrawThis(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            var text = Text + (blinkingCursorTime > (blinkingCursorStateTime / 2) ? "|" : "");
-            spriteBatch.DrawStringWithShadow(font, $"{text}", position, Color.White, 0, Vector2.Zero, 1f, 2f);
+            var cursor = (blinkingCursorTime > (blinkingCursorStateTime / 2) ? "|" : "");
+
+            if (Text is null || Text is "")
+            {
+                spriteBatch.DrawStringWithShadow(font, $"{HintText ?? ""}", position + Vector2.UnitX * 4, Color.Gray, 0, Vector2.Zero, 1f, 2f);
+                spriteBatch.DrawStringWithShadow(font, $"{cursor}", position, Color.White, 0, Vector2.Zero, 1f, 2f);
+            }
+            else
+            {
+                spriteBatch.DrawStringWithShadow(font, $"{Text + cursor}", position, Color.White, 0, Vector2.Zero, 1f, 2f);
+            }
         }
     }
 }

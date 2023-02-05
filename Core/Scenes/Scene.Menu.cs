@@ -50,6 +50,7 @@ namespace Pladi.Core.Scenes
             inputField.Top.SetPixel(10f);
             inputField.Width.SetPercent(1f);
             inputField.Height.SetPixel(50f);
+            inputField.HintText = "...";
             panel.Append(inputField);
 
             /*var cTime = new TextUIElement(FontAssets.DefaultSmall, string.Empty, Color.White);
