@@ -14,6 +14,10 @@ namespace Pladi.Content
 
         // ...
 
+        public static Texture2D UIPanel { get; private set; }
+
+        // ...
+
         public static void Load(ContentManager content)
         {
             Texture2D Load(string name) => content.Load<Texture2D>("Textures/" + name);
@@ -24,6 +28,8 @@ namespace Pladi.Content
             Pixel = Load("Pixel");
             Player = Load("Player");
             Tilemap = Load("Tilemap");
+
+            UIPanel = Load("Panel");
         }
 
         public static void Unload()
@@ -34,6 +40,8 @@ namespace Pladi.Content
             Cursor = null;
             CollisionTilemap = null;
             Collision = null;
+
+            UIPanel = null;
         }
     }
 }
