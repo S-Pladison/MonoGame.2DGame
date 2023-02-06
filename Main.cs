@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Content;
+using Pladi.Core;
 using Pladi.Core.Input;
 using Pladi.Core.Scenes;
 using System;
@@ -14,6 +15,7 @@ namespace Pladi
     {
         public static SceneManager SceneManager { get; private set; }
         public static InputManager InputManager { get; private set; }
+        public static FrameCounter FrameCounter { get; private set; }
 
         public static bool IsGameActive { get => instance.IsActive; }
         public static SpriteBatch SpriteBatch { get => instance.spriteBatch; }
@@ -53,6 +55,7 @@ namespace Pladi
             Rand = new Random((int)DateTime.Now.Ticks);
             InputManager = new InputManager(Window);
             SceneManager = new SceneManager();
+            FrameCounter = new FrameCounter();
         }
 
         protected override void LoadContent()
@@ -94,6 +97,7 @@ namespace Pladi
 
                 InputManager.Update(gameTime);
                 SceneManager.Update(gameTime);
+                FrameCounter.Update(gameTime);
             }
             catch (Exception ex)
             {

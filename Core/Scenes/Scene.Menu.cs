@@ -27,7 +27,7 @@ namespace Pladi.Core.Scenes
             panel.Height.SetPercent(0.5f);
             userInterface.Append(panel);
 
-            var startGameButton = new TextUIElement("Start")
+            var startGameButton = new TextUIElement("Начать")
             {
                 HorizontalAlign = 0.5f,
                 VerticalAlign = 0.5f
@@ -54,14 +54,6 @@ namespace Pladi.Core.Scenes
             inputField.Height.SetPixel(50f);
             inputField.HintText = "...";
             panel.Append(inputField);
-
-            var panel2 = new PanelUIElement();
-            panel2.BackgroundColor = new Color(0, 0, 255, 255);
-            panel2.HorizontalAlign = 0.1f;
-            panel2.VerticalAlign = 0.5f;
-            panel2.Width.SetPercent(0.2f);
-            panel2.Height.SetPercent(0.2f);
-            panel.Append(panel2);
 
             /*var cTime = new TextUIElement(FontAssets.DefaultSmall, string.Empty, Color.White);
             cTime.OnPostUpdate += (e) => cTime.SetText(DateTime.Now.ToString() + "\nVersion: D.0.0.0.1");

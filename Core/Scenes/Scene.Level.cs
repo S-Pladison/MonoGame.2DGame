@@ -2,13 +2,90 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Pladi.Content;
+using Pladi.Core.UI;
+using Pladi.Core.UI.Elements;
 using Pladi.Enitites;
 using Pladi.Utilities;
+using System.Collections.Generic;
 
 namespace Pladi.Core.Scenes
 {
     public class LevelScene : Scene
     {
+        private GraphicalUI graphicalUI;
+        private List<Entity> entities;
+
+        // ...
+
+        public LevelScene()
+        {
+            graphicalUI = new();
+            entities = new();
+
+            entities.Add(new Square());
+
+            InitUI();
+        }
+
+        // ...
+
+        private void InitUI()
+        {
+            var panel = new PanelUIElement();
+            panel.Width.SetPixel(100f);
+            panel.Height.SetPixel(55f);
+            panel.Left.SetPixel(10f);
+            panel.Top.SetPixel(10f);
+            graphicalUI.Append(panel);
+
+            var text = new TextUIElement();
+            text.OnPostUpdate += (elem) => (elem as TextUIElement).Text = $"" +
+                $"FPS: {(int)Main.FrameCounter.AverageFramesPerSecond}\n" +
+                $"Entities: {entities.Count}";
+            text.Left.SetPixel(10f);
+            text.Top.SetPixel(10f);
+            panel.Append(text);
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            foreach (var entity in entities.ToArray())
+            {
+                entity.Update(gameTime);
+            }
+
+            graphicalUI.Update(gameTime);
+        }
+
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+            var device = spriteBatch.GraphicsDevice;
+            device.Clear(Color.DarkGray);
+
+            DrawEntities(gameTime, spriteBatch);
+            DrawUI(gameTime, spriteBatch);
+        }
+
+        private void DrawEntities(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
+
+            foreach (var entity in entities)
+            {
+                entity.Draw(gameTime, spriteBatch);
+            }
+
+            spriteBatch.End();
+        }
+
+        private void DrawUI(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
+            graphicalUI.Draw(gameTime, spriteBatch);
+            spriteBatch.End();
+        }
+
+        /*
         private GameLevel level;
 
         private Camera camera;
@@ -101,6 +178,6 @@ namespace Pladi.Core.Scenes
             spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Velocity: {player.Velocity}", new Vector2(5, 20), Color.White, 0, Vector2.Zero, 1f, 1f);
 
             spriteBatch.End();
-        }
+        }*/
     }
 }

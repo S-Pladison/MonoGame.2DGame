@@ -50,9 +50,7 @@ namespace Pladi.Core.UI.Elements
         public void Update(GameTime gameTime)
         {
             UpdateThis(gameTime);
-
             OnPostUpdate(this);
-
             UpdateChildren(gameTime);
         }
 

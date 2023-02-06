@@ -42,7 +42,7 @@ namespace Pladi.Core.UI.Elements
 
         public TextUIElement(string text)
         {
-            this.font = FontAssets.DefaultMedium;
+            this.font = FontAssets.DefaultSmall;
             this.text = text;
             this.scale = 1f;
 
