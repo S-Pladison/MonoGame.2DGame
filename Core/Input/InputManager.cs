@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Pladi.Utilities.Enums;
-using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Pladi.Core.Input
 {
@@ -103,6 +99,8 @@ namespace Pladi.Core.Input
 
         public string GetInputText(string oldString)
         {
+            writingText = true;
+
             foreach (var ch in textInputChars)
             {
                 oldString += ch;
@@ -117,8 +115,6 @@ namespace Pladi.Core.Input
 
         private void GetInputText_BackSpace(ref string oldText)
         {
-            writingText = true;
-
             if (!IsHeld(Keys.Back))
             {
                 backSpaceTime = backSpaceSpeed = 0;
