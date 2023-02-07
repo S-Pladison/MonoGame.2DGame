@@ -10,11 +10,9 @@ namespace Pladi.Core.Scenes
 
         // ...
 
-        public override void Update(GameTime gameTime)
+        public override void Update()
         {
-            var delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            splashCounter += 1 * delta;
+            splashCounter += 1 * Main.DeltaTime;
 
             if (splashCounter >= blackScreenTime)
             {
@@ -22,7 +20,7 @@ namespace Pladi.Core.Scenes
             }
         }
 
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.GraphicsDevice.Clear(Color.Black);
         }

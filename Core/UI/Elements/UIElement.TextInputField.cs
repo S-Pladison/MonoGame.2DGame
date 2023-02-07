@@ -17,7 +17,7 @@ namespace Pladi.Core.UI.Elements
     {
         private readonly int blinkingCursorStateTime;
         private readonly SpriteFont font;
-        private int blinkingCursorTime;
+        private float blinkingCursorTime;
 
         // ...
 
@@ -38,7 +38,7 @@ namespace Pladi.Core.UI.Elements
 
         // ...
 
-        protected override void UpdateThis(GameTime gameTime)
+        protected override void UpdateThis()
         {
             if (!IsFocused) return;
 
@@ -59,7 +59,9 @@ namespace Pladi.Core.UI.Elements
 
         private void UpdateBlinkingCursor()
         {
-            if (--blinkingCursorTime <= 0)
+            blinkingCursorTime -= Main.DeltaTime * 60;
+
+            if (blinkingCursorTime <= 0)
             {
                 blinkingCursorTime = blinkingCursorStateTime;
             }
@@ -70,7 +72,7 @@ namespace Pladi.Core.UI.Elements
             IsFocused = true;
         }
 
-        protected override void DrawThis(GameTime gameTime, SpriteBatch spriteBatch)
+        protected override void DrawThis(SpriteBatch spriteBatch)
         {
             var cursor = (blinkingCursorTime > (blinkingCursorStateTime / 2) ? "|" : "");
 

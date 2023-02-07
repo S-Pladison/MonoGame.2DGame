@@ -36,13 +36,11 @@ namespace Pladi.Core.Scenes
 
         // ...
 
-        public void Update(GameTime gameTime)
+        public void Update()
         {
-            var delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
             if (expectedScene is not null)
             {
-                initSceneProgress += 1f * delta;
+                initSceneProgress += 1f * Main.DeltaTime;
 
                 if (initSceneProgress >= 1f)
                 {
@@ -56,7 +54,7 @@ namespace Pladi.Core.Scenes
                 }
             }
 
-            current.Update(gameTime);
+            current.Update();
         }
 
         public void OnResolutionChanged(int width, int height)
@@ -64,14 +62,14 @@ namespace Pladi.Core.Scenes
             current.OnResolutionChanged(width, height);
         }
 
-        public void PreDraw(GameTime gameTime, SpriteBatch spriteBatch)
+        public void PreDraw(SpriteBatch spriteBatch)
         {
-            current.PreDraw(gameTime, spriteBatch);
+            current.PreDraw(spriteBatch);
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch)
         {
-            current.Draw(gameTime, spriteBatch);
+            current.Draw(spriteBatch);
 
             if (expectedScene is null) return;
 

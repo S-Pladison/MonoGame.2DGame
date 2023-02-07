@@ -24,7 +24,7 @@ namespace Pladi.Core.UI.Elements
 
         // ...
 
-        protected override void DrawThis(GameTime gameTime, SpriteBatch spriteBatch)
+        protected override void DrawThis(SpriteBatch spriteBatch)
         {
             var texture = PanelTexture;
             var textureRect = texture.Bounds;

@@ -33,7 +33,7 @@ namespace Pladi.Core.UI
         public void Append(UIElement element)
             => Core.Append(element);
 
-        public void Update(GameTime gameTime)
+        public void Update()
         {
             var input = Main.InputManager;
             var mousePosition = input.GetMousePosition();
@@ -43,12 +43,12 @@ namespace Pladi.Core.UI
             UpdateMouseHover(mouseElement, mousePosition);
             UpdateMouseClick(mouseElement, mousePosition, mouseLeft);
 
-            Core.Update(gameTime);
+            Core.Update();
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch)
         {
-            Core.Draw(gameTime, spriteBatch);
+            Core.Draw(spriteBatch);
         }
 
         public void OnResolutionChanged(int width, int height)

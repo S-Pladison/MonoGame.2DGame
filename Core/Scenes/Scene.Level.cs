@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Input;
 using Pladi.Content;
 using Pladi.Core.UI;
 using Pladi.Core.UI.Elements;
-using Pladi.Enitites;
 using Pladi.Utilities;
 using System.Collections.Generic;
 
@@ -13,16 +12,12 @@ namespace Pladi.Core.Scenes
     public class LevelScene : Scene
     {
         private GraphicalUI graphicalUI;
-        private List<Entity> entities;
 
         // ...
 
         public LevelScene()
         {
             graphicalUI = new();
-            entities = new();
-
-            entities.Add(new Square());
 
             InitUI();
         }
@@ -41,47 +36,29 @@ namespace Pladi.Core.Scenes
             var text = new TextUIElement();
             text.OnPostUpdate += (elem) => (elem as TextUIElement).Text = $"" +
                 $"FPS: {(int)Main.FrameCounter.AverageFramesPerSecond}\n" +
-                $"Entities: {entities.Count}";
+                $"Entities: {0}";
             text.Left.SetPixel(10f);
             text.Top.SetPixel(10f);
             panel.Append(text);
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update()
         {
-            foreach (var entity in entities.ToArray())
-            {
-                entity.Update(gameTime);
-            }
-
-            graphicalUI.Update(gameTime);
+            graphicalUI.Update();
         }
 
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         {
             var device = spriteBatch.GraphicsDevice;
             device.Clear(Color.DarkGray);
 
-            DrawEntities(gameTime, spriteBatch);
-            DrawUI(gameTime, spriteBatch);
+            DrawUI(spriteBatch);
         }
 
-        private void DrawEntities(GameTime gameTime, SpriteBatch spriteBatch)
+        private void DrawUI(SpriteBatch spriteBatch)
         {
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
-
-            foreach (var entity in entities)
-            {
-                entity.Draw(gameTime, spriteBatch);
-            }
-
-            spriteBatch.End();
-        }
-
-        private void DrawUI(GameTime gameTime, SpriteBatch spriteBatch)
-        {
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
-            graphicalUI.Draw(gameTime, spriteBatch);
+            graphicalUI.Draw(spriteBatch);
             spriteBatch.End();
         }
 

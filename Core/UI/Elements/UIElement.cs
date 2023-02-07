@@ -47,30 +47,30 @@ namespace Pladi.Core.UI.Elements
 
         // ...
 
-        public void Update(GameTime gameTime)
+        public void Update()
         {
-            UpdateThis(gameTime);
+            UpdateThis();
             OnPostUpdate(this);
-            UpdateChildren(gameTime);
+            UpdateChildren();
         }
 
-        protected virtual void UpdateThis(GameTime gameTime) { }
+        protected virtual void UpdateThis() { }
 
-        private void UpdateChildren(GameTime gameTime)
+        private void UpdateChildren()
         {
             foreach (var child in children)
             {
-                child.Update(gameTime);
+                child.Update();
             }
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch)
         {
-            DrawThis(gameTime, spriteBatch);
+            DrawThis(spriteBatch);
 
             if (!ClippingOutsideRectangle)
             {
-                DrawChildren(gameTime, spriteBatch);
+                DrawChildren(spriteBatch);
                 return;
             }
 
@@ -84,7 +84,7 @@ namespace Pladi.Core.UI.Elements
             spriteBatch.GraphicsDevice.ScissorRectangle = Rectangle.Intersect(scissorRectangle, Dimensions.ToRectangle());
             spriteBatchData.Begin(spriteBatch);
 
-            DrawChildren(gameTime, spriteBatch);
+            DrawChildren(spriteBatch);
 
             spriteBatch.End();
             spriteBatchData.RasterizerState = rasterizerState;
@@ -92,13 +92,13 @@ namespace Pladi.Core.UI.Elements
             spriteBatchData.Begin(spriteBatch);
         }
 
-        protected virtual void DrawThis(GameTime gameTime, SpriteBatch spriteBatch) { }
+        protected virtual void DrawThis(SpriteBatch spriteBatch) { }
 
-        private void DrawChildren(GameTime gameTime, SpriteBatch spriteBatch)
+        private void DrawChildren(SpriteBatch spriteBatch)
         {
             foreach (var child in children)
             {
-                child.Draw(gameTime, spriteBatch);
+                child.Draw(spriteBatch);
             }
         }
 

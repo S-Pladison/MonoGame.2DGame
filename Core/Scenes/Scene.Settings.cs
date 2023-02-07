@@ -103,22 +103,22 @@ namespace Pladi.Core.Scenes
             userInterface?.OnResolutionChanged(width, height);
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update()
         {
             if (Main.InputManager.JustPressed(Keys.Escape))
             {
                 Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Menu);
             }
 
-            userInterface.Update(gameTime);
+            userInterface.Update();
         }
 
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.GraphicsDevice.Clear(Colors.MenuBackground);
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
-            userInterface.Draw(gameTime, spriteBatch);
+            userInterface.Draw(spriteBatch);
             spriteBatch.End();
         }
     }

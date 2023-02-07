@@ -41,7 +41,7 @@ namespace Pladi.Core.Input
 
         // ...
 
-        public void Update(GameTime gameTime)
+        public void Update()
         {
             previousKeyboardState = currentKeyboardState;
             currentKeyboardState = Keyboard.GetState();
@@ -121,7 +121,7 @@ namespace Pladi.Core.Input
                 return;
             }
 
-            backSpaceSpeed = Math.Min(backSpaceSpeed += 0.005f, 1.0f);
+            backSpaceSpeed = Math.Min(backSpaceSpeed += 0.005f * Main.DeltaTime, 1.0f);
             backSpaceTime = Math.Max(backSpaceTime -= backSpaceSpeed, 0);
 
             if (backSpaceTime is not 0) return;

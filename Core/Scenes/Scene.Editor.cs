@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Pladi.Content;
-using Pladi.Tiles;
 using Pladi.Utilities;
 using Pladi.Utilities.Enums;
 using System;
@@ -11,7 +10,7 @@ namespace Pladi.Core.Scenes
 {
     public class EditorScene : Scene
     {
-        private GameLevel level;
+        /*private GameLevel level;
         private Grid grid;
         private Camera camera;
 
@@ -126,7 +125,7 @@ namespace Pladi.Core.Scenes
 
             camera.Viewport = Main.SpriteBatch.GraphicsDevice.Viewport;
             /*tilemap.RecreateRenderTarget(Main.SpriteBatch.GraphicsDevice, width, height);
-            collisionTilemap.RecreateRenderTarget(Main.SpriteBatch.GraphicsDevice, width, height);*/
+            collisionTilemap.RecreateRenderTarget(Main.SpriteBatch.GraphicsDevice, width, height);
             level.RecreateRenderTargets(device, width, height);
             grid.RecreateRenderTarget(device, width, height);
         }
@@ -195,6 +194,6 @@ namespace Pladi.Core.Scenes
             spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Layer type: {(collideLayer ? "Collider" : "Back")}", new Vector2(5, 50), Color.White, 0, Vector2.Zero, 1f, 1f);
 
             spriteBatch.End();
-        }
+        }*/
     }
 }

@@ -22,6 +22,7 @@ namespace Pladi
         public static Random Rand { get; private set; }
         public static Point ScreenSize { get; private set; }
         public static float GlobalTimeWrappedHourly { get; private set; }
+        public static float DeltaTime { get; private set; }
 
         // ...
 
@@ -88,6 +89,7 @@ namespace Pladi
         {
             Window.Title = GetForm().WindowState.ToString() + " | " + graphics.PreferredBackBufferWidth + "x" + graphics.PreferredBackBufferHeight + " | " + windowMaximized;
             GlobalTimeWrappedHourly = (float)(gameTime.TotalGameTime.TotalSeconds % 3600.0);
+            DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             try
             {
@@ -95,9 +97,9 @@ namespace Pladi
 
                 base.Update(gameTime);
 
-                InputManager.Update(gameTime);
-                SceneManager.Update(gameTime);
-                FrameCounter.Update(gameTime);
+                InputManager.Update();
+                SceneManager.Update();
+                FrameCounter.Update();
             }
             catch (Exception ex)
             {
@@ -112,11 +114,11 @@ namespace Pladi
 
             try
             {
-                SceneManager.PreDraw(gameTime, spriteBatch);
+                SceneManager.PreDraw(spriteBatch);
 
                 base.Draw(gameTime);
 
-                SceneManager.Draw(gameTime, spriteBatch);
+                SceneManager.Draw(spriteBatch);
             }
             catch (Exception)
             {

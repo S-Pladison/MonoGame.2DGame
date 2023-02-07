@@ -28,9 +28,9 @@ namespace Pladi.Core
 
         // ...
 
-        public void Update(GameTime gameTime)
+        public void Update()
         {
-            var delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var delta = Main.DeltaTime;
 
             CurrentFramesPerSecond = 1.0f / delta;
 
