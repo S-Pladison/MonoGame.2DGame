@@ -84,7 +84,7 @@ namespace Pladi.Utilities.DataStructures.QuadTrees
                 var destTree = GetDestinationTree(Objects[i]);
 
                 if (destTree != this)
-                { 
+                {
                     destTree.Insert(Objects[i]);
                     Remove(Objects[i]);
                     i--;

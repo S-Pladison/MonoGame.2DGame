@@ -1,12 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Pladi.Content;
-using Pladi.Utilities;
-using Pladi.Utilities.Enums;
-using System;
-
-namespace Pladi.Core.Scenes
+﻿namespace Pladi.Core.Scenes
 {
     public class EditorScene : Scene
     {

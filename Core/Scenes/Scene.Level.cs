@@ -1,11 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Pladi.Content;
 using Pladi.Core.UI;
 using Pladi.Core.UI.Elements;
-using Pladi.Utilities;
-using System.Collections.Generic;
 
 namespace Pladi.Core.Scenes
 {

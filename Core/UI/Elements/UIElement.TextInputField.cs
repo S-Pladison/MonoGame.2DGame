@@ -4,12 +4,6 @@ using Pladi.Content;
 using Pladi.Core.UI.Events;
 using Pladi.Utilities;
 using Pladi.Utilities.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Pladi.Core.UI.Elements
 {

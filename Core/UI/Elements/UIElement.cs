@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Pladi.Core.UI.Events;
 using Pladi.Utilities;
 using Pladi.Utilities.DataStructures;
-using System;
 using System.Collections.Generic;
 
 namespace Pladi.Core.UI.Elements

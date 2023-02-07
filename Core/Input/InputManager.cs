@@ -125,7 +125,7 @@ namespace Pladi.Core.Input
             backSpaceTime = Math.Max(backSpaceTime -= backSpaceSpeed, 0);
 
             if (backSpaceTime is not 0) return;
-            
+
             oldText = oldText[..Math.Max(oldText.Length - 1, 0)];
             backSpaceTime = 1f;
         }
