@@ -92,7 +92,7 @@ namespace Pladi.Core.Scenes
             var text = new TextUIElement();
             text.OnPostUpdate += (elem) => (elem as TextUIElement).Text = $"" +
                 $"FPS: {(int)Main.FrameCounter.AverageFramesPerSecond}\n" +
-                $"Entities: {entities.Count}";
+                $"Entities: {entities.Count + (player is not null ? 1 : 0)}";
             text.Left.SetPixel(10f);
             text.Top.SetPixel(10f);
             panel.Append(text);
