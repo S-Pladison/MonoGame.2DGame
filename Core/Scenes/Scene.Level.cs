@@ -11,6 +11,7 @@ namespace Pladi.Core.Scenes
     {
         private GraphicalUI graphicalUI;
         private List<Entity> entities;
+        private Player player;
 
         // ...
 
@@ -19,19 +20,63 @@ namespace Pladi.Core.Scenes
             graphicalUI = new();
             entities = new();
 
+            InitPlayer();
             InitEntities();
             InitUI();
         }
 
         // ...
 
+        private void InitPlayer()
+        {
+            player = new()
+            {
+                Position = new Vector2(-15, -45),
+                Width = 30,
+                Height = 30
+            };
+        }
+
         private void InitEntities()
         {
             entities.Add(new Box()
             {
-                Position = new Vector2(-50, -50),
-                Width = 100,
-                Height = 100
+                Position = new Vector2(-50, 0),
+                Width = 150,
+                Height = 50,
+                Color = Color.Red
+            });
+
+            entities.Add(new Box()
+            {
+                Position = new Vector2(100, 0),
+                Width = 50,
+                Height = 50,
+                Color = Color.IndianRed
+            });
+
+            entities.Add(new Box()
+            {
+                Position = new Vector2(-100, 0),
+                Width = 50,
+                Height = 50,
+                Color = Color.OrangeRed
+            });
+
+            entities.Add(new Box()
+            {
+                Position = new Vector2(-100, -50),
+                Width = 50,
+                Height = 50,
+                Color = Color.DarkOrange
+            });
+
+            entities.Add(new Box()
+            {
+                Position = new Vector2(-100, -100),
+                Width = 50,
+                Height = 50,
+                Color = Color.MonoGameOrange
             });
         }
 
@@ -66,6 +111,8 @@ namespace Pladi.Core.Scenes
             {
                 entity.Update();
             }
+
+            player.Update();
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -87,6 +134,8 @@ namespace Pladi.Core.Scenes
             {
                 entity.Draw(spriteBatch);
             }
+
+            player.Draw(spriteBatch);
 
             spriteBatch.End();
         }

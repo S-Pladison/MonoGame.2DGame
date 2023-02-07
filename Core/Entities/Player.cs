@@ -10,15 +10,11 @@ using System.Threading.Tasks;
 
 namespace Pladi.Core.Entities
 {
-    public class Box : Entity
+    public class Player : Entity
     {
-        public Color Color { get; set; } = Color.White;
-
-        // ...
-
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(TextureAssets.Pixel, Hitbox, Color);
+            spriteBatch.Draw(TextureAssets.Pixel, Hitbox, Color.Blue);
         }
     }
 }
