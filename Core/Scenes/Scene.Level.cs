@@ -1,24 +1,39 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Pladi.Core.Entities;
 using Pladi.Core.UI;
 using Pladi.Core.UI.Elements;
+using System.Collections.Generic;
 
 namespace Pladi.Core.Scenes
 {
     public class LevelScene : Scene
     {
         private GraphicalUI graphicalUI;
+        private List<Entity> entities;
 
         // ...
 
         public LevelScene()
         {
             graphicalUI = new();
+            entities = new();
 
+            InitEntities();
             InitUI();
         }
 
         // ...
+
+        private void InitEntities()
+        {
+            entities.Add(new Box()
+            {
+                Position = new Vector2(-50, -50),
+                Width = 100,
+                Height = 100
+            });
+        }
 
         private void InitUI()
         {
@@ -32,7 +47,7 @@ namespace Pladi.Core.Scenes
             var text = new TextUIElement();
             text.OnPostUpdate += (elem) => (elem as TextUIElement).Text = $"" +
                 $"FPS: {(int)Main.FrameCounter.AverageFramesPerSecond}\n" +
-                $"Entities: {0}";
+                $"Entities: {entities.Count}";
             text.Left.SetPixel(10f);
             text.Top.SetPixel(10f);
             panel.Append(text);
@@ -40,7 +55,17 @@ namespace Pladi.Core.Scenes
 
         public override void Update()
         {
+            UpdateEntities();
+
             graphicalUI.Update();
+        }
+
+        private void UpdateEntities()
+        {
+            foreach (var entity in entities.ToArray())
+            {
+                entity.Update();
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -48,13 +73,30 @@ namespace Pladi.Core.Scenes
             var device = spriteBatch.GraphicsDevice;
             device.Clear(Color.DarkGray);
 
+            DrawEntities(spriteBatch);
             DrawUI(spriteBatch);
+        }
+
+        private void DrawEntities(SpriteBatch spriteBatch)
+        {
+            var matrix = Matrix.CreateTranslation(Main.ScreenSize.X / 2, Main.ScreenSize.Y / 2, 0);
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, matrix);
+
+            foreach (var entity in entities)
+            {
+                entity.Draw(spriteBatch);
+            }
+
+            spriteBatch.End();
         }
 
         private void DrawUI(SpriteBatch spriteBatch)
         {
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
+
             graphicalUI.Draw(spriteBatch);
+
             spriteBatch.End();
         }
 

@@ -1,10 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Pladi.Utilities.DataStructures;
 
 namespace Pladi.Utilities
 {
     public static partial class PladiUtils
     {
+        public static void Draw(this SpriteBatch spriteBatch, Texture2D texture, RectangleF destinationRectangle, Color color)
+            => spriteBatch.Draw(texture, destinationRectangle.ToRectangle(), color);
+
         public static void DrawStringWithShadow(this SpriteBatch spriteBatch, SpriteFont font, string text, Vector2 position, Color color, float rotation, Vector2 origin, float scale, float spread = 2f)
         {
             spriteBatch.DrawStringShadow(font, text, position, Color.Black, rotation, origin, scale, spread);
