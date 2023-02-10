@@ -1,9 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Pladi.Content;
+using Pladi.Core.Collisions;
 using Pladi.Core.Entities;
+using Pladi.Core.Input;
 using Pladi.Core.UI;
 using Pladi.Core.UI.Elements;
+using Pladi.Utilities;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace Pladi.Core.Scenes
 {
@@ -113,6 +119,29 @@ namespace Pladi.Core.Scenes
             }
 
             player.Update();
+
+            var colliders = entities;
+
+            foreach (var entity in entities)
+            {
+                if (player.Velocity == Vector2.Zero) continue;
+
+                var expandedTarget = entity.Hitbox;
+                expandedTarget.Location -= player.Hitbox.Size * 0.5f;
+                expandedTarget.Size += player.Hitbox.Size;
+
+                if (!CollisionUtils.CheckRayAabbCollision(player.Hitbox.Center, player.Velocity * Main.DeltaTime, expandedTarget, out Vector2 contactPoint, out Vector2 contactNormal, out float contactTime) || contactTime >= 1.0f || contactTime < 0.0f) continue;
+
+                player.OnCollision(new CollisionEventArgs()
+                {
+                    Other = entity,
+                    ContactPoint = contactPoint,
+                    ContactNormal = contactNormal,
+                    ContactTime = contactTime
+                });
+            }
+
+            player.Position += player.Velocity * Main.DeltaTime;
         }
 
         public override void Draw(SpriteBatch spriteBatch)

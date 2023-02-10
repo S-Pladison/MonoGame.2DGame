@@ -1,11 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 using Pladi.Utilities.DataStructures;
 using System;
+using System.Collections.Generic;
 
 namespace Pladi.Utilities
 {
     public static partial class PladiUtils
     {
+        public static bool Between<T>(this T item, T start, T end)
+            => Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
+
         public static double SmoothDamp(double previousValue, double targetValue, ref double speed, double smoothTime, double dt)
         {
             double t1 = 0.36 * smoothTime;

@@ -28,6 +28,10 @@ namespace Pladi.Core.Input
 
         // ...
 
+        public Vector2 MousePosition => GetMousePosition();
+
+        // ...
+
         public InputManager(GameWindow window)
         {
             currentKeyboardState = Keyboard.GetState();
