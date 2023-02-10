@@ -9,6 +9,7 @@ using Pladi.Core.UI.Elements;
 using Pladi.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Pladi.Core.Scenes
@@ -84,6 +85,14 @@ namespace Pladi.Core.Scenes
                 Height = 50,
                 Color = Color.MonoGameOrange
             });
+
+            entities.Add(new Box()
+            {
+                Position = new Vector2(100, 100),
+                Width = 25,
+                Height = 25,
+                Color = Color.Green
+            });
         }
 
         private void InitUI()
@@ -122,26 +131,54 @@ namespace Pladi.Core.Scenes
 
             var colliders = entities;
 
-            foreach (var entity in entities)
+            ResolveCollision(player);
+
+            player.Position += player.Velocity * Main.DeltaTime;
+        }
+
+        private void ResolveCollision(ICollidable collider)
+        {
+            if (collider.Velocity.Equals(Vector2.Zero)) return;
+
+            ResolveNearestCollision(collider, entities.AsEnumerable<ICollidable>().ToHashSet());
+        }
+
+        private void ResolveNearestCollision(ICollidable collider, HashSet<ICollidable> colliders)
+        {
+            if (colliders.Count is 0) return;
+
+            ICollidable nearest = null;
+            float nearestDistSqrt = float.MaxValue;
+
+            foreach (var other in colliders)
             {
-                if (player.Velocity == Vector2.Zero) continue;
+                var distSqrt = (other.Hitbox.Location - collider.Hitbox.Location).LengthSquared();
 
-                var expandedTarget = entity.Hitbox;
-                expandedTarget.Location -= player.Hitbox.Size * 0.5f;
-                expandedTarget.Size += player.Hitbox.Size;
-
-                if (!CollisionUtils.CheckRayAabbCollision(player.Hitbox.Center, player.Velocity * Main.DeltaTime, expandedTarget, out Vector2 contactPoint, out Vector2 contactNormal, out float contactTime) || contactTime >= 1.0f || contactTime < 0.0f) continue;
-
-                player.OnCollision(new CollisionEventArgs()
+                if (distSqrt < nearestDistSqrt)
                 {
-                    Other = entity,
+                    nearest = other;
+                    nearestDistSqrt = distSqrt;
+                }
+            }
+
+            var expandedTarget = nearest.Hitbox;
+            expandedTarget.Location -= collider.Hitbox.Size * 0.5f;
+            expandedTarget.Size += collider.Hitbox.Size;
+
+            if (CollisionUtils.CheckRayAabbCollision(collider.Hitbox.Center, collider.Velocity * Main.DeltaTime, expandedTarget, out Vector2 contactPoint, out Vector2 contactNormal, out float contactTime) && contactTime < 1.0f && contactTime >= 0.0f)
+            {
+                collider.OnCollision(new CollisionEventArgs()
+                {
+                    Other = nearest,
                     ContactPoint = contactPoint,
                     ContactNormal = contactNormal,
                     ContactTime = contactTime
                 });
             }
 
-            player.Position += player.Velocity * Main.DeltaTime;
+            colliders.Remove(nearest);
+
+            ResolveNearestCollision(collider, colliders);
         }
 
         public override void Draw(SpriteBatch spriteBatch)

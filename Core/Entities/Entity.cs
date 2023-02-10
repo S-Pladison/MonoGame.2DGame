@@ -13,7 +13,7 @@ namespace Pladi.Core.Entities
 {
     public abstract class Entity : ICollidable
     {
-        public Vector2 Velocity;
+        public Vector2 Velocity { get; set; }
         public Vector2 Position;
         public float Width;
         public float Height;

@@ -1,4 +1,5 @@
-﻿using Pladi.Utilities.DataStructures;
+﻿using Microsoft.Xna.Framework;
+using Pladi.Utilities.DataStructures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace Pladi.Core.Collisions
     public interface ICollidable
     {
         RectangleF Hitbox { get; }
+        Vector2 Velocity { get; }
 
         // ...
 

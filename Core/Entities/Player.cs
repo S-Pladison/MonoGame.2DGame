@@ -19,24 +19,27 @@ namespace Pladi.Core.Entities
         {
             var input = Main.InputManager;
 
+            Velocity += Vector2.UnitY * 100 * Main.DeltaTime;
+            Velocity *= new Vector2(0.95f, 1);
+
             if (input.IsPressed(Keys.A))
             {
-                Velocity.X += -100 * Main.DeltaTime;
+                Velocity += Vector2.UnitX * -300 * Main.DeltaTime;
             }
 
             if (input.IsPressed(Keys.D))
             {
-                Velocity.X += 100 * Main.DeltaTime;
+                Velocity += Vector2.UnitX * 300 * Main.DeltaTime;
             }
 
             if (input.IsPressed(Keys.W))
             {
-                Velocity.Y += -100 * Main.DeltaTime;
+                Velocity += Vector2.UnitY * -300 * Main.DeltaTime;
             }
 
             if (input.IsPressed(Keys.S))
             {
-                Velocity.Y += 100 * Main.DeltaTime;
+                Velocity += Vector2.UnitY * 300 * Main.DeltaTime;
             }
         }
 
@@ -54,8 +57,7 @@ namespace Pladi.Core.Entities
 
         private void OnCollisionWithTile(Box box, CollisionEventArgs args)
         {
-            //Velocity += Velocity * Vector2.Dot(args.ContactNormal, Velocity) * (1 - args.ContactTime) * Main.DeltaTime;
-            Velocity += args.ContactNormal * new Vector2(Math.Abs(Velocity.X), Math.Abs(Velocity.Y)) * (1 - args.ContactTime);
+            Velocity += args.ContactNormal * Velocity.Abs() * (1 - args.ContactTime);
         }
 
         public override void Draw(SpriteBatch spriteBatch)

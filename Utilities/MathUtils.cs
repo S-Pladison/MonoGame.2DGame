@@ -7,6 +7,9 @@ namespace Pladi.Utilities
 {
     public static partial class PladiUtils
     {
+        public static Vector2 Abs(this Vector2 vector)
+            => new(Math.Abs(vector.X), Math.Abs(vector.Y));
+
         public static bool Between<T>(this T item, T start, T end)
             => Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
 
