@@ -25,9 +25,9 @@ namespace Pladi.Utilities
             if (tNear.X > tFar.Y || tNear.Y > tFar.X) return false;
 
             contactTime = Math.Max(tNear.X, tNear.Y);
-            float t_hit_far = Math.Min(tFar.X, tFar.Y);
+            float tHitFar = Math.Min(tFar.X, tFar.Y);
 
-            if (t_hit_far < 0) return false;
+            if (tHitFar < 0) return false;
 
             contactPoint = rayPosition + contactTime * rayDirection;
 
