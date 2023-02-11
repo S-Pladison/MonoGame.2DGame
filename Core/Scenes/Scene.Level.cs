@@ -131,54 +131,35 @@ namespace Pladi.Core.Scenes
 
             var colliders = entities;
 
-            ResolveCollision(player);
+            entities.Last().Position = Main.InputManager.MousePosition;
 
-            player.Position += player.Velocity * Main.DeltaTime;
-        }
-
-        private void ResolveCollision(ICollidable collider)
-        {
-            if (collider.Velocity.Equals(Vector2.Zero)) return;
-
-            ResolveNearestCollision(collider, entities.AsEnumerable<ICollidable>().ToHashSet());
-        }
-
-        private void ResolveNearestCollision(ICollidable collider, HashSet<ICollidable> colliders)
-        {
-            if (colliders.Count is 0) return;
-
-            ICollidable nearest = null;
-            float nearestDistSqrt = float.MaxValue;
-
-            foreach (var other in colliders)
+            foreach (var collider in entities.OrderBy(x => x.Position.X).ThenBy(y => y.Position.Y).Distinct())
             {
-                var distSqrt = (other.Hitbox.Location - collider.Hitbox.Location).LengthSquared();
+                var expandedTarget = collider.Hitbox;
+                expandedTarget.Location -= player.Hitbox.Size * 0.5f;
+                expandedTarget.Size += player.Hitbox.Size;
 
-                if (distSqrt < nearestDistSqrt)
+                if (CollisionUtils.CheckRayAabbCollision(player.Hitbox.Center, player.Velocity * Main.DeltaTime, expandedTarget, out Vector2 contactPoint, out Vector2 contactNormal, out float contactTime) && contactTime < 1.0f && contactTime >= 0.0f)
                 {
-                    nearest = other;
-                    nearestDistSqrt = distSqrt;
+                    player.OnCollision(new CollisionEventArgs()
+                    {
+                        Other = collider,
+                        ContactPoint = contactPoint,
+                        ContactNormal = contactNormal,
+                        ContactTime = contactTime
+                    });
+
+                    collider.OnCollision(new CollisionEventArgs()
+                    {
+                        Other = collider,
+                        ContactPoint = contactPoint,
+                        ContactNormal = -1f * contactNormal,
+                        ContactTime = contactTime
+                    });
                 }
             }
 
-            var expandedTarget = nearest.Hitbox;
-            expandedTarget.Location -= collider.Hitbox.Size * 0.5f;
-            expandedTarget.Size += collider.Hitbox.Size;
-
-            if (CollisionUtils.CheckRayAabbCollision(collider.Hitbox.Center, collider.Velocity * Main.DeltaTime, expandedTarget, out Vector2 contactPoint, out Vector2 contactNormal, out float contactTime) && contactTime < 1.0f && contactTime >= 0.0f)
-            {
-                collider.OnCollision(new CollisionEventArgs()
-                {
-                    Other = nearest,
-                    ContactPoint = contactPoint,
-                    ContactNormal = contactNormal,
-                    ContactTime = contactTime
-                });
-            }
-
-            colliders.Remove(nearest);
-
-            ResolveNearestCollision(collider, colliders);
+            player.Position += player.Velocity * Main.DeltaTime;
         }
 
         public override void Draw(SpriteBatch spriteBatch)

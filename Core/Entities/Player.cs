@@ -19,8 +19,8 @@ namespace Pladi.Core.Entities
         {
             var input = Main.InputManager;
 
-            Velocity += Vector2.UnitY * 100 * Main.DeltaTime;
-            Velocity *= new Vector2(0.95f, 1);
+            /*Velocity += Vector2.UnitY * 100 * Main.DeltaTime;
+            Velocity *= new Vector2(0.95f, 1);*/
 
             if (input.IsPressed(Keys.A))
             {
