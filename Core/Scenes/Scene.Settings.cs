@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Pladi.Core.Input;
 using Pladi.Core.UI;
 
 namespace Pladi.Core.Scenes
@@ -102,9 +103,9 @@ namespace Pladi.Core.Scenes
 
         public override void Update()
         {
-            if (Main.InputManager.JustPressed(Keys.Escape))
+            if (ILoadable.GetInstance<InputComponent>().JustPressed(Keys.Escape))
             {
-                Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Menu);
+                SceneComponent.SetActiveScene(SceneComponent.GameScenes.Menu);
             }
 
             userInterface.Update();

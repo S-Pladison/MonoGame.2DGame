@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Pladi.Core.Tiles;
+using SharpDX.Direct2D1.Effects;
 
 namespace Pladi.Content
 {
@@ -11,6 +13,21 @@ namespace Pladi.Content
         public static Texture2D Pixel { get; private set; }
         public static Texture2D Player { get; private set; }
         public static Texture2D Tilemap { get; private set; }
+        public static Texture2D Shadow { get; private set; }
+
+        public static Texture2D Crate { get; private set; }
+
+        public static Texture2D Cloud1 { get; private set; }
+        public static Texture2D Cloud2 { get; private set; }
+        public static Texture2D Cloud3 { get; private set; }
+        public static Texture2D Cloud4 { get; private set; }
+        public static Texture2D Cloud5 { get; private set; }
+        public static Texture2D Cloud6 { get; private set; }
+
+        public static Texture2D WallPalette { get; private set; }
+        public static Texture2D TilePalette { get; private set; }
+
+        public static Texture2D Normal { get; private set; }
 
         // ...
 
@@ -28,18 +45,47 @@ namespace Pladi.Content
             Pixel = Load("Pixel");
             Player = Load("Player");
             Tilemap = Load("Tilemap");
+            Shadow = Load("Shadow");
+
+            Crate = Load("Crate");
+
+            Cloud1 = Load("Clouds/1");
+            Cloud2 = Load("Clouds/2");
+            Cloud3 = Load("Clouds/3");
+            Cloud4 = Load("Clouds/4");
+            Cloud5 = Load("Clouds/5");
+            Cloud6 = Load("Clouds/6");
+
+            WallPalette = Load("WallPalette");
+            TilePalette = Load("TilePalette");
+
+            Normal = Load("Normal");
 
             UIPanel = Load("Panel");
         }
 
         public static void Unload()
         {
+            Shadow = null;
             Tilemap = null;
             Player = null;
             Pixel = null;
             Cursor = null;
             CollisionTilemap = null;
             Collision = null;
+
+            Crate = null;
+
+            Cloud6 = null;
+            Cloud5 = null;
+            Cloud4 = null;
+            Cloud3 = null;
+            Cloud2 = null;
+            Cloud1 = null;
+
+            TilePalette = null;
+
+            Normal = null;
 
             UIPanel = null;
         }

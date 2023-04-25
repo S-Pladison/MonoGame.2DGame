@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Pladi.Core;
 using Pladi.Core.Scenes;
 using System;
 using System.Collections.Generic;
@@ -10,18 +11,18 @@ namespace Pladi
     public partial class Main : Game
     {
         public static void ToggleFullScreen()
-            => SetDisplayMode(ScreenSize.X, ScreenSize.Y, !instance.graphics.IsFullScreen);
+            => SetDisplayMode(ScreenSize.X, ScreenSize.Y, !Instance.graphics.IsFullScreen);
 
         public static void SetDisplayMode(int width, int height)
-            => SetDisplayMode(width, height, instance.graphics.IsFullScreen);
+            => SetDisplayMode(width, height, Instance.graphics.IsFullScreen);
 
         public static void SetDisplayMode(int width, int height, bool fullscreen)
         {
-            var graphics = instance.graphics;
+            var graphics = Instance.graphics;
             var form = GetForm();
 
-            width = Math.Max(width, minScreenWidth);
-            height = Math.Max(height, minScreenHeight);
+            width = Math.Max(width, MinScreenWidth);
+            height = Math.Max(height, MinScreenHeight);
 
             windowMaximized = form.WindowState.HasFlag(FormWindowState.Maximized);
 
@@ -47,11 +48,11 @@ namespace Pladi
         public static List<Point> GetSupportedScreenResolutions()
         {
             var result = new List<Point>();
-            var displayModes = instance.graphics.GraphicsDevice.Adapter.SupportedDisplayModes;
+            var displayModes = Instance.graphics.GraphicsDevice.Adapter.SupportedDisplayModes;
 
             foreach (var mode in displayModes)
             {
-                if (mode.Width < minScreenWidth || mode.Height < minScreenHeight) continue;
+                if (mode.Width < MinScreenWidth || mode.Height < MinScreenHeight) continue;
 
                 result.Add(new Point(mode.Width, mode.Height));
             }
@@ -63,13 +64,13 @@ namespace Pladi
         {
             if (width <= 0 || height <= 0) return;
 
-            SceneManager.OnResolutionChanged(width, height);
+            ILoadable.GetInstance<SceneComponent>().OnResolutionChanged(width, height);
         }
 
         private static void CheckWindowSize()
         {
-            int width = instance.graphics.PreferredBackBufferWidth;
-            int height = instance.graphics.PreferredBackBufferHeight;
+            int width = Instance.graphics.PreferredBackBufferWidth;
+            int height = Instance.graphics.PreferredBackBufferHeight;
 
             if (ScreenSize.X != width || ScreenSize.Y != height)
             {

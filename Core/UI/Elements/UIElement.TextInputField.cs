@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Content;
+using Pladi.Core.Input;
 using Pladi.Core.UI.Events;
 using Pladi.Utilities;
 using Pladi.Utilities.Enums;
@@ -36,8 +37,8 @@ namespace Pladi.Core.UI.Elements
         {
             if (!IsFocused) return;
 
-            var input = Main.InputManager;
-            var mousePosition = input.GetMousePosition();
+            var input = ILoadable.GetInstance<InputComponent>();
+            var mousePosition = input.MousePosition;
 
             if (!ContainsPoint(mousePosition) && input.JustPressed(MouseInputTypes.LeftButton))
             {

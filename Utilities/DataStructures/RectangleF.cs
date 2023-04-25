@@ -1,11 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
+using Pladi.Core.Entities;
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Pladi.Utilities.DataStructures
 {
     public struct RectangleF : IEquatable<RectangleF>
     {
+        public static RectangleF Empty { get; } = default;
+
+        // ...
+
         [DataMember]
         public float X;
 
@@ -20,8 +26,6 @@ namespace Pladi.Utilities.DataStructures
 
         // ...
 
-        public static RectangleF Empty { get; } = default;
-
         public float Left => X;
         public float Right => X + Width;
         public float Top => Y;
@@ -31,21 +35,14 @@ namespace Pladi.Utilities.DataStructures
         {
             get
             {
-                if (Width == 0 && Height == 0 && X == 0)
-                {
-                    return Y == 0;
-                }
-
+                if (Width == 0 && Height == 0 && X == 0) return Y == 0;
                 return false;
             }
         }
 
         public Vector2 Location
         {
-            get
-            {
-                return new Vector2(X, Y);
-            }
+            get => new(X, Y);
             set
             {
                 X = value.X;
@@ -55,10 +52,7 @@ namespace Pladi.Utilities.DataStructures
 
         public Vector2 Size
         {
-            get
-            {
-                return new Vector2(Width, Height);
-            }
+            get => new(Width, Height);
             set
             {
                 Width = value.X;
@@ -66,7 +60,11 @@ namespace Pladi.Utilities.DataStructures
             }
         }
 
-        public Vector2 Center => new Vector2(X + Width / 2, Y + Height / 2);
+        public Vector2 Center
+        {
+            get => new(X + Width / 2f, Y + Height / 2f);
+        }
+
 
         // ...
 
@@ -90,44 +88,30 @@ namespace Pladi.Utilities.DataStructures
 
         public static bool operator ==(RectangleF a, RectangleF b)
         {
-            if (a.X == b.X && a.Y == b.Y && a.Width == b.Width)
-            {
-                return a.Height == b.Height;
-            }
-
+            if (a.X == b.X && a.Y == b.Y && a.Width == b.Width) return a.Height == b.Height;
             return false;
         }
 
         public static bool operator !=(RectangleF a, RectangleF b)
             => !(a == b);
 
+        // ...
+
         public bool Contains(int x, int y)
         {
-            if (X <= x && x < X + Width && Y <= y)
-            {
-                return y < Y + Height;
-            }
-
+            if (X <= x && x < X + Width && Y <= y) return y < Y + Height;
             return false;
         }
 
         public bool Contains(float x, float y)
         {
-            if (X <= x && x < (float)(X + Width) && Y <= y)
-            {
-                return y < (float)(Y + Height);
-            }
-
+            if (X <= x && x < (float)(X + Width) && Y <= y) return y < (float)(Y + Height);
             return false;
         }
 
         public bool Contains(Vector2 value)
         {
-            if (X <= value.X && value.X < X + Width && Y <= value.Y)
-            {
-                return value.Y < Y + Height;
-            }
-
+            if (X <= value.X && value.X < X + Width && Y <= value.Y) return value.Y < Y + Height;
             return false;
         }
 
@@ -136,11 +120,7 @@ namespace Pladi.Utilities.DataStructures
 
         public bool Contains(RectangleF value)
         {
-            if (X <= value.X && value.X + value.Width <= X + Width && Y <= value.Y)
-            {
-                return value.Y + value.Height <= Y + Height;
-            }
-
+            if (X <= value.X && value.X + value.Width <= X + Width && Y <= value.Y) return value.Y + value.Height <= Y + Height;
             return false;
         }
 
@@ -152,11 +132,7 @@ namespace Pladi.Utilities.DataStructures
 
         public override bool Equals(object obj)
         {
-            if (obj is RectangleF)
-            {
-                return this == (RectangleF)obj;
-            }
-
+            if (obj is RectangleF) return this == (RectangleF)obj;
             return false;
         }
 
@@ -164,7 +140,7 @@ namespace Pladi.Utilities.DataStructures
             => this == other;
 
         public override int GetHashCode()
-            => (((17 * 23 + X.GetHashCode()) * 23 + Y.GetHashCode()) * 23 + Width.GetHashCode()) * 23 + Height.GetHashCode();
+            => (((17 * 25 + X.GetHashCode()) * 25 + Y.GetHashCode()) * 25 + Width.GetHashCode()) * 25 + Height.GetHashCode();
 
         public void Inflate(float horizontalAmount, float verticalAmount)
         {
@@ -176,11 +152,7 @@ namespace Pladi.Utilities.DataStructures
 
         public bool Intersects(RectangleF value)
         {
-            if (value.Left < Right && Left < value.Right && value.Top < Bottom)
-            {
-                return Top < value.Bottom;
-            }
-
+            if (value.Left < Right && Left < value.Right && value.Top < Bottom) return Top < value.Bottom;
             return false;
         }
 
@@ -239,6 +211,39 @@ namespace Pladi.Utilities.DataStructures
             result.Y = Math.Min(value1.Y, value2.Y);
             result.Width = Math.Max(value1.Right, value2.Right) - result.X;
             result.Height = Math.Max(value1.Bottom, value2.Bottom) - result.Y;
+        }
+
+        public static EdgeF[] GetEdges(RectangleF rectangle)
+        {
+            var points = new Vector2[]
+            {
+                rectangle.Location,
+                rectangle.Location + new Vector2(rectangle.Width, 0),
+                rectangle.Location + new Vector2(rectangle.Width, rectangle.Height),
+                rectangle.Location + new Vector2(0, rectangle.Height)
+            };
+
+            var edges = new EdgeF[4];
+
+            for (int i = 0; i < edges.Length; i++)
+            {
+                edges[i] = new EdgeF(points[i], points[(i + 1) % 4]);
+            }
+
+            return edges;
+        }
+
+        public static Vector2 Penetration(RectangleF value1, RectangleF value2)
+            => Penetration(value1, value2, out _);
+
+        public static Vector2 Penetration(RectangleF value1, RectangleF value2, out RectangleF intersect)
+        {
+            intersect = Intersect(value1, value2);
+
+            if (intersect.Width < intersect.Height)
+                return new(value1.Center.X < value2.Center.X ? intersect.Width : -intersect.Width, 0);
+            else
+                return new(0, value1.Center.Y < value2.Center.Y ? intersect.Height : -intersect.Height);
         }
 
         public void Deconstruct(out float x, out float y, out float width, out float height)

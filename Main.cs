@@ -2,10 +2,14 @@
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Content;
 using Pladi.Core;
+using Pladi.Core.Graphics.Renderers;
 using Pladi.Core.Input;
 using Pladi.Core.Scenes;
+using Pladi.Utilities.DataStructures;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text.Json;
 using System.Windows.Forms;
 
@@ -13,24 +17,23 @@ namespace Pladi
 {
     public partial class Main : Game
     {
-        public static SceneManager SceneManager { get; private set; }
-        public static InputManager InputManager { get; private set; }
-        public static FrameCounter FrameCounter { get; private set; }
+        public static Main Instance { get; private set; }
 
-        public static bool IsGameActive { get => instance.IsActive; }
-        public static SpriteBatch SpriteBatch { get => instance.spriteBatch; }
+        public static SpriteBatch SpriteBatch { get => Instance.spriteBatch; }
         public static Random Rand { get; private set; }
         public static Point ScreenSize { get; private set; }
         public static float GlobalTimeWrappedHourly { get; private set; }
         public static float DeltaTime { get; private set; }
 
+        public Action<GameTime> OnPreDraw;
+        public Action<GameTime> OnPostDraw;
+
         // ...
 
         private static readonly string configFilePath = AppDomain.CurrentDomain.BaseDirectory + "\\config.json";
-        private static readonly int minScreenWidth = 800;
-        private static readonly int minScreenHeight = 500;
+        public static readonly int MinScreenWidth = 800;
+        public static readonly int MinScreenHeight = 500;
         private static bool windowMaximized;
-        private static Main instance;
 
         // ...
 
@@ -41,22 +44,24 @@ namespace Pladi
 
         public Main()
         {
-            instance = this;
+            Instance = this;
+
             graphics = new GraphicsDeviceManager(this);
 
             Content.RootDirectory = "Content";
-            IsMouseVisible = false;
             IsFixedTimeStep = false;
 
             var form = GetForm();
-            form.MinimumSize = new System.Drawing.Size(minScreenWidth, minScreenHeight);
+            form.MinimumSize = new System.Drawing.Size(MinScreenWidth, MinScreenHeight);
 
             Window.AllowUserResizing = true;
 
             Rand = new Random((int)DateTime.Now.Ticks);
-            InputManager = new InputManager(Window);
-            SceneManager = new SceneManager();
-            FrameCounter = new FrameCounter();
+
+            graphics.SynchronizeWithVerticalRetrace = false;
+            graphics.ApplyChanges();
+
+            LoadLoadables();
         }
 
         protected override void LoadContent()
@@ -66,6 +71,7 @@ namespace Pladi
             FontAssets.Load(Content);
             TextureAssets.Load(Content);
             EffectAssets.Load(Content);
+            AudioAssets.Load(Content);
         }
 
         protected override void Initialize()
@@ -78,6 +84,7 @@ namespace Pladi
 
         protected override void UnloadContent()
         {
+            AudioAssets.Unload();
             EffectAssets.Unload();
             TextureAssets.Unload();
             FontAssets.Unload();
@@ -96,10 +103,6 @@ namespace Pladi
                 CheckWindowSize();
 
                 base.Update(gameTime);
-
-                InputManager.Update();
-                SceneManager.Update();
-                FrameCounter.Update();
             }
             catch (Exception ex)
             {
@@ -114,19 +117,19 @@ namespace Pladi
 
             try
             {
-                SceneManager.PreDraw(spriteBatch);
+                OnPreDraw?.Invoke(gameTime);
+
+                ILoadable.GetInstance<RendererHandler>().Render(gameTime);
 
                 base.Draw(gameTime);
 
-                SceneManager.Draw(spriteBatch);
+                OnPostDraw?.Invoke(gameTime);
             }
             catch (Exception)
             {
                 // TODO: ...
                 throw;
             }
-
-            DrawMouse();
         }
 
         protected override void OnExiting(object sender, EventArgs args)
@@ -138,7 +141,7 @@ namespace Pladi
 
         private async void SaveConfig()
         {
-            var config = new Config();
+            var config = new ConfigData();
 
             var screenConfig = config.Screen;
             screenConfig.Width = ScreenSize.X;
@@ -148,7 +151,7 @@ namespace Pladi
 
             using var fs = new FileStream(configFilePath, FileMode.Create);
 
-            await JsonSerializer.SerializeAsync<Config>(fs, config, new JsonSerializerOptions() { WriteIndented = true });
+            await JsonSerializer.SerializeAsync<ConfigData>(fs, config, new JsonSerializerOptions() { WriteIndented = true });
         }
 
         private async void LoadConfig()
@@ -158,7 +161,7 @@ namespace Pladi
                 using var fs = new FileStream(configFilePath, FileMode.Open);
 
                 var form = GetForm();
-                var config = await JsonSerializer.DeserializeAsync<Config>(fs);
+                var config = await JsonSerializer.DeserializeAsync<ConfigData>(fs);
                 var screenConfig = config.Screen;
 
                 if (screenConfig.WindowMaximized)
@@ -176,21 +179,33 @@ namespace Pladi
             ScreenSize = new Point(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
         }
 
-        private void DrawMouse()
-        {
-            if (!IsActive) return;
-
-            spriteBatch.Begin();
-            spriteBatch.Draw(TextureAssets.Cursor, InputManager.GetMousePosition(), null, Color.White, 0f, Vector2.Zero, 0.35f, SpriteEffects.None, 0);
-            spriteBatch.End();
-        }
-
         // ...
 
-        public static void ExitFromGame()
-            => instance.Exit();
+        private static void LoadLoadables()
+        {
+            var queue = new PriorityQueue<ILoadable, float>();
+
+            foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
+            {
+                if (type.IsAbstract ||
+                    type.ContainsGenericParameters ||
+                    type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null) is null ||
+                    !type.IsAssignableTo(typeof(ILoadable))) continue;
+
+                var instance = Activator.CreateInstance(type) as ILoadable;
+
+                queue.Enqueue(instance, instance.LoadOrder);
+            }
+
+            while (queue.TryDequeue(out var instance, out var _))
+            {
+                ILoadable.AddInstance(instance);
+            }
+
+            ILoadable.LoadInstances();
+        }
 
         private static Form GetForm()
-            => Form.FromHandle(instance.Window.Handle).FindForm();
+            => Form.FromHandle(Instance.Window.Handle).FindForm();
     }
 }

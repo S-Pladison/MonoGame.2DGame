@@ -5,5 +5,6 @@ namespace Pladi.Core
     public static class Colors
     {
         public static readonly Color MenuBackground = new(50, 80, 80);
+        public static readonly Color Main = new(30, 32, 47);
     }
 }

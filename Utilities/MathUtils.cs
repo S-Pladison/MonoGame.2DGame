@@ -1,15 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
+using Pladi.Core.Entities;
 using Pladi.Utilities.DataStructures;
 using System;
 using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
+using System.Runtime.CompilerServices;
 
 namespace Pladi.Utilities
 {
     public static partial class PladiUtils
     {
-        public static Vector2 Abs(this Vector2 vector)
-            => new(Math.Abs(vector.X), Math.Abs(vector.Y));
-
         public static bool Between<T>(this T item, T start, T end)
             => Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
 
@@ -44,35 +44,5 @@ namespace Pladi.Utilities
 
         public static RectangleF ToRectangleF(this Rectangle rect)
             => new(rect.X, rect.Y, rect.Width, rect.Height);
-
-        public static float GetHorizontalIntersectionDepth(this RectangleF rectA, RectangleF rectB)
-        {
-            float halfWidthA = rectA.Width / 2.0f;
-            float halfWidthB = rectB.Width / 2.0f;
-
-            float centerA = rectA.Left + halfWidthA;
-            float centerB = rectB.Left + halfWidthB;
-
-            float distanceX = centerA - centerB;
-            float minDistanceX = halfWidthA + halfWidthB;
-
-            if (Math.Abs(distanceX) >= minDistanceX) return 0f;
-            return distanceX > 0 ? minDistanceX - distanceX : -minDistanceX - distanceX;
-        }
-
-        public static float GetVerticalIntersectionDepth(this RectangleF rectA, RectangleF rectB)
-        {
-            float halfHeightA = rectA.Height / 2.0f;
-            float halfHeightB = rectB.Height / 2.0f;
-
-            float centerA = rectA.Top + halfHeightA;
-            float centerB = rectB.Top + halfHeightB;
-
-            float distanceY = centerA - centerB;
-            float minDistanceY = halfHeightA + halfHeightB;
-
-            if (Math.Abs(distanceY) >= minDistanceY) return 0f;
-            return distanceY > 0 ? minDistanceY - distanceY : -minDistanceY - distanceY;
-        }
     }
 }

@@ -1,6 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Pladi.Content;
 using Pladi.Utilities.DataStructures;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Pladi.Utilities
 {
@@ -21,6 +25,14 @@ namespace Pladi.Utilities
             {
                 spriteBatch.DrawString(font, text, position + shadowDirections[i] * spread, color, rotation, origin, scale, SpriteEffects.None, 0);
             }
+        }
+
+        public static void DrawRectangle(this SpriteBatch spriteBatch, Rectangle rectangle, Color color, int lineWidth)
+        {
+            spriteBatch.Draw(TextureAssets.Pixel, new Rectangle(rectangle.X, rectangle.Y, lineWidth, rectangle.Height + lineWidth), color);
+            spriteBatch.Draw(TextureAssets.Pixel, new Rectangle(rectangle.X, rectangle.Y, rectangle.Width + lineWidth, lineWidth), color);
+            spriteBatch.Draw(TextureAssets.Pixel, new Rectangle(rectangle.X + rectangle.Width, rectangle.Y, lineWidth, rectangle.Height + lineWidth), color);
+            spriteBatch.Draw(TextureAssets.Pixel, new Rectangle(rectangle.X, rectangle.Y + rectangle.Height, rectangle.Width + lineWidth, lineWidth), color);
         }
 
         // ...

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Pladi.Core.Input;
 using Pladi.Core.UI.Elements;
 using Pladi.Core.UI.Events;
 using Pladi.Utilities.Enums;
@@ -35,8 +36,8 @@ namespace Pladi.Core.UI
 
         public void Update()
         {
-            var input = Main.InputManager;
-            var mousePosition = input.GetMousePosition();
+            var input = ILoadable.GetInstance<InputComponent>();
+            var mousePosition = input.MousePosition;
             var mouseLeft = input.JustPressed(MouseInputTypes.LeftButton);
             var mouseElement = Core.GetElementAt(mousePosition);
 

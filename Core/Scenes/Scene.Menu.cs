@@ -40,7 +40,7 @@ namespace Pladi.Core.Scenes
                 text.FontScale = 1.0f;
                 text.FontColor = Color.White;
             };
-            startGameButton.OnMouseClick += (_, _) => Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Game);
+            startGameButton.OnMouseClick += (_, _) => SceneComponent.SetActiveScene(SceneComponent.GameScenes.Game);
             panel.Append(startGameButton);
 
             var inputField = new TextInputFieldUIElement();
