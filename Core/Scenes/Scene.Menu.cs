@@ -43,6 +43,30 @@ namespace Pladi.Core.Scenes
             startGameButton.OnMouseClick += (_, _) => SceneComponent.SetActiveScene(SceneComponent.GameScenes.Game);
             panel.Append(startGameButton);
 
+            var editorButton = new TextUIElement("Редактор")
+            {
+                HorizontalAlign = 1.0f,
+                VerticalAlign = 1.0f
+            };
+
+            editorButton.Left.SetPixel(-20);
+            editorButton.Top.SetPixel(-20);
+
+            editorButton.OnMouseOver += (_, e) =>
+            {
+                var text = (e as TextUIElement);
+                text.FontScale = 1.1f;
+                text.FontColor = Color.Gold;
+            };
+            editorButton.OnMouseOut += (_, e) =>
+            {
+                var text = (e as TextUIElement);
+                text.FontScale = 1.0f;
+                text.FontColor = Color.White;
+            };
+            editorButton.OnMouseClick += (_, _) => SceneComponent.SetActiveScene(SceneComponent.GameScenes.Editor);
+            panel.Append(editorButton);
+
             var inputField = new TextInputFieldUIElement();
             inputField.Left.SetPixel(10f);
             inputField.Top.SetPixel(10f);

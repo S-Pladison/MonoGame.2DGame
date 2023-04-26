@@ -16,16 +16,14 @@ namespace Pladi.Core
             get => position;
             set
             {
-                if (position != value)
-                {
-                    position = value;
+                position = value;
 
-                    UpdateMatrices();
-                }
+                UpdateMatrices();
             }
         }
 
         public Matrix ViewMatrix { get; private set; }
+        public Matrix InvertViewMatrix { get; private set; }
         public Matrix ProjectionMatrix { get; private set; }
         public Matrix TransformMatrix { get; private set; }
         public Rectangle VisibleArea { get; private set; }
@@ -47,6 +45,9 @@ namespace Pladi.Core
             //UpdateMatrices();
         }
 
+        public void ResetPosition()
+            => Position = Vector2.Zero;
+
         // ...
 
         private void UpdateMatrices()
@@ -56,6 +57,7 @@ namespace Pladi.Core
 
             ViewMatrix = Matrix.CreateTranslation(new Vector3(-position.X, -position.Y, 0))
                        * Matrix.CreateTranslation(viewport.Width * 0.5f, viewport.Height * 0.5f, 0);
+            InvertViewMatrix = Matrix.Invert(ViewMatrix);
             ProjectionMatrix = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0f, -1f);
             TransformMatrix = ViewMatrix * ProjectionMatrix;
             VisibleArea = new

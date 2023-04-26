@@ -25,6 +25,10 @@ namespace Pladi.Core.UI.Elements
         public StyleDimension Height;
         public float HorizontalAlign;
         public float VerticalAlign;
+        public float PaddingLeft;
+        public float PaddingTop;
+        public float PaddingRight;
+        public float PaddingBottom;
 
         public bool ClippingOutsideRectangle;
 
@@ -181,10 +185,10 @@ namespace Pladi.Core.UI.Elements
             }
             else
             {
-                parentPosX = Parent.position.X;
-                parentPosY = Parent.position.Y;
-                parentSizeX = Parent.size.X;
-                parentSizeY = Parent.size.Y;
+                parentPosX = Parent.position.X + Parent.PaddingLeft;
+                parentPosY = Parent.position.Y + Parent.PaddingTop;
+                parentSizeX = Parent.size.X - Parent.PaddingLeft - Parent.PaddingRight;
+                parentSizeY = Parent.size.Y - Parent.PaddingTop - Parent.PaddingBottom;
             }
 
             position.X = parentPosX + Left.GetPixelBaseParent(parentSizeX) + parentSizeX * HorizontalAlign;
@@ -201,6 +205,22 @@ namespace Pladi.Core.UI.Elements
             {
                 child.Recalculate();
             }
+        }
+
+        public void SetPadding(float lr, float tb)
+        {
+            PaddingLeft = lr;
+            PaddingRight = lr;
+            PaddingTop = tb;
+            PaddingBottom = tb;
+        }
+
+        public void SetPadding(float value)
+        {
+            PaddingLeft = value;
+            PaddingRight = value;
+            PaddingTop = value;
+            PaddingBottom = value;
         }
 
         public bool ContainsPoint(Vector2 point)

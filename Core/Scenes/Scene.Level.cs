@@ -96,6 +96,7 @@ namespace Pladi.Core.Scenes
         public override void OnDeactivate()
         {
             lightRendered.PrepareStaticShadowVertices(null);
+            camera.ResetPosition();
 
             MediaPlayer.Stop();
 
@@ -274,7 +275,7 @@ namespace Pladi.Core.Scenes
                 edges.AddRange(e);
             }
 
-            //lightRendered.Seeee(edges);
+            lightRendered.Seeee(edges);
 
             var camera = ILoadable.GetInstance<CameraComponent>();
             camera.Position = PladiUtils.SmoothDamp(camera.Position, player.Hitbox.Center, ref cameraSmoothVelocity, 0.05f, Main.DeltaTime);

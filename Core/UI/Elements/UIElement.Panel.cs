@@ -7,26 +7,35 @@ namespace Pladi.Core.UI.Elements
 {
     public class PanelUIElement : UIElement
     {
-        public static Texture2D PanelTexture => TextureAssets.UIPanel;
+        public enum PanelStyles
+        {
+            Standard,
+            WithoutTexture
+        }
+
+        // ...
 
         // ...
 
         public Color BackgroundColor { get; set; }
 
+        private Texture2D texture;
+
         // ...
 
         public PanelUIElement() : this(Color.White) { }
 
-        public PanelUIElement(Color backgroundColor)
+        public PanelUIElement(Color backgroundColor, PanelStyles style = PanelStyles.Standard)
         {
             BackgroundColor = backgroundColor;
+
+            texture = GetTextureByStyle(style);
         }
 
         // ...
 
         protected override void DrawThis(SpriteBatch spriteBatch)
         {
-            var texture = PanelTexture;
             var textureRect = texture.Bounds;
             var width = textureRect.Width / 3;
             var height = textureRect.Height / 3;
@@ -84,6 +93,17 @@ namespace Pladi.Core.UI.Elements
             distRect.X += wx;
             distRect.Width = width;
             spriteBatch.Draw(texture, distRect, sourceRect, BackgroundColor, 0f, Vector2.Zero, SpriteEffects.None, 0f);
+        }
+
+        // ...
+
+        private Texture2D GetTextureByStyle(PanelStyles style)
+        {
+            return style switch
+            {
+                PanelStyles.WithoutTexture => TextureAssets.Pixel,
+                _ => TextureAssets.UIPanel
+            };
         }
     }
 }

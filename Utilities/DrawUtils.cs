@@ -2,9 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Content;
 using Pladi.Utilities.DataStructures;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Pladi.Utilities
 {
@@ -33,6 +30,28 @@ namespace Pladi.Utilities
             spriteBatch.Draw(TextureAssets.Pixel, new Rectangle(rectangle.X, rectangle.Y, rectangle.Width + lineWidth, lineWidth), color);
             spriteBatch.Draw(TextureAssets.Pixel, new Rectangle(rectangle.X + rectangle.Width, rectangle.Y, lineWidth, rectangle.Height + lineWidth), color);
             spriteBatch.Draw(TextureAssets.Pixel, new Rectangle(rectangle.X, rectangle.Y + rectangle.Height, rectangle.Width + lineWidth, lineWidth), color);
+        }
+
+        public static void DrawGrid(this SpriteBatch spriteBatch, Rectangle bounds, Color color, int cellSizeX, int cellSizeY, int lineWidth)
+        {
+            var offset = new Point(bounds.X / cellSizeX, bounds.Y / cellSizeY);
+            var xMax = bounds.Width / cellSizeX + offset.X;
+            var yMax = bounds.Height / cellSizeY + offset.Y;
+            var halfWidth = lineWidth / 2;
+
+            for (float x = offset.X; x <= xMax; x++)
+            {
+                var position = new Point((int)(x * cellSizeX) - halfWidth, bounds.Y);
+                var rectangle = new Rectangle(position.X, position.Y, lineWidth, bounds.Height);
+                spriteBatch.Draw(TextureAssets.Pixel, rectangle, color);
+            }
+
+            for (float y = offset.Y; y <= yMax; y++)
+            {
+                var position = new Point(bounds.X, (int)(y * cellSizeY) - halfWidth);
+                var rectangle = new Rectangle(position.X, position.Y, bounds.Width, lineWidth);
+                spriteBatch.Draw(TextureAssets.Pixel, rectangle, color);
+            }
         }
 
         // ...

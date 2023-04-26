@@ -303,6 +303,30 @@
 /processorParam:TextureFormat=Color
 /build:Textures/TilePalette.png
 
+#begin Textures/UI/Switch2UIElement.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/UI/Switch2UIElement.png
+
+#begin Textures/UI/SwitchUIElement.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/UI/SwitchUIElement.png
+
 #begin Textures/WallPalette.png
 /importer:TextureImporter
 /processor:TextureProcessor

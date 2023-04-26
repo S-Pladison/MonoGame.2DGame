@@ -24,6 +24,7 @@ namespace Pladi.Core.Scenes
 
         // ...
 
+        private bool sceneWasChanged;
         private Scene current;
         private float initSceneProgress;
         private GameScenes? expectedScene;
@@ -45,10 +46,11 @@ namespace Pladi.Core.Scenes
                 {
                     expectedScene = null;
                 }
-                else if (initSceneProgress > 0.5f)
+                else if (initSceneProgress > 0.5f && !sceneWasChanged)
                 {
                     current.OnDeactivate();
                     current = CreateScene(expectedScene.Value);
+                    sceneWasChanged = true;
                     current.OnActivate();
                 }
             }
@@ -83,6 +85,7 @@ namespace Pladi.Core.Scenes
         {
             if (!CanChangeScene) return;
 
+            sceneWasChanged = false;
             expectedScene = gameScenes;
             initSceneProgress = 0f;
         }

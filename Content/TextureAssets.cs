@@ -31,7 +31,13 @@ namespace Pladi.Content
 
         // ...
 
-        public static Texture2D UIPanel { get; private set; }
+        public static Texture2D UIPanel { get; set; }
+
+        public static class UI
+        {
+            public static Texture2D Switch { get; set; }
+            public static Texture2D Switch2 { get; set; }
+        }
 
         // ...
 
@@ -62,6 +68,9 @@ namespace Pladi.Content
             Normal = Load("Normal");
 
             UIPanel = Load("Panel");
+
+            UI.Switch = Load("UI/SwitchUIElement");
+            UI.Switch2 = Load("UI/Switch2UIElement");
         }
 
         public static void Unload()
@@ -88,6 +97,9 @@ namespace Pladi.Content
             Normal = null;
 
             UIPanel = null;
+
+            UI.Switch = null;
+            UI.Switch2 = null;
         }
     }
 }
