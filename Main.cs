@@ -163,7 +163,8 @@ namespace Pladi
                 var config = await JsonSerializer.DeserializeAsync<ConfigData>(fs);
                 var screenConfig = config.Screen;
 
-                screen.SetDisplayMode(screenConfig.Width, screenConfig.Height, screenConfig.Fullscreen, screenConfig.WindowMaximized);
+                //screen.SetDisplayMode(screenConfig.Width, screenConfig.Height, screenConfig.Fullscreen, screenConfig.WindowMaximized);
+                screen.SetDisplayMode(screenConfig.Width, screenConfig.Height);
             }
             catch
             {

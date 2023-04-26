@@ -6,27 +6,36 @@ namespace Pladi.Core
 {
     public class FrameCounterComponent : BasicComponent
     {
-        public const int MaximumSamples = 100;
+        // [public static properties and fields]
 
-        // ...
+        public static readonly int MaximumSamples;
+
+        // [static constructors]
+
+        static FrameCounterComponent()
+        {
+            MaximumSamples = 100;
+        }
+
+        // [public properties and fields]
 
         public long TotalFrames { get; private set; }
         public float TotalSeconds { get; private set; }
         public float AverageFramesPerSecond { get; private set; }
         public float CurrentFramesPerSecond { get; private set; }
 
-        // ...
+        // [private properties and fields]
 
         private readonly Queue<float> sampleBuffer;
 
-        // ...
+        // [constructors]
 
         public FrameCounterComponent()
         {
             sampleBuffer = new Queue<float>();
         }
 
-        // ...
+        // [public methods]
 
         public override void Initialize()
         {
