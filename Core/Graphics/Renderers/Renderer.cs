@@ -14,11 +14,7 @@ namespace Pladi.Core.Graphics.Renderers
         public virtual int RenderOrder { get; }
         public virtual Point Size
         {
-            get => new
-            (
-                Main.Instance.GraphicsDevice.PresentationParameters.BackBufferWidth,
-                Main.Instance.GraphicsDevice.PresentationParameters.BackBufferHeight
-            );
+            get => ILoadable.GetInstance<ScreenComponent>().Size;
         }
 
         public event OnRecreateRenderTargetDelegate OnRecreateRenderTarget;
@@ -45,7 +41,7 @@ namespace Pladi.Core.Graphics.Renderers
 
         public void PrepareRenderTarget(GraphicsDevice graphicsDevice)
         {
-            if (RenderTarget == null || RenderTarget.IsDisposed || RenderTarget.Width != Size.X || RenderTarget.Height != Size.Y)
+            if ((RenderTarget == null || RenderTarget.IsDisposed || RenderTarget.Width != Size.X || RenderTarget.Height != Size.Y))
             {
                 RenderTarget = new(graphicsDevice, Size.X, Size.Y, false, graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);
                 WasPrepared = false;

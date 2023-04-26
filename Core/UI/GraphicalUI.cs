@@ -19,14 +19,23 @@ namespace Pladi.Core.UI
 
         public GraphicalUI()
         {
+            var screen = ILoadable.GetInstance<ScreenComponent>();
+
             Core = new UIElement();
 
             Core.Left.SetValue(0, 0);
             Core.Top.SetValue(0, 0);
-            Core.Width.SetValue(Main.ScreenSize.X, 0);
-            Core.Height.SetValue(Main.ScreenSize.Y, 0);
+            Core.Width.SetValue(screen.Width, 0);
+            Core.Height.SetValue(screen.Height, 0);
 
             Core.Recalculate();
+
+            screen.OnResolutionChanged += OnResolutionChanged;
+        }
+
+        ~GraphicalUI()
+        {
+            ILoadable.GetInstance<ScreenComponent>().OnResolutionChanged -= OnResolutionChanged;
         }
 
         // ...
@@ -56,11 +65,11 @@ namespace Pladi.Core.UI
         {
             Core.Left.SetValue(0, 0);
             Core.Top.SetValue(0, 0);
-            Core.Width.SetValue(Main.ScreenSize.X, 0);
-            Core.Height.SetValue(Main.ScreenSize.Y, 0);
+            Core.Width.SetValue(width, 0);
+            Core.Height.SetValue(height, 0);
 
-            Core.Recalculate();
             Core.ResolutionChanged(new UIResolutionChangeEvent(Core, width, height));
+            Core.Recalculate();
         }
 
         private void UpdateMouseHover(UIElement mouseElement, Vector2 mousePosition)

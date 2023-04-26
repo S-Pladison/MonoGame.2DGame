@@ -78,7 +78,21 @@ namespace Pladi.Core.Scenes
             text.Top.SetPixel(10f);
             panel.Append(text);*/
 
-            Hee();
+            //Hee();
+
+            InitLayerPanel();
+        }
+
+        private void InitLayerPanel()
+        {
+            var screen = ILoadable.GetInstance<ScreenComponent>();
+
+            var panel = new PanelUIElement();
+            panel.HorizontalAlign = 1f;
+            panel.Width.SetPixel(230f);
+            panel.Height.SetPixel(screen.Height);
+            panel.OnResolutionChanged += (@event, elem) => elem.Height.SetPixel(screen.Height);
+            graphicalUI.Append(panel);
         }
 
         private void Hee()
@@ -129,7 +143,7 @@ namespace Pladi.Core.Scenes
             };
             panel2.Append(wallSwitchUIElement);
 
-            tileSwitchUIElement = new SwitchUIElement("2. Передние плитки", true, SwitchUIElement.SwitchStyles.White);
+            tileSwitchUIElement = new SwitchUIElement("2. Передние плитки", false, SwitchUIElement.SwitchStyles.White);
             tileSwitchUIElement.OnMouseClick += (@event, elem) =>
             {
                 isGUIMouseClick = true;
@@ -201,11 +215,6 @@ namespace Pladi.Core.Scenes
             SaveLevelToFile("Debug", tileMap);
 
             tileMap = null;
-        }
-
-        public override void OnResolutionChanged(int width, int height)
-        {
-            graphicalUI.OnResolutionChanged(width, height);
         }
 
         public override void Update()

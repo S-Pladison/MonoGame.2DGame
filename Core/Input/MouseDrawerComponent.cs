@@ -6,6 +6,8 @@ namespace Pladi.Core.Input
 {
     public class MouseDrawerComponent : BasicComponent
     {
+        // [public methods]
+
         public override void Initialize()
         {
             Game.IsMouseVisible = false;

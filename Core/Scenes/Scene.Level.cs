@@ -218,10 +218,10 @@ namespace Pladi.Core.Scenes
             //lights.Add(new Light(Color.Red * 0.3f, new Vector2(48 * 3, 48 * 7), 48 * 13));
             //lights.Add(new Light(Color.Yellow * 0.3f, new Vector2(48 * 21, 48 * 7), 48 * 12));
 
-            for (int i = 0; i < 100; i++)
+            /*for (int i = 0; i < 100; i++)
             {
                 lights.Add(new Light(Color.Red * 0.3f, new Vector2(400, 100), 48 * 7));
-            }
+            }*/
 
             lights.Add(new Light(Color.Red * 0.3f, new Vector2(400, 100), 48 * 7));
 
@@ -323,7 +323,7 @@ namespace Pladi.Core.Scenes
         {
             var effect = EffectAssets.TileEdgeShadow;
             effect.Parameters["TransformMatrix"].SetValue(camera.ProjectionMatrix);
-            effect.Parameters["Texture0Size"].SetValue(new Vector2(Main.ScreenSize.X, Main.ScreenSize.Y));
+            effect.Parameters["Texture0Size"].SetValue(ILoadable.GetInstance<ScreenComponent>().Size.ToVector2());
 
             if (!lightRendered.TryGetTargetIfPrepared(out var lightTarget))
                 throw new Exception("Цель рендеринга освещения не была подготовлена...");
@@ -335,7 +335,7 @@ namespace Pladi.Core.Scenes
             effect = EffectAssets.Tile;
             effect.Parameters["TransformMatrix"].SetValue(camera.ProjectionMatrix);
             effect.Parameters["Texture1"].SetValue(lightTarget);
-            effect.Parameters["Resolution"].SetValue(Main.ScreenSize.ToVector2());
+            effect.Parameters["Resolution"].SetValue(ILoadable.GetInstance<ScreenComponent>().Size.ToVector2());
         }
 
         private void Draw_OutlineEffect(SpriteBatch spriteBatch, RenderTarget2D target)

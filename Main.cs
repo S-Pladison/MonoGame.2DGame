@@ -15,13 +15,12 @@ using System.Windows.Forms;
 
 namespace Pladi
 {
-    public partial class Main : Game
+    public class Main : Game
     {
         public static Main Instance { get; private set; }
 
         public static SpriteBatch SpriteBatch { get => Instance.spriteBatch; }
         public static Random Rand { get; private set; }
-        public static Point ScreenSize { get; private set; }
         public static float GlobalTimeWrappedHourly { get; private set; }
         public static float DeltaTime { get; private set; }
 
@@ -31,9 +30,6 @@ namespace Pladi
         // ...
 
         private static readonly string configFilePath = AppDomain.CurrentDomain.BaseDirectory + "\\config.json";
-        public static readonly int MinScreenWidth = 800;
-        public static readonly int MinScreenHeight = 500;
-        private static bool windowMaximized;
 
         // ...
 
@@ -46,15 +42,13 @@ namespace Pladi
         {
             Instance = this;
 
-            graphics = new GraphicsDeviceManager(this);
+            graphics = new GraphicsDeviceManager(this)
+            {
+                PreferHalfPixelOffset = true,
+            };
 
             Content.RootDirectory = "Content";
             IsFixedTimeStep = false;
-
-            var form = GetForm();
-            form.MinimumSize = new System.Drawing.Size(MinScreenWidth, MinScreenHeight);
-
-            Window.AllowUserResizing = true;
 
             Rand = new Random((int)DateTime.Now.Ticks);
 
@@ -62,6 +56,8 @@ namespace Pladi
             graphics.ApplyChanges();
 
             LoadLoadables();
+
+            ILoadable.GetInstance<ScreenComponent>().SetGraphicsDeviceManager(graphics);
         }
 
         protected override void LoadContent()
@@ -94,21 +90,21 @@ namespace Pladi
 
         protected override void Update(GameTime gameTime)
         {
-            Window.Title = GetForm().WindowState.ToString() + " | " + graphics.PreferredBackBufferWidth + "x" + graphics.PreferredBackBufferHeight + " | " + windowMaximized;
+            //Window.Title = Form.FromHandle(Window.Handle).FindForm().WindowState.ToString() + " | " + graphics.PreferredBackBufferWidth + "x" + graphics.PreferredBackBufferHeight + " | " + windowMaximized;
             GlobalTimeWrappedHourly = (float)(gameTime.TotalGameTime.TotalSeconds % 3600.0);
             DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            try
-            {
-                CheckWindowSize();
+            base.Update(gameTime);
 
+            /*try
+            {
                 base.Update(gameTime);
             }
             catch (Exception ex)
             {
                 // TODO: ...
                 throw new Exception(ex.Message);
-            }
+            }*/
         }
 
         protected override void Draw(GameTime gameTime)
@@ -143,11 +139,12 @@ namespace Pladi
         {
             var config = new ConfigData();
 
+            var screen = ILoadable.GetInstance<ScreenComponent>();
             var screenConfig = config.Screen;
-            screenConfig.Width = ScreenSize.X;
-            screenConfig.Height = ScreenSize.Y;
-            screenConfig.Fullscreen = graphics.IsFullScreen;
-            screenConfig.WindowMaximized = windowMaximized;
+            screenConfig.Width = screen.Width;
+            screenConfig.Height = screen.Height;
+            //screenConfig.Fullscreen = screen.IsFullscreen;
+            //screenConfig.WindowMaximized = screen.IsMaximized;
 
             using var fs = new FileStream(configFilePath, FileMode.Create);
 
@@ -156,6 +153,8 @@ namespace Pladi
 
         private async void LoadConfig()
         {
+            var screen = ILoadable.GetInstance<ScreenComponent>();
+
             try
             {
                 using var fs = new FileStream(configFilePath, FileMode.Open);
@@ -164,19 +163,14 @@ namespace Pladi
                 var config = await JsonSerializer.DeserializeAsync<ConfigData>(fs);
                 var screenConfig = config.Screen;
 
-                if (screenConfig.WindowMaximized)
-                {
-                    form.WindowState = FormWindowState.Maximized;
-                }
-
-                SetDisplayMode(screenConfig.Width, screenConfig.Height, screenConfig.Fullscreen);
+                screen.SetDisplayMode(screenConfig.Width, screenConfig.Height, screenConfig.Fullscreen, screenConfig.WindowMaximized);
             }
             catch
             {
                 File.Delete(configFilePath);
-            }
 
-            ScreenSize = new Point(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
+                screen.SetMinDisplayMode();
+            }
         }
 
         // ...

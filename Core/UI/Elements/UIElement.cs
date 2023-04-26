@@ -178,10 +178,12 @@ namespace Pladi.Core.UI.Elements
 
             if (Parent is null)
             {
+                var screen = ILoadable.GetInstance<ScreenComponent>();
+
                 parentPosX = 0;
                 parentPosY = 0;
-                parentSizeX = Main.ScreenSize.X;
-                parentSizeY = Main.ScreenSize.Y;
+                parentSizeX = screen.Width;
+                parentSizeY = screen.Height;
             }
             else
             {

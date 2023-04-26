@@ -8,14 +8,25 @@ namespace Pladi.Core.Input
 {
     public class InputComponent : BasicComponent
     {
+        // [private static properties and fields]
+
         private static readonly HashSet<Keys> blackListKeys;
+
+        // [static constructors]
 
         static InputComponent()
         {
             blackListKeys = new() { Keys.Back };
         }
 
-        // ...
+        // [public properties and fields]
+
+        public Vector2 MousePosition
+        {
+            get => currentMouseState.Position.ToVector2();
+        }
+
+        // [private properties and fields]
 
         private KeyboardState currentKeyboardState;
         private KeyboardState previousKeyboardState;
@@ -26,12 +37,7 @@ namespace Pladi.Core.Input
         private float backSpaceTime;
         private float backSpaceSpeed;
 
-        // ...
-
-        public Vector2 MousePosition
-            => currentMouseState.Position.ToVector2();
-
-        // ...
+        // [public methods]
 
         public override void Initialize()
         {
@@ -42,6 +48,7 @@ namespace Pladi.Core.Input
             textInputChars = new List<char>();
 
             Game.Window.TextInput += ProcessTextInput;
+            UpdateOrder = int.MinValue;
             Visible = false;
         }
 
@@ -113,6 +120,8 @@ namespace Pladi.Core.Input
 
             return oldString;
         }
+
+        // [private methods]
 
         private void GetInputText_BackSpace(ref string oldText)
         {

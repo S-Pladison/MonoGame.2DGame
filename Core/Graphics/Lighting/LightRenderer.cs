@@ -157,7 +157,7 @@ namespace Pladi.Core.Graphics.Lighting
                 var effect = EffectAssets.TileEdgeShadow;
 
                 effect.Parameters["TransformMatrix"].SetValue(camera.ProjectionMatrix);
-                effect.Parameters["Texture0Size"].SetValue(new Vector2(Main.ScreenSize.X, Main.ScreenSize.Y));
+                effect.Parameters["Texture0Size"].SetValue(new Vector2(tileTarget.Width, tileTarget.Height));
 
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, effect, Matrix.Identity);
                 spriteBatch.Draw(tileTarget, Vector2.Zero, null, Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0);

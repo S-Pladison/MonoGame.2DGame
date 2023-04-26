@@ -148,11 +148,6 @@ namespace Pladi.Core.Scenes
             userInterface.Append(panel);*/
         }
 
-        public override void OnResolutionChanged(int width, int height)
-        {
-            userInterface.OnResolutionChanged(width, height);
-        }
-
         public override void Update()
         {
             userInterface.Update();

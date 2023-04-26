@@ -1,29 +1,42 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Pladi.Core
 {
     public interface ILoadable
     {
+        // [properties]
+
         int LoadOrder { get; set; }
+
+        // [methods]
+
         void Load() { }
 
-        // ...
+        // [...]
 
-        private static readonly HashSet<ILoadable> loadables = new();
+        private static readonly IDictionary<Type, ILoadable> loadables;
+
+        static ILoadable()
+        {
+            loadables = new Dictionary<Type, ILoadable>();
+        }
 
         internal static void AddInstance(ILoadable loadable)
-            => loadables.Add(loadable);
+            => loadables[loadable.GetType()] = loadable;
 
         public static void LoadInstances()
         {
-            foreach (var loadable in loadables)
+            foreach (var (_, instance) in loadables)
             {
-                loadable.Load();
+                instance.Load();
             }
         }
 
         public static T GetInstance<T>() where T : ILoadable
-            => (T)loadables.FirstOrDefault(x => x is T, null);
+        {
+            loadables.TryGetValue(typeof(T), out var instance);
+            return (T)instance;
+        }
     }
 }
