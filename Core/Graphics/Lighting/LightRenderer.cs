@@ -1,20 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Content;
-using Pladi.Core.Entities;
 using Pladi.Core.Graphics.Renderers;
-using Pladi.Core.Input;
 using Pladi.Core.Tiles;
-using Pladi.Utilities;
 using Pladi.Utilities.DataStructures;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 
 namespace Pladi.Core.Graphics.Lighting
 {

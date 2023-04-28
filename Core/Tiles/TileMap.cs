@@ -1,13 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Pladi.Utilities.DataStructures;
-using Pladi.Utilities.DataStructures.QuadTrees;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pladi.Core.Tiles
+﻿namespace Pladi.Core.Tiles
 {
     public class TileMap
     {

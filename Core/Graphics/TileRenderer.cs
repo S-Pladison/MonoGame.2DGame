@@ -1,15 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Pladi.Content;
-using Pladi.Core.Entities;
 using Pladi.Core.Graphics.Renderers;
 using Pladi.Core.Tiles;
-using Pladi.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pladi.Core.Graphics
 {

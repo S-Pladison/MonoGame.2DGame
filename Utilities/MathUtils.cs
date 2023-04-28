@@ -1,14 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
-using Pladi.Core.Entities;
 using Pladi.Utilities.DataStructures;
-using System;
 using System.Collections.Generic;
-using System.DirectoryServices.ActiveDirectory;
-using System.Runtime.CompilerServices;
 
 namespace Pladi.Utilities
 {
-    public static partial class PladiUtils
+    public static class MathUtils
     {
         public static bool Between<T>(this T item, T start, T end)
             => Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;

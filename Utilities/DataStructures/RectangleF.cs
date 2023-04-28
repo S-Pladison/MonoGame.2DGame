@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Pladi.Core.Entities;
 using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Pladi.Utilities.DataStructures

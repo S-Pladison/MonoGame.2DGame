@@ -16,7 +16,7 @@ namespace Pladi.Core.Graphics
             var camera = ILoadable.GetInstance<CameraComponent>();
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, camera.ViewMatrix);
-            
+
             for (int i = 0; i < entities.Count; i++)
             {
                 if (entities[i] is PlayerEntity) continue;

@@ -1,17 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
-using Pladi.Core.Collisions;
 using Pladi.Core.Entities;
 using Pladi.Core.Tiles;
 using Pladi.Utilities.DataStructures;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
-using System.Windows.Forms;
 
 namespace Pladi.Utilities
 {

@@ -5,7 +5,7 @@ using Pladi.Utilities.DataStructures;
 
 namespace Pladi.Utilities
 {
-    public static partial class PladiUtils
+    public static class DrawUtils
     {
         public static void Draw(this SpriteBatch spriteBatch, Texture2D texture, RectangleF destinationRectangle, Color color)
             => spriteBatch.Draw(texture, destinationRectangle.ToRectangle(), color);

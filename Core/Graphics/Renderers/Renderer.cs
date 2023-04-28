@@ -70,7 +70,7 @@ namespace Pladi.Core.Graphics.Renderers
             WasPrepared = true;
 
             AfterRender(spriteBatch);
-            
+
             extraData = null;
         }
 

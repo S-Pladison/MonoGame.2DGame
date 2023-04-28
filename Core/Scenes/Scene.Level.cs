@@ -7,7 +7,6 @@ using Pladi.Core.Collisions;
 using Pladi.Core.Entities;
 using Pladi.Core.Graphics;
 using Pladi.Core.Graphics.Lighting;
-using Pladi.Core.Graphics.Renderers;
 using Pladi.Core.Input;
 using Pladi.Core.Tiles;
 using Pladi.Core.UI;
@@ -16,7 +15,6 @@ using Pladi.Utilities;
 using Pladi.Utilities.DataStructures;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Pladi.Core.Scenes
@@ -227,8 +225,8 @@ namespace Pladi.Core.Scenes
 
             foreach (var entity in entities)
             {
-                entity.OnChangePosition += () => entitySpatialHash.Update(entity.Position, entity);
-                entitySpatialHash.Insert(entity.Position, entity);
+                entity.OnChangePosition += () => entitySpatialHash.Update(entity.Hitbox, entity);
+                entitySpatialHash.Insert(entity.Hitbox, entity);
             }
         }
 
@@ -278,7 +276,7 @@ namespace Pladi.Core.Scenes
             lightRendered.Seeee(edges);
 
             var camera = ILoadable.GetInstance<CameraComponent>();
-            camera.Position = PladiUtils.SmoothDamp(camera.Position, player.Hitbox.Center, ref cameraSmoothVelocity, 0.05f, Main.DeltaTime);
+            camera.Position = MathUtils.SmoothDamp(camera.Position, player.Hitbox.Center, ref cameraSmoothVelocity, 0.05f, Main.DeltaTime);
         }
 
         private void UpdateEntities()
@@ -400,22 +398,30 @@ namespace Pladi.Core.Scenes
         {
             if (!shouldDrawHitboxes) return;
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, camera.ViewMatrix);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, camera.ViewMatrix);
 
-            foreach (var e in Eee(tileMap.TileLayer))
+            /*foreach (var e in Eee(tileMap.TileLayer))
             {
                 spriteBatch.DrawRectangle(e.ToRectangle(), Color.Cyan * 0.35f, 1);
-            }
+            }*/
+
+            spriteBatch.DrawGrid(camera.VisibleArea, Color.White * 0.05f, 48, 48, 1);
+            spriteBatch.DrawGrid(camera.VisibleArea, Color.White * 0.1f, 48 * 5, 48 * 5, 2);
 
 
             for (int i = 0; i < lights.Count; i++)
             {
-                spriteBatch.DrawRectangle(lights[i].VisibleArea.ToRectangle(), Color.Yellow, 1);
+                spriteBatch.DrawRectangle(lights[i].VisibleArea.ToRectangle(), Color.Yellow, 2);
             }
 
             for (int i = 0; i < entities.Count; i++)
             {
-                spriteBatch.DrawRectangle(entities[i].Hitbox.ToRectangle(), entities[i].IsTrigger ? Color.Orange : Color.Red, 1);
+                spriteBatch.DrawRectangle(entities[i].Hitbox.ToRectangle(), entities[i].IsTrigger ? Color.Blue : Color.Red, 2);
+            }
+
+            for (int i = 0; i < entities.Count; i++)
+            {
+                spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, entities[i].co.ToString(), entities[i].Hitbox.Location, Color.White, 0f, Vector2.Zero, 1);
             }
 
             // Проверка коллизии
@@ -425,7 +431,12 @@ namespace Pladi.Core.Scenes
 
                 var checkRectangle = new RectangleF(mousePosition.X - 8, mousePosition.Y - 8, 16, 16);
 
-                spriteBatch.DrawRectangle(checkRectangle.ToRectangle(), levelCollision.IsRectCollideWithEntities(checkRectangle) ? Color.Green : Color.Red, 1);
+                spriteBatch.DrawRectangle(checkRectangle.ToRectangle(), levelCollision.IsRectCollideWithEntities(checkRectangle) ? Color.Green : Color.Red, 2);
+
+
+
+
+                spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, entitySpatialHash.GetCellAtPosition(mousePosition).ToString(), mousePosition + Vector2.One * 12f, Color.White, 0f, Vector2.Zero, 1);
             }
 
             // ...

@@ -5,16 +5,18 @@ using Pladi.Content;
 using Pladi.Core.Collisions;
 using Pladi.Core.Graphics.Particles;
 using Pladi.Core.Input;
-using Pladi.Core.Tiles;
 using Pladi.Utilities;
 using Pladi.Utilities.DataStructures;
 using System;
-using System.Diagnostics;
 
 namespace Pladi.Core.Entities
 {
     public class PlayerEntity : Entity
     {
+        // [private properties and fields]
+
+        private bool IsJumping { get => jumpTimer >= 0; }
+
         private readonly float moveSpeed;
         private readonly float acceleration;
         private readonly float decceleration;
@@ -28,8 +30,6 @@ namespace Pladi.Core.Entities
 
         private readonly Texture2D texture;
 
-        // ...
-
         private bool onGround;
         private float jumpTimer;
 
@@ -39,11 +39,7 @@ namespace Pladi.Core.Entities
         private ParticleSystem particleSystem;
         private float runParticleTimer;
 
-        // ...
-
-        private bool IsJumping { get => jumpTimer >= 0; }
-
-        // ...
+        // [constructors]
 
         public PlayerEntity()
         {
@@ -57,8 +53,9 @@ namespace Pladi.Core.Entities
             moveSpeed = 48 * 5f;
             acceleration = 48 * 1f;
             decceleration = 48 * 0.25f;
-            fallGravityMult = 2f;
             velPower = 0.9f;
+
+            fallGravityMult = 2f;
 
             jumpPower = 48 * 6f;
             heldJumpTime = 0.33f;
@@ -71,13 +68,6 @@ namespace Pladi.Core.Entities
 
             // ...
 
-            InitParticleSystem();
-        }
-
-        // ...
-
-        private void InitParticleSystem()
-        {
             particleSystem = new ParticleSystem(TextureAssets.Pixel, particle =>
             {
                 var progress = 1.0f - particle.Timer / particle.InitTimer;
@@ -87,17 +77,7 @@ namespace Pladi.Core.Entities
             });
         }
 
-        /*public override void OnCollide(CollisionInfo info)
-        {
-            if (info.Penetration.Y < 0) return;
-
-            var absX = Math.Abs(info.Penetration.X);
-            var absY = Math.Abs(info.Penetration.Y);
-
-            if (absX >= absY) return;
-
-            onGround = true;
-        }*/
+        // [protected methods]
 
         protected override bool PreUpdate(LevelCollision levelCollision)
         {
@@ -134,7 +114,6 @@ namespace Pladi.Core.Entities
             else
             {
                 frameCounter += Main.DeltaTime * 8f;
-                //onGround = false;
 
                 Update_OnRunParticles();
             }
@@ -143,6 +122,31 @@ namespace Pladi.Core.Entities
 
             return true;
         }
+
+        protected override void ModifyGravityScale(ref float scale)
+        {
+            if (onGround || Velocity.Y < 0) return;
+
+            scale = fallGravityMult;
+        }
+
+        protected override bool PreDraw(SpriteBatch spriteBatch)
+        {
+            particleSystem.Draw(spriteBatch);
+
+            GetCurrentSpriteFrameIndex(out int frame);
+
+            var spriteEffect = direction ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+            var drawPosition = new Vector2(Hitbox.Center.X, Hitbox.Bottom);
+            var frameRect = new Rectangle(frame * 24, 0, 24, 24);
+            var origin = new Vector2(12, 21);
+
+            spriteBatch.Draw(texture, drawPosition, frameRect, Color.White, 0f, origin, 3f, spriteEffect, 0f);
+
+            return true;
+        }
+
+        // [private methods]
 
         private void Update_CheckOnGrount(LevelCollision levelCollision)
         {
@@ -177,17 +181,10 @@ namespace Pladi.Core.Entities
             }
 
             if (IsJumping
-                && input.JustReleased(Keys.W) || input.JustReleased(Keys.Space))
+                && (input.JustReleased(Keys.W) || input.JustReleased(Keys.Space)))
             {
                 jumpTimer = -1;
             }
-        }
-
-        protected override void ModifyGravityScale(ref float scale)
-        {
-            if (onGround || Velocity.Y < 0) return;
-
-            scale = fallGravityMult;
         }
 
         private void Update_OnJumpParticles()
@@ -237,22 +234,6 @@ namespace Pladi.Core.Entities
                 vector += Vector2.UnitY;
         }
 
-        protected override bool PreDraw(SpriteBatch spriteBatch)
-        {
-            particleSystem.Draw(spriteBatch);
-
-            GetCurrentSpriteFrameIndex(out int frame);
-
-            var spriteEffect = direction ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-            var drawPosition = new Vector2(Hitbox.Center.X, Hitbox.Bottom);
-            var frameRect = new Rectangle(frame * 24, 0, 24, 24);
-            var origin = new Vector2(12, 21);
-
-            spriteBatch.Draw(texture, drawPosition, frameRect, Color.White, 0f, origin, 3f, spriteEffect, 0f);
-
-            return true;
-        }
-
         private void GetCurrentSpriteFrameIndex(out int frame)
         {
             int frameCount;
@@ -263,7 +244,7 @@ namespace Pladi.Core.Entities
                 frameCount = 1;
                 frameOffset = 12;
             }
-            else if(Math.Abs(Velocity.X) > 16f)
+            else if (Math.Abs(Velocity.X) > 16f)
             {
                 frameCount = 6;
                 frameOffset = 4;

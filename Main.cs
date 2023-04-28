@@ -3,8 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Pladi.Content;
 using Pladi.Core;
 using Pladi.Core.Graphics.Renderers;
-using Pladi.Core.Input;
-using Pladi.Core.Scenes;
 using Pladi.Utilities.DataStructures;
 using System;
 using System.Collections.Generic;

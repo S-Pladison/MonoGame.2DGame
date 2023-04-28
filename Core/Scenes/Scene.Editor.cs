@@ -1,16 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
-using Pladi.Core.Graphics.Lighting;
-using Pladi.Core.Graphics;
-using Pladi.Core.Tiles;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Pladi.Content;
 using Pladi.Core.Input;
-using Microsoft.Xna.Framework.Input;
+using Pladi.Core.Tiles;
+using Pladi.Core.UI;
+using Pladi.Core.UI.Elements;
 using Pladi.Utilities;
 using Pladi.Utilities.Enums;
 using System.IO;
-using Pladi.Core.UI;
-using Pladi.Core.UI.Elements;
 using System.Linq;
 
 namespace Pladi.Core.Scenes
@@ -128,7 +126,7 @@ namespace Pladi.Core.Scenes
 
             wallSwitchUIElement = new SwitchUIElement("1. Задние плитки", false, SwitchUIElement.SwitchStyles.White);
             wallSwitchUIElement.OnMouseClick += (@event, elem) =>
-            {  
+            {
                 isGUIMouseClick = true;
 
                 if (!wallSwitchUIElement.Value)
@@ -255,7 +253,7 @@ namespace Pladi.Core.Scenes
                                 tileMap.CollisionLayer.Tiles[tilePosition.X, tilePosition.Y].Type = (ushort)((tileMap.CollisionLayer.Tiles[tilePosition.X, tilePosition.Y].Type > 0) ? 0 : 1);
                                 break;
                             case DrawLayerTypes.NotSelected:
-                                default:
+                            default:
                                 break;
                         }
                     }

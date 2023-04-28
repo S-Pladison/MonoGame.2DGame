@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
 
 namespace Pladi.Core
 {
@@ -119,7 +118,7 @@ namespace Pladi.Core
         {
             this.width = Math.Max(width, MinWidth);
             this.height = Math.Max(height, MinHeight);
-           
+
             graphics.PreferredBackBufferWidth = this.width;
             graphics.PreferredBackBufferHeight = this.height;
             graphics.ApplyChanges();
