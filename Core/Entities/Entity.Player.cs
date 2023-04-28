@@ -13,9 +13,29 @@ namespace Pladi.Core.Entities
 {
     public class PlayerEntity : Entity
     {
+        // [...]
+
+        private class DeathInfo
+        {
+            // [public properties and fields]
+
+            public readonly Vector2 Position;
+            public readonly Vector2 Velocity;
+            public float Time;
+
+            // [constructors]
+
+            public DeathInfo(Vector2 position, Vector2 velocity)
+            {
+                Position = position;
+                Velocity = velocity;
+            }
+        }
+
         // [private properties and fields]
 
         private bool IsJumping { get => jumpTimer >= 0; }
+        private bool IsDead { get => deathInfo is not null; }
 
         private readonly float moveSpeed;
         private readonly float acceleration;
@@ -32,6 +52,7 @@ namespace Pladi.Core.Entities
 
         private bool onGround;
         private float jumpTimer;
+        private DeathInfo deathInfo;
 
         private bool direction;
         private float frameCounter;
@@ -63,8 +84,7 @@ namespace Pladi.Core.Entities
 
             texture = TextureAssets.Player;
 
-            onGround = false;
-            jumpTimer = -1;
+            Reset();
 
             // ...
 
@@ -77,10 +97,45 @@ namespace Pladi.Core.Entities
             });
         }
 
+        // [public methods]
+
+        public void Kill()
+        {
+            if (IsDead) return;
+
+            deathInfo = new DeathInfo(Position, Velocity);
+
+            Velocity = Vector2.Zero;
+        }
+
+        public void Reset()
+        {
+            // TODO: Заменить на последний чекпоинт
+            {
+                Position = new Vector2(50, 48 * 6);
+            }
+
+            onGround = false;
+            jumpTimer = -1;
+            deathInfo = null;
+        }
+
         // [protected methods]
 
         protected override bool PreUpdate(LevelCollision levelCollision)
         {
+            if (IsDead)
+            {
+                if (deathInfo.Time > 2f)
+                {
+                    Reset();
+                    return false;
+                }
+
+                deathInfo.Time += Main.DeltaTime;
+                return false;
+            }
+
             var input = ILoadable.GetInstance<InputComponent>();
 
             GetInputMoveVector(input, out Vector2 inputVector);
@@ -92,10 +147,10 @@ namespace Pladi.Core.Entities
             if (inputXSign is not 0)
                 direction = inputXSign > 0;
 
-            float targetSpeed = inputVector.X * moveSpeed;
-            float speedDif = targetSpeed - Velocity.X;
-            float accelRate = (MathF.Abs(targetSpeed) > 0.01f) ? acceleration : decceleration;
-            float movement = MathF.Pow(MathF.Abs(speedDif) * accelRate, velPower) * Math.Sign(speedDif);
+            var targetSpeed = inputVector.X * moveSpeed;
+            var speedDif = targetSpeed - Velocity.X;
+            var accelRate = (MathF.Abs(targetSpeed) > 0.01f) ? acceleration : decceleration;
+            var movement = MathF.Pow(MathF.Abs(speedDif) * accelRate, velPower) * Math.Sign(speedDif);
 
             Velocity += movement * Vector2.UnitX * Main.DeltaTime;
 
@@ -140,8 +195,16 @@ namespace Pladi.Core.Entities
             var drawPosition = new Vector2(Hitbox.Center.X, Hitbox.Bottom);
             var frameRect = new Rectangle(frame * 24, 0, 24, 24);
             var origin = new Vector2(12, 21);
+            var color = Color.White;
 
-            spriteBatch.Draw(texture, drawPosition, frameRect, Color.White, 0f, origin, 3f, spriteEffect, 0f);
+            if (IsDead)
+            {
+                var progress = MathF.Pow(deathInfo.Time * 0.333f, 5f) * 48 * 3;
+                drawPosition -= Vector2.UnitY * progress * 48 * 2;
+                color *= 1 - progress;
+            }
+
+            spriteBatch.Draw(texture, drawPosition, frameRect, color, 0f, origin, 3f, spriteEffect, 0f);
 
             return true;
         }
@@ -239,7 +302,12 @@ namespace Pladi.Core.Entities
             int frameCount;
             int frameOffset;
 
-            if (!onGround)
+            if (IsDead)
+            {
+                frameCount = 1;
+                frameOffset = 14;
+            }
+            else if (!onGround)
             {
                 frameCount = 1;
                 frameOffset = 12;

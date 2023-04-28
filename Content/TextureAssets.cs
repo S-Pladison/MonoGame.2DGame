@@ -22,6 +22,8 @@ namespace Pladi.Content
         public static Texture2D Cloud5 { get; private set; }
         public static Texture2D Cloud6 { get; private set; }
 
+        public static Texture2D Spikes { get; private set; }
+
         public static Texture2D WallPalette { get; private set; }
         public static Texture2D TilePalette { get; private set; }
 
@@ -60,6 +62,8 @@ namespace Pladi.Content
             Cloud5 = Load("Clouds/5");
             Cloud6 = Load("Clouds/6");
 
+            Spikes = Load("Spikes");
+
             WallPalette = Load("WallPalette");
             TilePalette = Load("TilePalette");
 
@@ -89,6 +93,8 @@ namespace Pladi.Content
             Cloud3 = null;
             Cloud2 = null;
             Cloud1 = null;
+
+            Spikes = null;
 
             TilePalette = null;
 

@@ -178,6 +178,32 @@ namespace Pladi.Core.Scenes
             tileMap.TileLayer.Tiles[15, 5 + 2].Type = 1;
             tileMap.TileLayer.Tiles[16, 5 + 2].Type = 1;
             tileMap.TileLayer.Tiles[17, 5 + 2].Type = 1;
+
+            tileMap.TileLayer.Tiles[19, 10].Type = 1;
+            tileMap.TileLayer.Tiles[23, 10].Type = 1;
+
+            Aa(20);
+            Aa(21);
+            Aa(22);
+
+
+
+            tileMap.TileLayer.Tiles[1, 11].Type = 2;
+            tileMap.TileLayer.Tiles[2, 11].Type = 2;
+            tileMap.TileLayer.Tiles[3, 11].Type = 2;
+            tileMap.TileLayer.Tiles[4, 11].Type = 2;
+
+            tileMap.TileLayer.Tiles[12, 11].Type = 2;
+            tileMap.TileLayer.Tiles[13, 11].Type = 2;
+            tileMap.TileLayer.Tiles[14, 11].Type = 2;
+            tileMap.TileLayer.Tiles[15, 11].Type = 2;
+            tileMap.TileLayer.Tiles[16, 11].Type = 2;
+            tileMap.TileLayer.Tiles[17, 11].Type = 2;
+            tileMap.TileLayer.Tiles[18, 11].Type = 2;
+
+            tileMap.TileLayer.Tiles[20, 11].Type = 2;
+            tileMap.TileLayer.Tiles[21, 11].Type = 2;
+            tileMap.TileLayer.Tiles[22, 11].Type = 2;
         }
 
         private void InitPlayer()
@@ -209,6 +235,9 @@ namespace Pladi.Core.Scenes
         private void InitEntities()
         {
             entities.Add(new CrateEntity() { Position = new Vector2(48 * 8, 48 * 6) });
+            entities.Add(new SpikesTrigger() { Position = new Vector2(48 * 20 + 8, 48 * 10 + 8) });
+            entities.Add(new SpikesTrigger() { Position = new Vector2(48 * 21 + 8, 48 * 10 + 8) });
+            entities.Add(new SpikesTrigger() { Position = new Vector2(48 * 22 + 8, 48 * 10 + 8) });
 
 
             entities.Add(player);
@@ -221,6 +250,8 @@ namespace Pladi.Core.Scenes
                 lights.Add(new Light(Color.Red * 0.3f, new Vector2(400, 100), 48 * 7));
             }*/
 
+            //lights.Add(new Light(Color.CadetBlue * 0.3f, new Vector2(48 * 3, 48 * 7), 48 * 6));
+            lights.Add(new Light(Color.DarkSlateBlue * 0.3f, new Vector2(48 * 0, 48 * 8), 48 * 9));
             lights.Add(new Light(Color.Red * 0.3f, new Vector2(400, 100), 48 * 7));
 
             foreach (var entity in entities)

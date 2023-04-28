@@ -42,8 +42,8 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
 	float color = 0.0f;
-	float blurSizeX = 2.0f / Texture0Size.x;
-	float blurSizeY = 2.0f / Texture0Size.y;
+	float blurSizeX = 1.0f / Texture0Size.x;
+	float blurSizeY = 1.0f / Texture0Size.y;
 
 	color += tex2D(Texture0Sampler, float2(input.TextureCoordinates.x, input.TextureCoordinates.y - 3.0 * blurSizeY)).a * 0.09f;
 	color += tex2D(Texture0Sampler, float2(input.TextureCoordinates.x, input.TextureCoordinates.y - 2.0 * blurSizeY)).a * 0.11f;
