@@ -7,6 +7,8 @@ namespace Pladi.Utilities.DataStructures
 {
     public struct SpriteBatchData
     {
+        // [private static properties and fields]
+
         private static readonly FieldInfo sortModeField;
         private static readonly FieldInfo blendStateField;
         private static readonly FieldInfo samplerStateField;
@@ -15,16 +17,7 @@ namespace Pladi.Utilities.DataStructures
         private static readonly FieldInfo effectField;
         private static readonly FieldInfo spriteEffectField;
 
-        public SpriteSortMode SortMode;
-        public BlendState BlendState;
-        public SamplerState SamplerState;
-        public DepthStencilState DepthStencilState;
-        public RasterizerState RasterizerState;
-        public Effect Effect;
-
-        private SpriteEffect spriteEffect;
-
-        // ...
+        // [static constructors]
 
         static SpriteBatchData()
         {
@@ -40,6 +33,21 @@ namespace Pladi.Utilities.DataStructures
             spriteEffectField = type.GetField("_spriteEffect", flags);
         }
 
+        // [public properties and fields]
+
+        public SpriteSortMode SortMode;
+        public BlendState BlendState;
+        public SamplerState SamplerState;
+        public DepthStencilState DepthStencilState;
+        public RasterizerState RasterizerState;
+        public Effect Effect;
+
+        // [private properties and fields]
+
+        private SpriteEffect spriteEffect;
+
+        // [constructors]
+
         public SpriteBatchData(SpriteBatch spriteBatch)
         {
             if (spriteBatch == null) throw new ArgumentNullException(nameof(spriteBatch));
@@ -54,7 +62,7 @@ namespace Pladi.Utilities.DataStructures
             Effect = (Effect)effectField.GetValue(spriteBatch);
         }
 
-        // ...
+        // [public methods]
 
         public void Begin(SpriteBatch spriteBatch)
         {

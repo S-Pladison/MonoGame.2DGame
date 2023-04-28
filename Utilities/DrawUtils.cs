@@ -54,7 +54,7 @@ namespace Pladi.Utilities
             }
         }
 
-        // ...
+        // [...]
 
         private static readonly Vector2[] shadowDirections = new Vector2[] { Vector2.UnitX, Vector2.UnitY, -Vector2.UnitX, -Vector2.UnitY };
     }
