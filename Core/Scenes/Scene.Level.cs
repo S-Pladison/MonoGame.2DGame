@@ -419,33 +419,6 @@ namespace Pladi.Core.Scenes
                 spriteBatch.DrawRectangle(entities[i].Hitbox.ToRectangle(), entities[i].IsTrigger ? Color.Blue : Color.Red, 2);
             }
 
-            for (int i = 0; i < entities.Count; i++)
-            {
-                spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, entities[i].co.ToString(), entities[i].Hitbox.Location, Color.White, 0f, Vector2.Zero, 1);
-            }
-
-            // Проверка коллизии
-            {
-                var mousePosition = ILoadable.GetInstance<InputComponent>().MousePosition;
-                mousePosition = Vector2.Transform(mousePosition, Matrix.Invert(ILoadable.GetInstance<CameraComponent>().ViewMatrix));
-
-                var checkRectangle = new RectangleF(mousePosition.X - 8, mousePosition.Y - 8, 16, 16);
-
-                spriteBatch.DrawRectangle(checkRectangle.ToRectangle(), levelCollision.IsRectCollideWithEntities(checkRectangle) ? Color.Green : Color.Red, 2);
-
-
-
-
-                spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, entitySpatialHash.GetCellAtPosition(mousePosition).ToString(), mousePosition + Vector2.One * 12f, Color.White, 0f, Vector2.Zero, 1);
-            }
-
-            // ...
-
-            //var t = new TilesFromStrings().Create(tileMap.TileLayer);
-
-
-            // ...
-
             spriteBatch.End();
         }
 

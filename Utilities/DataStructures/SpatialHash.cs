@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using Pladi.Core.Entities;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Pladi.Utilities.DataStructures
 {
@@ -30,9 +28,6 @@ namespace Pladi.Utilities.DataStructures
         public void Insert(RectangleF rectangle, T obj)
         {
             var rectCells = GetCellsOfRectangle(rectangle);
-
-            if (obj is PlayerEntity)
-                Debug.WriteLine(rectCells.Count);
 
             if (!objects.ContainsKey(obj))
                 objects.Add(obj, new());
