@@ -44,6 +44,25 @@ namespace Pladi.Utilities.DataStructures
             }
         }
 
+        public void Remove(RectangleF rectangle, T obj)
+        {
+            if (!objects.ContainsKey(obj))
+                return;
+
+            var rectCells = GetCellsOfRectangle(rectangle);
+
+            for (int i = 0; i < rectCells.Count; i++)
+            {
+                var cell = rectCells[i];
+
+                if (!cells.ContainsKey(cell))
+                    continue;
+
+                objects[obj].Remove(rectCells[i]);
+                cells[rectCells[i]].Remove(obj);
+            }
+        }
+
         public void Update(RectangleF rectangle, T obj)
         {
             if (objects.ContainsKey(obj))

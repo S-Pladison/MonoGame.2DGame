@@ -11,6 +11,8 @@ namespace Pladi.Core.Graphics.Lighting
 {
     public class LightRenderer : Renderer
     {
+        // [private static properties and fields]
+
         private static readonly float scale;
         private static readonly Matrix scaleMatrix;
 
@@ -19,11 +21,11 @@ namespace Pladi.Core.Graphics.Lighting
         private static readonly BlendState shadowBlendState;
         private static readonly BlendState lightBlendState;
 
-        // ...
+        // [static constructors]
 
         static LightRenderer()
         {
-            scale = 2.5f;
+            scale = 1f;
             scaleMatrix = Matrix.CreateScale(scale);
 
             lightIndices = new short[] { 0, 1, 2, 3 };
@@ -45,9 +47,11 @@ namespace Pladi.Core.Graphics.Lighting
             };
         }
 
-        // ...
+        // [public properties and fields]
 
         public override Point Size => new((int)(base.Size.X / scale), (int)(base.Size.Y / scale));
+
+        // [private properties and fields]
 
         private readonly VertexPositionTexture[] lightVertices;
         private RenderTarget2D tempTarget;
@@ -58,10 +62,9 @@ namespace Pladi.Core.Graphics.Lighting
 
         private DynamicVertexBuffer dynamicVertexBuffer;
         private DynamicIndexBuffer dynamicIndexBuffer;
-        private int dynamicMaxPrimitiveCount;
         private int dynamicPrimitiveCount;
 
-        // ...
+        // [constructors]
 
         public LightRenderer()
         {
@@ -73,98 +76,7 @@ namespace Pladi.Core.Graphics.Lighting
             lightVertices[3].TextureCoordinate = Vector2.One;
         }
 
-        // ...
-
-        protected override void OnLoad()
-        {
-            OnRecreateRenderTarget += (device, width, height) =>
-            {
-                tempTarget = new(device, Size.X, Size.Y, false, device.PresentationParameters.BackBufferFormat, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);
-            };
-        }
-
-        protected override void OnRender(SpriteBatch spriteBatch)
-        {
-            if (extraData is not (IList<Light> lights, TileLayer collisionLayer)) return;
-
-            var camera = ILoadable.GetInstance<CameraComponent>();
-            var oldBlendState = spriteBatch.GraphicsDevice.BlendState;
-            var oldSamplerState = spriteBatch.GraphicsDevice.SamplerStates[0];
-
-            spriteBatch.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
-
-            PrepareEffects(camera);
-
-            /*if (vertexBuffer is null)
-            {
-                var edges = collisionLayer.GetEdgesFromTiles(camera.VisibleArea.ToRectangleF());
-
-                vertexBuffer = new DynamicVertexBuffer(spriteBatch.GraphicsDevice, typeof(VertexPosition), edges.Length * 4 * 10, BufferUsage.WriteOnly);
-
-                var vertices = new VertexPosition[edges.Length * 4 * 10];
-
-                for (int j = 0; j < edges.Length; j++)
-                {
-                    ref var a = ref edges[j].A;
-                    ref var b = ref edges[j].B;
-
-                    vertices[0 + j].Position = new Vector3(b.X, b.Y, 0);
-                    vertices[1 + j].Position = new Vector3(b.X, b.Y, 1);
-                    vertices[2 + j].Position = new Vector3(a.X, a.Y, 0);
-                    vertices[3 + j].Position = new Vector3(a.X, a.Y, 1);
-                }
-
-                vertexBuffer.SetData(vertices);
-
-                count = edges.Length;
-            }*/
-
-
-
-
-            // ...
-
-            lightVertices[0].Position = new Vector3(0, 0, 0);
-            lightVertices[1].Position = new Vector3(Size.X, 0, 0);
-            lightVertices[2].Position = new Vector3(0, Size.Y, 0);
-            lightVertices[3].Position = new Vector3(Size.X, Size.Y, 0);
-
-            for (int i = 0; i < lights.Count; i++)
-            {
-                RenderLight(spriteBatch, lights[i], camera, collisionLayer);
-            }
-
-            if (ILoadable.GetInstance<TileRenderer>().TryGetTargetIfPrepared(out RenderTarget2D tileTarget)
-                && ILoadable.GetInstance<EntityRenderer>().TryGetTargetIfPrepared(out RenderTarget2D entityTarget))
-            {
-                spriteBatch.GraphicsDevice.SetRenderTarget(tempTarget);
-                spriteBatch.GraphicsDevice.Clear(Color.Transparent);
-
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, Matrix.Identity);
-                spriteBatch.Draw(RenderTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                spriteBatch.Draw(tileTarget, Vector2.Zero, null, Color.Black, 0f, Vector2.Zero, 1f / scale, SpriteEffects.None, 0);
-                spriteBatch.End();
-
-                var effect = EffectAssets.TileEdgeShadow;
-
-                effect.Parameters["TransformMatrix"].SetValue(camera.ProjectionMatrix);
-                effect.Parameters["Texture0Size"].SetValue(new Vector2(tileTarget.Width, tileTarget.Height));
-
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, effect, Matrix.Identity);
-                spriteBatch.Draw(tileTarget, Vector2.Zero, null, Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                spriteBatch.Draw(entityTarget, Vector2.Zero, null, Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                spriteBatch.End();
-
-                (tempTarget, RenderTarget) = (RenderTarget, tempTarget);
-            }
-
-            // ...
-
-            spriteBatch.GraphicsDevice.SamplerStates[0] = oldSamplerState;
-            spriteBatch.GraphicsDevice.BlendState = oldBlendState;
-        }
-
-        // ...
+        // [public methods]
 
         public void PrepareStaticShadowVertices(EdgeF[] edges)
         {
@@ -208,13 +120,16 @@ namespace Pladi.Core.Graphics.Lighting
 
         public void PrepareDynamicBuffers(int maxShadowCount)
         {
-            dynamicMaxPrimitiveCount = maxShadowCount * 2;
             dynamicVertexBuffer = new DynamicVertexBuffer(Main.SpriteBatch.GraphicsDevice, typeof(VertexPosition), maxShadowCount * 4, BufferUsage.WriteOnly);
             dynamicIndexBuffer = new DynamicIndexBuffer(Main.SpriteBatch.GraphicsDevice, IndexElementSize.SixteenBits, maxShadowCount * 6, BufferUsage.WriteOnly);
         }
 
-        public void Seeee(List<EdgeF> edges)
+        public void UpdateDynamicBuffers(List<EdgeF> edges)
         {
+            dynamicPrimitiveCount = edges.Count * 2;
+
+            if (edges.Count <= 0) return;
+
             var vertices = new VertexPosition[edges.Count * 4];
             var indices = new short[edges.Count * 6];
 
@@ -239,8 +154,73 @@ namespace Pladi.Core.Graphics.Lighting
 
             dynamicVertexBuffer.SetData(vertices);
             dynamicIndexBuffer.SetData(indices);
-            dynamicPrimitiveCount = edges.Count * 2;
         }
+
+        // [protected methods]
+
+        protected override void OnLoad()
+        {
+            OnRecreateRenderTarget += (device, width, height) =>
+            {
+                tempTarget = new(device, Size.X, Size.Y, false, device.PresentationParameters.BackBufferFormat, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);
+            };
+        }
+
+        protected override void OnRender(SpriteBatch spriteBatch)
+        {
+            if (extraData is not (IList<Light> lights, TileLayer collisionLayer)) return;
+
+            var camera = ILoadable.GetInstance<CameraComponent>();
+            var oldBlendState = spriteBatch.GraphicsDevice.BlendState;
+            var oldSamplerState = spriteBatch.GraphicsDevice.SamplerStates[0];
+
+            spriteBatch.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
+
+            PrepareEffects(camera);
+
+            // ...
+
+            lightVertices[0].Position = new Vector3(0, 0, 0);
+            lightVertices[1].Position = new Vector3(Size.X, 0, 0);
+            lightVertices[2].Position = new Vector3(0, Size.Y, 0);
+            lightVertices[3].Position = new Vector3(Size.X, Size.Y, 0);
+
+            for (int i = 0; i < lights.Count; i++)
+            {
+                RenderLight(spriteBatch, lights[i], camera, collisionLayer);
+            }
+
+            if (ILoadable.GetInstance<TileRenderer>().TryGetTargetIfPrepared(out RenderTarget2D tileTarget)
+                && ILoadable.GetInstance<EntityRenderer>().TryGetTargetIfPrepared(out RenderTarget2D entityTarget))
+            {
+                spriteBatch.GraphicsDevice.SetRenderTarget(tempTarget);
+                spriteBatch.GraphicsDevice.Clear(Color.Transparent);
+
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, Matrix.Identity);
+                spriteBatch.Draw(RenderTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                spriteBatch.Draw(tileTarget, Vector2.Zero, null, Color.Black, 0f, Vector2.Zero, 1f / scale, SpriteEffects.None, 0);
+                spriteBatch.End();
+
+                var effect = EffectAssets.TileEdgeShadow;
+
+                effect.Parameters["TransformMatrix"].SetValue(camera.ProjectionMatrix);
+                effect.Parameters["Texture0Size"].SetValue(new Vector2(tileTarget.Width, tileTarget.Height));
+
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, effect, Matrix.Identity);
+                spriteBatch.Draw(tileTarget, Vector2.Zero, null, Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                spriteBatch.Draw(entityTarget, Vector2.Zero, null, Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                spriteBatch.End();
+
+                (tempTarget, RenderTarget) = (RenderTarget, tempTarget);
+            }
+
+            // ...
+
+            spriteBatch.GraphicsDevice.SamplerStates[0] = oldSamplerState;
+            spriteBatch.GraphicsDevice.BlendState = oldBlendState;
+        }
+
+        // [private methods]
 
         private void PrepareEffects(CameraComponent camera)
         {
@@ -252,37 +232,13 @@ namespace Pladi.Core.Graphics.Lighting
             e.Parameters["Resolution"].SetValue(scale * Size.ToVector2());
         }
 
+        [Obsolete]
         private void RenderLight(SpriteBatch spriteBatch, Light light, CameraComponent camera, TileLayer collisionLayer)
         {
-            /*spriteBatch.GraphicsDevice.BlendState = shadowBlendState;
-
-            var effect = EffectAssets.Shadow;
-            effect.Parameters["LightPosition"].SetValue(light.Position);
-
-            var edges = collisionLayer.GetEdgesFromTiles(RectangleF.Intersect(light.VisibleArea, camera.VisibleArea.ToRectangleF()));
-
-            for (int j = 0; j < edges.Length; j++)
-            {
-                ref var a = ref edges[j].A;
-                ref var b = ref edges[j].B;
-
-                shadowVertices[0].Position = new Vector3(b.X, b.Y, 0);
-                shadowVertices[1].Position = new Vector3(b.X, b.Y, 1);
-                shadowVertices[2].Position = new Vector3(a.X, a.Y, 0);
-                shadowVertices[3].Position = new Vector3(a.X, a.Y, 1);
-
-                for (int k = 0; k < effect.CurrentTechnique.Passes.Count; k++)
-                {
-                    effect.CurrentTechnique.Passes[k].Apply();
-                    spriteBatch.GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleStrip, shadowVertices, 0, 4, indeces, 0, 2);
-                }
-            }*/
-
             spriteBatch.GraphicsDevice.BlendState = shadowBlendState;
 
             if (staticPrimitiveCount > 0)
             {
-                //spriteBatch.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
                 var e = EffectAssets.Shadow;
                 e.Parameters["LightPosition"].SetValue(light.Position);
 
@@ -310,8 +266,6 @@ namespace Pladi.Core.Graphics.Lighting
                     spriteBatch.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, dynamicPrimitiveCount * 3, 0, dynamicPrimitiveCount);
                 }
             }
-
-        DrawLight:
 
             spriteBatch.GraphicsDevice.BlendState = lightBlendState;
 

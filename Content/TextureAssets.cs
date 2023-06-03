@@ -5,39 +5,43 @@ namespace Pladi.Content
 {
     public static class TextureAssets
     {
+        public static Texture2D Pixel { get; private set; }
+
+        // ...
+
+        public static Texture2D Cursor { get; private set; }
+        public static Texture2D Logo { get; private set; }
+
+        // ...
+
         public static Texture2D Collision { get; private set; }
         public static Texture2D CollisionTilemap { get; private set; }
-        public static Texture2D Cursor { get; private set; }
-        public static Texture2D Pixel { get; private set; }
-        public static Texture2D Player { get; private set; }
-        public static Texture2D Tilemap { get; private set; }
         public static Texture2D Shadow { get; private set; }
 
+        // ...
+
+        public static Texture2D Player { get; private set; }
         public static Texture2D Crate { get; private set; }
-
-        public static Texture2D Cloud1 { get; private set; }
-        public static Texture2D Cloud2 { get; private set; }
-        public static Texture2D Cloud3 { get; private set; }
-        public static Texture2D Cloud4 { get; private set; }
-        public static Texture2D Cloud5 { get; private set; }
-        public static Texture2D Cloud6 { get; private set; }
-
         public static Texture2D Spikes { get; private set; }
+        public static Texture2D Flagpole { get; private set; }
+        public static Texture2D Flag { get; private set; }
+        public static Texture2D PressurePlate { get; private set; }
+        public static Texture2D DeadZone { get; private set; }
+
+        // ...
 
         public static Texture2D WallPalette { get; private set; }
         public static Texture2D TilePalette { get; private set; }
 
-        public static Texture2D Normal { get; private set; }
+        // ...
+
+        public static Texture2D KeyboardButtons { get; private set; }
 
         // ...
 
         public static Texture2D UIPanel { get; set; }
-
-        public static class UI
-        {
-            public static Texture2D Switch { get; set; }
-            public static Texture2D Switch2 { get; set; }
-        }
+        public static Texture2D UISwitch { get; set; }
+        public static Texture2D UISwitch2 { get; set; }
 
         // ...
 
@@ -45,65 +49,60 @@ namespace Pladi.Content
         {
             Texture2D Load(string name) => content.Load<Texture2D>("Textures/" + name);
 
+            Pixel = Load("Pixel");
+
+            Cursor = Load("Cursor");
+            Logo = Load("Logo");
+
             Collision = Load("Collision");
             CollisionTilemap = Load("CollisionTilemap");
-            Cursor = Load("Cursor");
-            Pixel = Load("Pixel");
-            Player = Load("Player");
-            Tilemap = Load("Tilemap");
             Shadow = Load("Shadow");
 
+            Player = Load("Player");
             Crate = Load("Crate");
-
-            Cloud1 = Load("Clouds/1");
-            Cloud2 = Load("Clouds/2");
-            Cloud3 = Load("Clouds/3");
-            Cloud4 = Load("Clouds/4");
-            Cloud5 = Load("Clouds/5");
-            Cloud6 = Load("Clouds/6");
-
             Spikes = Load("Spikes");
+            Flagpole = Load("Flagpole");
+            Flag = Load("Flag");
+            PressurePlate = Load("PressurePlate");
+            DeadZone = Load("DeadZone");
 
             WallPalette = Load("WallPalette");
             TilePalette = Load("TilePalette");
 
-            Normal = Load("Normal");
+            KeyboardButtons = Load("ButtonKey");
 
             UIPanel = Load("Panel");
-
-            UI.Switch = Load("UI/SwitchUIElement");
-            UI.Switch2 = Load("UI/Switch2UIElement");
+            UISwitch = Load("UI/SwitchUIElement");
+            UISwitch2 = Load("UI/Switch2UIElement");
         }
 
         public static void Unload()
         {
-            Shadow = null;
-            Tilemap = null;
-            Player = null;
             Pixel = null;
+
             Cursor = null;
-            CollisionTilemap = null;
+            Logo = null;
+
             Collision = null;
+            CollisionTilemap = null;
+            Shadow = null;
 
+            Player = null;
             Crate = null;
-
-            Cloud6 = null;
-            Cloud5 = null;
-            Cloud4 = null;
-            Cloud3 = null;
-            Cloud2 = null;
-            Cloud1 = null;
-
             Spikes = null;
+            Flagpole = null;
+            Flag = null;
+            PressurePlate = null;
+            DeadZone = null;
 
+            WallPalette = null;
             TilePalette = null;
 
-            Normal = null;
+            KeyboardButtons = null;
 
             UIPanel = null;
-
-            UI.Switch = null;
-            UI.Switch2 = null;
+            UISwitch = null;
+            UISwitch2 = null;
         }
     }
 }

@@ -76,8 +76,8 @@ namespace Pladi.Core.UI.Elements
         {
             return style switch
             {
-                SwitchStyles.White => TextureAssets.UI.Switch2,
-                _ => TextureAssets.UI.Switch
+                SwitchStyles.White => TextureAssets.UISwitch2,
+                _ => TextureAssets.UISwitch
             };
         }
     }

@@ -40,12 +40,14 @@ namespace Pladi.Core.UI.Elements
         public Vector2 Position { get => position; }
         public Vector2 Size { get => size; }
         public RectangleF Dimensions { get => new(position.X, position.Y, size.X, size.Y); }
+        public bool IsVisible { get; set; }
 
         // ...
 
         public UIElement()
         {
             children = new();
+            IsVisible = true;
         }
 
         // ...
@@ -53,7 +55,7 @@ namespace Pladi.Core.UI.Elements
         public void Update()
         {
             UpdateThis();
-            OnPostUpdate(this);
+            OnPostUpdate?.Invoke(this);
             UpdateChildren();
         }
 
@@ -69,6 +71,8 @@ namespace Pladi.Core.UI.Elements
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            if (!IsVisible) return;
+
             DrawThis(spriteBatch);
 
             if (!ClippingOutsideRectangle)

@@ -4,6 +4,8 @@ namespace Pladi.Core.Graphics.Particles
 {
     public class Particle
     {
+        // [public properties and fields]
+
         public Vector2 Position;
         public Vector2 Velocity;
         public Rectangle Frame;
@@ -15,7 +17,7 @@ namespace Pladi.Core.Graphics.Particles
 
         public readonly float InitTimer;
 
-        // ...
+        // [constructors]
 
         public Particle(Vector2 position, Vector2 velocity, Color color, float rotation, float scale, float timer)
         : this(position, velocity, default, color, 255, rotation, scale, timer)

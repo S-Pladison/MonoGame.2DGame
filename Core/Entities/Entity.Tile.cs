@@ -1,4 +1,5 @@
-﻿using Pladi.Utilities.DataStructures;
+﻿using Pladi.Core.Scenes;
+using Pladi.Utilities.DataStructures;
 
 namespace Pladi.Core.Entities
 {
@@ -6,7 +7,7 @@ namespace Pladi.Core.Entities
     {
         // [constructors]
 
-        public TileEntity(RectangleF hitbox)
+        public TileEntity(LevelScene scene, RectangleF hitbox) : base(scene)
         {
             Hitbox = hitbox;
 

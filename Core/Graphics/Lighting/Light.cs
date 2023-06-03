@@ -5,6 +5,8 @@ namespace Pladi.Core.Graphics.Lighting
 {
     public class Light
     {
+        // [public properties and fields]
+
         public Color Color
         {
             get => color;
@@ -45,12 +47,14 @@ namespace Pladi.Core.Graphics.Lighting
             }
         }
 
+        // [private properties and fields]
+
         private Color color;
         private Vector2 position;
         private float radius;
         private RectangleF area;
 
-        // ...
+        // [constructors]
 
         public Light(Color color, Vector2 position, float radius)
         {
@@ -61,7 +65,7 @@ namespace Pladi.Core.Graphics.Lighting
             UpdateVisibleArea();
         }
 
-        // ...
+        // [private methods]
 
         private void UpdateVisibleArea()
         {

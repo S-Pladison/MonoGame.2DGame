@@ -11,7 +11,7 @@ namespace Pladi.Core
 
         // [methods]
 
-        void Load() { }
+        virtual void Initialize() { }
 
         // [...]
 
@@ -29,7 +29,7 @@ namespace Pladi.Core
         {
             foreach (var (_, instance) in loadables)
             {
-                instance.Load();
+                instance.Initialize();
             }
         }
 

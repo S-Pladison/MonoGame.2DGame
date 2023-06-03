@@ -1,4 +1,5 @@
 ﻿using Pladi.Core.Collisions;
+using Pladi.Core.Scenes;
 using System;
 using System.Collections.Generic;
 
@@ -11,13 +12,18 @@ namespace Pladi.Core.Entities
         public Action<Entity> OnTriggerEnter;
         public Action<Entity> OnTriggerExit;
 
+        public bool AnyEntitiesInHistory
+        {
+            get => entityHistory.Count > 0;
+        }
+
         // [private properties and fields]
 
         private readonly List<Entity> entityHistory;
 
         // [constructors]
 
-        public Trigger()
+        public Trigger(LevelScene scene) : base(scene)
         {
             entityHistory = new();
 
@@ -32,10 +38,12 @@ namespace Pladi.Core.Entities
         {
             for (int i = 0; i < entityHistory.Count; i++)
             {
-                if (entityHistory[i].Hitbox.Intersects(Hitbox)) continue;
+                var other = entityHistory[i];
 
-                OnTriggerExit?.Invoke(entityHistory[i]);
-                entityHistory.Remove(entityHistory[i]);
+                if (other.Hitbox.Intersects(Hitbox)) continue;
+
+                entityHistory.Remove(other);
+                OnTriggerExit?.Invoke(other);
 
                 i--;
             }

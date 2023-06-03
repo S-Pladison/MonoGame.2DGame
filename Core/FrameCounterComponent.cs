@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Pladi.Core
 {
-    public class FrameCounterComponent : BasicComponent
+    public class FrameCounterComponent : BaseComponent
     {
         // [public static properties and fields]
 

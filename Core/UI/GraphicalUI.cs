@@ -50,10 +50,10 @@ namespace Pladi.Core.UI
             var mouseLeft = input.JustPressed(MouseInputTypes.LeftButton);
             var mouseElement = Core.GetElementAt(mousePosition);
 
+            Core.Update();
+
             UpdateMouseHover(mouseElement, mousePosition);
             UpdateMouseClick(mouseElement, mousePosition, mouseLeft);
-
-            Core.Update();
         }
 
         public void Draw(SpriteBatch spriteBatch)

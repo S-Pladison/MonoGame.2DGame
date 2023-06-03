@@ -4,7 +4,7 @@ using Pladi.Content;
 
 namespace Pladi.Core.Input
 {
-    public class MouseDrawerComponent : BasicComponent
+    public class MouseDrawerComponent : BaseComponent
     {
         // [public methods]
 

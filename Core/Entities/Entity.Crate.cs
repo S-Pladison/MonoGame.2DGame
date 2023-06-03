@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Content;
 using Pladi.Core.Collisions;
+using Pladi.Core.Scenes;
 using Pladi.Utilities.DataStructures;
 using System;
 
@@ -25,7 +26,7 @@ namespace Pladi.Core.Entities
 
         // [constructors]
 
-        public CrateEntity()
+        public CrateEntity(LevelScene scene) : base(scene)
         {
             Mass = 20f;
 

@@ -15,32 +15,31 @@ namespace Pladi
 {
     public class Main : Game
     {
-        public static Main Instance { get; private set; }
+        // [public static properties and fields]
 
-        public static SpriteBatch SpriteBatch { get => Instance.spriteBatch; }
+        public static Main Instance { get; private set; }
+        public static SpriteBatch SpriteBatch { get; private set; }
+        public static GraphicsDeviceManager Graphics { get; private set; }
         public static Random Rand { get; private set; }
         public static float GlobalTimeWrappedHourly { get; private set; }
         public static float DeltaTime { get; private set; }
 
-        public Action<GameTime> OnPreDraw;
-        public Action<GameTime> OnPostDraw;
-
-        // ...
+        // [private static properties and fields]
 
         private static readonly string configFilePath = AppDomain.CurrentDomain.BaseDirectory + "\\config.json";
 
-        // ...
+        // [public properties and fields]
 
-        private GraphicsDeviceManager graphics;
-        private SpriteBatch spriteBatch;
+        public Action<GameTime> OnPreDraw;
+        public Action<GameTime> OnPostDraw;
 
-        // ...
+        // [constructors]
 
         public Main()
         {
             Instance = this;
 
-            graphics = new GraphicsDeviceManager(this)
+            Graphics = new GraphicsDeviceManager(this)
             {
                 PreferHalfPixelOffset = true,
             };
@@ -50,17 +49,15 @@ namespace Pladi
 
             Rand = new Random((int)DateTime.Now.Ticks);
 
-            graphics.SynchronizeWithVerticalRetrace = false;
-            graphics.ApplyChanges();
-
-            LoadLoadables();
-
-            ILoadable.GetInstance<ScreenComponent>().SetGraphicsDeviceManager(graphics);
+            Graphics.SynchronizeWithVerticalRetrace = false;
+            Graphics.ApplyChanges();
         }
+
+        // [protected methods]
 
         protected override void LoadContent()
         {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            SpriteBatch = new SpriteBatch(GraphicsDevice);
 
             FontAssets.Load(Content);
             TextureAssets.Load(Content);
@@ -73,6 +70,7 @@ namespace Pladi
             // Not remove // LoadContent()
             base.Initialize();
 
+            LoadLoadables();
             LoadConfig();
         }
 
@@ -92,9 +90,7 @@ namespace Pladi
             GlobalTimeWrappedHourly = (float)(gameTime.TotalGameTime.TotalSeconds % 3600.0);
             DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            base.Update(gameTime);
-
-            /*try
+            try
             {
                 base.Update(gameTime);
             }
@@ -102,7 +98,7 @@ namespace Pladi
             {
                 // TODO: ...
                 throw new Exception(ex.Message);
-            }*/
+            }
         }
 
         protected override void Draw(GameTime gameTime)
@@ -131,9 +127,9 @@ namespace Pladi
             SaveConfig();
         }
 
-        // ...
+        // [private static methods]
 
-        private async void SaveConfig()
+        private static async void SaveConfig()
         {
             var config = new ConfigData();
 
@@ -149,7 +145,7 @@ namespace Pladi
             await JsonSerializer.SerializeAsync<ConfigData>(fs, config, new JsonSerializerOptions() { WriteIndented = true });
         }
 
-        private async void LoadConfig()
+        private static async void LoadConfig()
         {
             var screen = ILoadable.GetInstance<ScreenComponent>();
 
@@ -171,8 +167,6 @@ namespace Pladi
                 screen.SetMinDisplayMode();
             }
         }
-
-        // ...
 
         private static void LoadLoadables()
         {
@@ -199,6 +193,8 @@ namespace Pladi
         }
 
         private static Form GetForm()
-            => Form.FromHandle(Instance.Window.Handle).FindForm();
+        {
+            return Form.FromHandle(Instance.Window.Handle).FindForm();
+        }
     }
 }

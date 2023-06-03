@@ -2,13 +2,15 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Pladi.Content;
+using Pladi.Core.Entities;
+using Pladi.Core.Graphics.Lighting;
 using Pladi.Core.Input;
 using Pladi.Core.Tiles;
 using Pladi.Core.UI;
 using Pladi.Core.UI.Elements;
 using Pladi.Utilities;
 using Pladi.Utilities.Enums;
-using System.IO;
+using System;
 using System.Linq;
 
 namespace Pladi.Core.Scenes
@@ -26,7 +28,7 @@ namespace Pladi.Core.Scenes
         //
 
         private GraphicalUI graphicalUI;
-        private TileMap tileMap;
+        private GameLevel gameLevel;
 
         private bool isGUIMouseClick;
         private bool drawTileLayer = true;
@@ -41,19 +43,18 @@ namespace Pladi.Core.Scenes
 
         public override void OnActivate()
         {
-            tileMap = new TileMap(100, 50, 3);
+            gameLevel = new GameLevel(100, 50, 3);
 
-            if (TryLoadLevelFromFile("Debug", out var level))
+            if (GameLevel.TryLoadLevelFromFile("lv_1", out var level))
             {
-                tileMap = level;
-            }
-            else
-            {
-                tileMap.TileLayer.Tiles[0, 0].Type = 1;
+                gameLevel = level;
             }
 
-            tileMap.WallLayer.SetPalette(new TilePalette(TextureAssets.WallPalette, 5, 1));
-            tileMap.TileLayer.SetPalette(new TilePalette(TextureAssets.TilePalette, 3, 1));
+            gameLevel.TileMap.WallLayer.SetPalette(new TilePalette(TextureAssets.WallPalette, 5, 1));
+            gameLevel.TileMap.TileLayer.SetPalette(new TilePalette(TextureAssets.TilePalette, 4, 1));
+
+            gameLevel.Entities.Clear();
+            gameLevel.Lights.Clear();
 
             ILoadable.GetInstance<CameraComponent>().ResetPosition();
 
@@ -76,9 +77,9 @@ namespace Pladi.Core.Scenes
             text.Top.SetPixel(10f);
             panel.Append(text);*/
 
-            //Hee();
+            Hee();
 
-            InitLayerPanel();
+            //InitLayerPanel();
         }
 
         private void InitLayerPanel()
@@ -210,9 +211,47 @@ namespace Pladi.Core.Scenes
 
         public override void OnDeactivate()
         {
-            SaveLevelToFile("Debug", tileMap);
+            // ...
 
-            tileMap = null;
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.Player, new Vector2(3 * 48, 20 * 48)));
+
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.Spikes, new Vector2(6 * 48, 23 * 48) + new Vector2(8)));
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.Spikes, new Vector2(7 * 48, 23 * 48) + new Vector2(8)));
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.Spikes, new Vector2(8 * 48, 23 * 48) + new Vector2(8)));
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.Spikes, new Vector2(9 * 48, 23 * 48) + new Vector2(8)));
+
+            gameLevel.Lights.Add(new Light(Color.Cyan * 0.35f, new Vector2(2 * 48, 18 * 48) + new Vector2(24), 15 * 48));
+
+            // ...
+
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.Spikes, new Vector2(18 * 48, 20 * 48) + new Vector2(8)));
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.Spikes, new Vector2(19 * 48, 20 * 48) + new Vector2(8)));
+
+            gameLevel.Lights.Add(new Light(Color.Red * 0.35f, new Vector2(21 * 48, 18 * 48) + new Vector2(24), 15 * 48));
+
+            // ...
+
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.Crate, new Vector2(3 * 48, 12 * 48)));
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.Spikes, new Vector2(5 * 48, 14 * 48) + new Vector2(8)));
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.Spikes, new Vector2(6 * 48, 14 * 48) + new Vector2(8)));
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.Spikes, new Vector2(7 * 48, 14 * 48) + new Vector2(8)));
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.PressurePlate, new Vector2(9 * 48, 12 * 48) + new Vector2(8, 32)));
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.DeadZone, new Vector2(1 * 48, 9 * 48)));
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.DeadZone, new Vector2(2 * 48, 9 * 48)));
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.DeadZone, new Vector2(3 * 48, 9 * 48)));
+            gameLevel.Entities.Add(new Tuple<EntityTypes, Vector2>(EntityTypes.Finish, new Vector2(6 * 48, 6 * 48)));
+
+            gameLevel.Lights.Add(new Light(Color.Lime * 0.35f, new Vector2(9 * 48, 11 * 48) + new Vector2(24), 12 * 48));
+            gameLevel.Lights.Add(new Light(Color.CadetBlue * 0.35f, new Vector2(6 * 48, 3 * 48) + new Vector2(24), 12 * 48));
+
+            // ...
+
+            gameLevel.Entities.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+
+            // ...
+
+            gameLevel.SaveToFile("lv_1");
+            gameLevel = null;
         }
 
         public override void Update()
@@ -227,7 +266,7 @@ namespace Pladi.Core.Scenes
             camera.Position += inputVector * 48f * 10f * Main.DeltaTime;
 
             if (input.JustPressed(Keys.Escape))
-                SceneComponent.SetActiveScene(SceneComponent.GameScenes.Menu);
+                SceneComponent.SetActiveScene<MenuScene>();
 
             graphicalUI.Update();
 
@@ -239,18 +278,18 @@ namespace Pladi.Core.Scenes
                 {
                     var tilePosition = (mousePosition / 48).ToPoint();
 
-                    if (tilePosition.X.Between(0, tileMap.Width) && tilePosition.Y.Between(0, tileMap.Height))
+                    if (tilePosition.X.Between(0, gameLevel.TileMap.Width) && tilePosition.Y.Between(0, gameLevel.TileMap.Height))
                     {
                         switch (drawLayerType)
                         {
                             case DrawLayerTypes.Walls:
-                                tileMap.WallLayer.Tiles[tilePosition.X, tilePosition.Y].Type = (ushort)((tileMap.WallLayer.Tiles[tilePosition.X, tilePosition.Y].Type > 0) ? 0 : 1);
+                                gameLevel.TileMap.WallLayer.Tiles[tilePosition.X, tilePosition.Y].Type = (ushort)((gameLevel.TileMap.WallLayer.Tiles[tilePosition.X, tilePosition.Y].Type + 1) % gameLevel.TileMap.WallLayer.Palette.CountX);
                                 break;
                             case DrawLayerTypes.Tiles:
-                                tileMap.TileLayer.Tiles[tilePosition.X, tilePosition.Y].Type = (ushort)((tileMap.TileLayer.Tiles[tilePosition.X, tilePosition.Y].Type > 0) ? 0 : 1);
+                                gameLevel.TileMap.TileLayer.Tiles[tilePosition.X, tilePosition.Y].Type = (ushort)((gameLevel.TileMap.TileLayer.Tiles[tilePosition.X, tilePosition.Y].Type + 1) % gameLevel.TileMap.TileLayer.Palette.CountX);
                                 break;
                             case DrawLayerTypes.Collisions:
-                                tileMap.CollisionLayer.Tiles[tilePosition.X, tilePosition.Y].Type = (ushort)((tileMap.CollisionLayer.Tiles[tilePosition.X, tilePosition.Y].Type > 0) ? 0 : 1);
+                                gameLevel.TileMap.CollisionLayer.Tiles[tilePosition.X, tilePosition.Y].Type = (ushort)((gameLevel.TileMap.TileLayer.Tiles[tilePosition.X, tilePosition.Y].Type + 1) % gameLevel.TileMap.TileLayer.Palette.CountX);
                                 break;
                             case DrawLayerTypes.NotSelected:
                             default:
@@ -267,14 +306,14 @@ namespace Pladi.Core.Scenes
 
             // ...
 
-            spriteBatch.GraphicsDevice.Clear(Colors.Main * 0.5f);
+            spriteBatch.GraphicsDevice.Clear(new Color(47, 54, 73));
 
             // ...
 
-            tileMap.WallLayer.Draw(spriteBatch, Color.DarkGray, camera);
-            if (drawTileLayer) tileMap.TileLayer.Draw(spriteBatch, Color.White, camera);
+            gameLevel.TileMap.WallLayer.Draw(spriteBatch, Color.DarkGray, camera);
+            if (drawTileLayer) gameLevel.TileMap.TileLayer.Draw(spriteBatch, Color.White, camera);
 
-            var tileMapRect = new Rectangle(0, 0, tileMap.Width * 48, tileMap.Height * 48);
+            var tileMapRect = new Rectangle(0, 0, gameLevel.TileMap.Width * 48, gameLevel.TileMap.Height * 48);
             var cameraRect = camera.VisibleArea;
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, camera.ViewMatrix);
@@ -288,77 +327,6 @@ namespace Pladi.Core.Scenes
         }
 
         // ...
-
-        private bool TryLoadLevelFromFile(string name, out TileMap level)
-        {
-            CreateMapDirectoryIfDontExists();
-
-            var path = $"Maps/{name}.pl";
-
-            if (!File.Exists(path))
-            {
-                level = null;
-                return false;
-            }
-
-            using var reader = new BinaryReader(File.Open(path, FileMode.Open));
-
-            try
-            {
-                var scale = reader.ReadInt32();
-                var width = reader.ReadInt32();
-                var height = reader.ReadInt32();
-
-                level = new TileMap(width, height, scale);
-
-                for (int i = 0; i < width; i++)
-                {
-                    for (int j = 0; j < height; j++)
-                    {
-                        level.WallLayer.Tiles[i, j].Type = reader.ReadUInt16();
-                        level.TileLayer.Tiles[i, j].Type = reader.ReadUInt16();
-                    }
-                }
-
-                return true;
-            }
-            catch
-            {
-                reader?.Close();
-                level = null;
-            }
-
-            return false;
-        }
-
-        private void SaveLevelToFile(string name, TileMap level)
-        {
-            CreateMapDirectoryIfDontExists();
-
-            var path = $"Maps/{name}.pl";
-
-            using var writer = new BinaryWriter(File.Create(path));
-
-            writer.Write(tileMap.Scale);
-            writer.Write(tileMap.Width);
-            writer.Write(tileMap.Height);
-
-            for (int i = 0; i < tileMap.Width; i++)
-            {
-                for (int j = 0; j < tileMap.Height; j++)
-                {
-                    writer.Write(tileMap.WallLayer.Tiles[i, j].Type);
-                    writer.Write(tileMap.TileLayer.Tiles[i, j].Type);
-                }
-            }
-        }
-
-        private void CreateMapDirectoryIfDontExists()
-        {
-            if (Directory.Exists("Maps")) return;
-
-            Directory.CreateDirectory("Maps");
-        }
 
         private void GetInputMoveVector(InputComponent input, out Vector2 vector)
         {
@@ -376,192 +344,5 @@ namespace Pladi.Core.Scenes
             if (input.IsPressed(Keys.S))
                 vector += Vector2.UnitY;
         }
-
-
-        /*private GameLevel level;
-        private Grid grid;
-        private Camera camera;
-
-        private int currentTileType;
-        private bool collideLayer;
-
-        // ...
-
-        public override void OnActivate()
-        {
-            level = new GameLevel(width: 100, height: 100, tileScale: 4f);
-
-            try
-            {
-                level = GameLevel.LoadFromFile("Editor.pgm");
-                level.BackTilemap.SetTexture(TextureAssets.Tilemap, 8, 12);
-                level.CollisionTilemap.SetTexture(TextureAssets.CollisionTilemap, 2, 1);
-            }
-            catch
-            {
-                level = new GameLevel(100, 100, 4f);
-            }
-
-            grid = new Grid(32, 32, 2);
-
-            camera = new Camera(Main.SpriteBatch.GraphicsDevice.Viewport, 1f);
-        }
-
-        public override void OnDeactivate()
-        {
-            level.SaveToFile("Editor.pgm");
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            var input = Main.InputManager;
-            var delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if (input.JustPressed(Keys.Escape))
-            {
-                Main.SceneManager.SetActiveScene(SceneManager.GameScenes.Menu);
-            }
-
-            float cameraSpeed = 32 * 15 * delta;
-
-            if (input.IsPressed(Keys.W))
-            {
-                camera.Location -= Vector2.UnitY * cameraSpeed;
-            }
-
-            if (input.IsPressed(Keys.S))
-            {
-                camera.Location += Vector2.UnitY * cameraSpeed;
-            }
-
-            if (input.IsPressed(Keys.D))
-            {
-                camera.Location += Vector2.UnitX * cameraSpeed;
-            }
-
-            if (input.IsPressed(Keys.A))
-            {
-                camera.Location -= Vector2.UnitX * cameraSpeed;
-            }
-
-            if (input.JustPressed(Keys.NumPad7))
-            {
-                currentTileType++;
-            }
-
-            if (input.JustPressed(Keys.NumPad4))
-            {
-                currentTileType--;
-            }
-
-            if (input.JustPressed(Keys.NumPad1))
-            {
-                collideLayer = !collideLayer;
-                currentTileType = 0;
-            }
-
-            var scroll = Main.InputManager.GetMouseScroll();
-
-            if (scroll != 0)
-            {
-                camera.Zoom += Math.Sign(scroll) * 5f * delta;
-            }
-
-            if (!input.JustPressed(MouseInputTypes.LeftButton)) return;
-
-            var mousePosition = camera.ScreenToWorldSpace(Main.InputManager.GetMousePosition());
-            var tileCoordsX = (int)(mousePosition.X / 32);
-            var tileCoordsY = (int)(mousePosition.Y / 32);
-
-            if (tileCoordsX < 0 || tileCoordsX >= level.Width || tileCoordsY < 0 || tileCoordsY >= level.Height) return;
-
-            //tilemap.SetTile(tileCoordsX, tileCoordsY, new Tile() { Type = (ushort)currentTileType });
-
-            if (collideLayer)
-            {
-                level.CollisionTilemap.SetTile(tileCoordsX, tileCoordsY, new Tile() { Type = (ushort)currentTileType });
-            }
-            else
-            {
-                level.BackTilemap.SetTile(tileCoordsX, tileCoordsY, new Tile() { Type = (ushort)currentTileType });
-            }
-        }
-
-        public override void OnResolutionChanged(int width, int height)
-        {
-            var device = Main.SpriteBatch.GraphicsDevice;
-
-            camera.Viewport = Main.SpriteBatch.GraphicsDevice.Viewport;
-            /*tilemap.RecreateRenderTarget(Main.SpriteBatch.GraphicsDevice, width, height);
-            collisionTilemap.RecreateRenderTarget(Main.SpriteBatch.GraphicsDevice, width, height);
-            level.RecreateRenderTargets(device, width, height);
-            grid.RecreateRenderTarget(device, width, height);
-        }
-
-        public override void PreDraw(GameTime gameTime, SpriteBatch spriteBatch)
-        {
-            level.Render(spriteBatch, camera);
-            grid.Render(spriteBatch, camera);
-        }
-
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-        {
-            var device = spriteBatch.GraphicsDevice;
-            device.Clear(Color.DarkGray);
-
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, camera.TransformMatrix);
-            level.BackTilemap.Draw(spriteBatch, Vector2.Zero);
-            spriteBatch.End();
-
-            DrawCollisionAreas(spriteBatch);
-            DrawGrid(spriteBatch);
-            DrawTempInfo(spriteBatch);
-        }
-
-        // ...
-
-        private void DrawCollisionAreas(SpriteBatch spriteBatch)
-        {
-            var effect = EffectAssets.Collision;
-
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.DepthRead, RasterizerState.CullCounterClockwise, EffectAssets.Collision, camera.TransformMatrix);
-
-            var texture = level.CollisionTilemap.RenderedTexture;
-            var thickness = 2 / level.CollisionTilemap.Scale;
-
-            effect.Parameters["Texture1"].SetValue(TextureAssets.Collision);
-            effect.Parameters["OutlineColor"].SetValue(new Color(57, 184, 255).ToVector4());
-            effect.Parameters["OutlineWidth"].SetValue(thickness / (float)texture.Width);
-            effect.Parameters["OutlineHeight"].SetValue(thickness / (float)texture.Height);
-            effect.Parameters["Texture1UvMult"].SetValue(new Vector2(texture.Width, texture.Height) / 32 * 4);
-            effect.Parameters["Offset"].SetValue(new Vector2(Main.GlobalTimeWrappedHourly * 0.25f));
-
-            level.CollisionTilemap.Draw(spriteBatch, Vector2.Zero);
-
-            spriteBatch.End();
-        }
-
-        private void DrawGrid(SpriteBatch spriteBatch)
-        {
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
-            spriteBatch.Draw(grid.RenderedTexture, Vector2.Zero, null, new Color(240, 240, 240, 5), 0f, Vector2.Zero, 1f, SpriteEffects.None, 0);
-            spriteBatch.End();
-        }
-
-        private void DrawTempInfo(SpriteBatch spriteBatch)
-        {
-            var mousePosition = camera.ScreenToWorldSpace(Main.InputManager.GetMousePosition());
-            var tileCoordsX = (int)(mousePosition.X / 32);
-            var tileCoordsY = (int)(mousePosition.Y / 32);
-
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
-
-            spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Rendered tiles: {level.BackTilemap.RenderedTileCount}", new Vector2(5, 5), Color.White, 0, Vector2.Zero, 1f, 1f);
-            spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Tile coords [Mouse]: x:{tileCoordsX} y:{tileCoordsY}", new Vector2(5, 20), Color.White, 0, Vector2.Zero, 1f, 1f);
-            spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Tile type: {currentTileType}", new Vector2(5, 35), Color.White, 0, Vector2.Zero, 1f, 1f);
-            spriteBatch.DrawStringWithShadow(FontAssets.DefaultSmall, $"Layer type: {(collideLayer ? "Collider" : "Back")}", new Vector2(5, 50), Color.White, 0, Vector2.Zero, 1f, 1f);
-
-            spriteBatch.End();
-        }*/
     }
 }

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Pladi.Core.Input
 {
-    public class InputComponent : BasicComponent
+    public class InputComponent : BaseComponent
     {
         // [private static properties and fields]
 

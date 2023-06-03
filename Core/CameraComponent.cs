@@ -2,7 +2,7 @@
 
 namespace Pladi.Core
 {
-    public class CameraComponent : BasicComponent
+    public class CameraComponent : BaseComponent
     {
         public Vector2 Position
         {

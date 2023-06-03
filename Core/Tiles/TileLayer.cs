@@ -10,6 +10,8 @@ namespace Pladi.Core.Tiles
 {
     public class TileLayer
     {
+        // [public properties and fields]
+
         public TileMap Map { get; init; }
         public Tile[,] Tiles { get; init; }
         public TilePalette Palette { get; private set; }
@@ -17,7 +19,7 @@ namespace Pladi.Core.Tiles
         public int Width => Map.Width;
         public int Height => Map.Height;
 
-        // ...
+        // [constructors]
 
         public TileLayer(TileMap map)
         {
@@ -25,7 +27,7 @@ namespace Pladi.Core.Tiles
             Tiles = new Tile[map.Width, map.Height];
         }
 
-        // ...
+        // [public methods]
 
         public void SetPalette(TilePalette palette)
             => Palette = palette;
@@ -38,6 +40,40 @@ namespace Pladi.Core.Tiles
 
         public int DrawWithoutTypes(SpriteBatch spriteBatch, Color color, CameraComponent camera, IEnumerable<ushort> types)
             => InnerDraw(t => !types.Contains(t.Type), spriteBatch, color, camera);
+
+        public void GetTileCoordsIntersectsWithRect(Rectangle rectangle, out Point leftTop, out Point rightBottom)
+            => GetTileCoordsIntersectsWithRect(rectangle.ToRectangleF(), out leftTop, out rightBottom);
+
+        public void GetTileCoordsIntersectsWithRect(RectangleF rectangleF, out Point leftTop, out Point rightBottom)
+        {
+            var tileWidth = Palette.TileWidth * Map.Scale;
+            var tileHeight = Palette.TileHeight * Map.Scale;
+
+            rectangleF.X /= tileWidth;
+            rectangleF.Y /= tileHeight;
+            rectangleF.Width /= tileWidth;
+            rectangleF.Height /= tileHeight;
+
+            var rectangle = rectangleF.ToRectangle();
+
+            var leftTile = rectangle.X - 1;
+            var rightTile = rectangle.X + rectangle.Width + 1;
+            var topTile = rectangle.Y - 1;
+            var bottomTile = rectangle.Y + rectangle.Height + 1;
+
+            var xMax = Width - 1;
+            var yMax = Height - 1;
+
+            leftTile = Math.Clamp(leftTile, 0, xMax);
+            rightTile = Math.Clamp(rightTile, 0, xMax);
+            topTile = Math.Clamp(topTile, 0, yMax);
+            bottomTile = Math.Clamp(bottomTile, 0, yMax);
+
+            leftTop = new Point(leftTile, topTile);
+            rightBottom = new Point(rightTile, bottomTile);
+        }
+
+        // [private methods]
 
         private int InnerDraw(Predicate<Tile> predicate, SpriteBatch spriteBatch, Color color, CameraComponent camera)
         {
@@ -70,38 +106,6 @@ namespace Pladi.Core.Tiles
             spriteBatch.End();
 
             return counter;
-        }
-
-        public void GetTileCoordsIntersectsWithRect(Rectangle rectangle, out Point leftTop, out Point rightBottom)
-            => GetTileCoordsIntersectsWithRect(rectangle.ToRectangleF(), out leftTop, out rightBottom);
-
-        public void GetTileCoordsIntersectsWithRect(RectangleF rectangleF, out Point leftTop, out Point rightBottom)
-        {
-            var tileWidth = Palette.TileWidth * Map.Scale;
-            var tileHeight = Palette.TileHeight * Map.Scale;
-
-            rectangleF.X /= tileWidth;
-            rectangleF.Y /= tileHeight;
-            rectangleF.Width /= tileWidth;
-            rectangleF.Height /= tileHeight;
-
-            var rectangle = rectangleF.ToRectangle();
-
-            var leftTile = rectangle.X - 1;
-            var rightTile = rectangle.X + rectangle.Width + 1;
-            var topTile = rectangle.Y - 1;
-            var bottomTile = rectangle.Y + rectangle.Height + 1;
-
-            var xMax = Width - 1;
-            var yMax = Height - 1;
-
-            leftTile = Math.Clamp(leftTile, 0, xMax);
-            rightTile = Math.Clamp(rightTile, 0, xMax);
-            topTile = Math.Clamp(topTile, 0, yMax);
-            bottomTile = Math.Clamp(bottomTile, 0, yMax);
-
-            leftTop = new Point(leftTile, topTile);
-            rightBottom = new Point(rightTile, bottomTile);
         }
     }
 }

@@ -5,6 +5,7 @@ using Pladi.Content;
 using Pladi.Core.Collisions;
 using Pladi.Core.Graphics.Particles;
 using Pladi.Core.Input;
+using Pladi.Core.Scenes;
 using Pladi.Utilities;
 using Pladi.Utilities.DataStructures;
 using System;
@@ -14,6 +15,17 @@ namespace Pladi.Core.Entities
     public class PlayerEntity : Entity
     {
         // [...]
+
+        [Flags]
+        public enum InputFlags : byte
+        {
+            None = 0,
+            Left = 1,
+            Jump = 2,
+            Right = 4,
+
+            All = Left | Jump | Right
+        }
 
         private class DeathInfo
         {
@@ -31,6 +43,10 @@ namespace Pladi.Core.Entities
                 Velocity = velocity;
             }
         }
+
+        // [public properties and fields]
+
+        public InputFlags Input { get; set; }
 
         // [private properties and fields]
 
@@ -62,12 +78,13 @@ namespace Pladi.Core.Entities
 
         // [constructors]
 
-        public PlayerEntity()
+        public PlayerEntity(LevelScene scene) : base(scene)
         {
             Width = 12 * 3;
             Height = 15 * 3;
 
             Mass = 5f;
+            Input = InputFlags.All;
 
             // ...
 
@@ -84,7 +101,9 @@ namespace Pladi.Core.Entities
 
             texture = TextureAssets.Player;
 
-            Reset();
+            onGround = false;
+            jumpTimer = -1;
+            deathInfo = null;
 
             // ...
 
@@ -108,18 +127,6 @@ namespace Pladi.Core.Entities
             Velocity = Vector2.Zero;
         }
 
-        public void Reset()
-        {
-            // TODO: Заменить на последний чекпоинт
-            {
-                Position = new Vector2(50, 48 * 6);
-            }
-
-            onGround = false;
-            jumpTimer = -1;
-            deathInfo = null;
-        }
-
         // [protected methods]
 
         protected override bool PreUpdate(LevelCollision levelCollision)
@@ -128,7 +135,7 @@ namespace Pladi.Core.Entities
             {
                 if (deathInfo.Time > 2f)
                 {
-                    Reset();
+                    Scene.ResetLevel();
                     return false;
                 }
 
@@ -228,7 +235,7 @@ namespace Pladi.Core.Entities
 
             if (!IsJumping && onGround)
             {
-                if (input.JustPressed(Keys.W) || input.JustPressed(Keys.Space))
+                if (Input.HasFlag(InputFlags.Jump) && (input.JustPressed(Keys.W) || input.JustPressed(Keys.Space)))
                 {
                     Velocity.Y = -jumpPower;
 
@@ -258,7 +265,7 @@ namespace Pladi.Core.Entities
             {
                 var velocity = new Vector2(Main.Rand.NextFloat(-48f, 48f), 0).RotateBy(Main.Rand.NextFloat(-0.3f, 0.3f));
 
-                particleSystem.Add(new Particle(position, velocity, Colors.Main, 0f, 1f, Main.Rand.NextFloat(0.4f, 0.8f)));
+                particleSystem.Add(new Particle(position, velocity, new Color(47, 54, 73), 0f, 1f, Main.Rand.NextFloat(0.4f, 0.8f)));
             }
         }
 
@@ -277,7 +284,7 @@ namespace Pladi.Core.Entities
             var position = new Vector2(Hitbox.Center.X, Hitbox.Bottom - 1);
             var velocity = new Vector2(-MathF.Sign(Velocity.X) * 0.35f, 0).RotateBy(Main.Rand.NextFloat(-0.2f, 0.2f));
 
-            particleSystem.Add(new Particle(position, velocity, Colors.Main, 0f, 1f, Main.Rand.NextFloat(0.2f, 0.4f)));
+            particleSystem.Add(new Particle(position, velocity, new Color(47, 54, 73), 0f, 1f, Main.Rand.NextFloat(0.2f, 0.4f)));
         }
 
         private void GetInputMoveVector(InputComponent input, out Vector2 vector)
@@ -295,6 +302,15 @@ namespace Pladi.Core.Entities
 
             if (input.IsPressed(Keys.S))
                 vector += Vector2.UnitY;
+
+            if (!Input.HasFlag(InputFlags.Left))
+                vector.X = MathF.Max(vector.X, 0);
+
+            if (!Input.HasFlag(InputFlags.Right))
+                vector.X = MathF.Min(vector.X, 0);
+
+            if (!Input.HasFlag(InputFlags.Jump))
+                vector.Y = MathF.Max(vector.Y, 0);
         }
 
         private void GetCurrentSpriteFrameIndex(out int frame)

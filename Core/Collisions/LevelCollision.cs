@@ -48,7 +48,23 @@ namespace Pladi.Core.Collisions
             var entities = tileLayer.GetTileEntitiesIntersectsWithRect(rectangle);
             entities.AddRange(entitySpatialHash.GetObjectsIntersectsWithRect(rectangle));
 
-            return entities;
+            var queue = new PriorityQueue<Entity, float>();
+            var result = new List<Entity>();
+
+            for (int i = 0; i < entities.Count; i++)
+            {
+                var entity = entities[i];
+                var intersect = RectangleF.Intersect(rectangle, entity.Hitbox);
+
+                queue.Enqueue(entity, -(intersect.Width * intersect.Height));
+            }
+
+            while (queue.TryDequeue(out var entity, out var _))
+            {
+                result.Add(entity);
+            }
+
+            return result;
         }
     }
 }

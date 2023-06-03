@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace Pladi.Core
 {
-    public class ScreenComponent : BasicComponent
+    public class ScreenComponent : BaseComponent
     {
         // [public static properties and fields]
 
@@ -78,14 +78,13 @@ namespace Pladi.Core
 
         private int width;
         private int height;
-        private GraphicsDeviceManager graphics;
 
         // [public methods]
 
         public override void Initialize()
         {
-            width = graphics.PreferredBackBufferWidth;
-            height = graphics.PreferredBackBufferHeight;
+            width = Main.Graphics.PreferredBackBufferWidth;
+            height = Main.Graphics.PreferredBackBufferHeight;
 
             GameForm.MinimumSize = new System.Drawing.Size(MinWidth, MinHeight);
             Game.Window.AllowUserResizing = true;
@@ -95,9 +94,9 @@ namespace Pladi.Core
 
         public override void Update(GameTime gameTime)
         {
-            if (graphics.PreferredBackBufferWidth != width || graphics.PreferredBackBufferHeight != height)
+            if (Main.Graphics.PreferredBackBufferWidth != width || Main.Graphics.PreferredBackBufferHeight != height)
             {
-                SetDisplayMode(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
+                SetDisplayMode(Main.Graphics.PreferredBackBufferWidth, Main.Graphics.PreferredBackBufferHeight);
             }
 
             /*var input = ILoadable.GetInstance<InputComponent>();
@@ -108,9 +107,6 @@ namespace Pladi.Core
             }*/
         }
 
-        public void SetGraphicsDeviceManager(GraphicsDeviceManager graphics)
-            => this.graphics = graphics;
-
         public void SetMinDisplayMode()
             => SetDisplayMode(MinWidth, MinHeight);
 
@@ -119,9 +115,9 @@ namespace Pladi.Core
             this.width = Math.Max(width, MinWidth);
             this.height = Math.Max(height, MinHeight);
 
-            graphics.PreferredBackBufferWidth = this.width;
-            graphics.PreferredBackBufferHeight = this.height;
-            graphics.ApplyChanges();
+            Main.Graphics.PreferredBackBufferWidth = this.width;
+            Main.Graphics.PreferredBackBufferHeight = this.height;
+            Main.Graphics.ApplyChanges();
 
             OnResolutionChanged?.Invoke(this.width, this.height);
         }

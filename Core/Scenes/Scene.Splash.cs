@@ -16,7 +16,7 @@ namespace Pladi.Core.Scenes
 
             if (splashCounter >= blackScreenTime)
             {
-                SceneComponent.SetActiveScene(SceneComponent.GameScenes.Menu);
+                SceneComponent.SetActiveScene<MenuScene>();
             }
         }
 

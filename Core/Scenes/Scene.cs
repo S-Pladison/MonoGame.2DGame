@@ -4,14 +4,7 @@ namespace Pladi.Core.Scenes
 {
     public class Scene
     {
-        public SceneComponent SceneComponent { get; private set; }
-
-        // ...
-
-        public Scene()
-        {
-            SceneComponent = ILoadable.GetInstance<SceneComponent>();
-        }
+        public SceneComponent SceneComponent { get; internal set; }
 
         // ...
 

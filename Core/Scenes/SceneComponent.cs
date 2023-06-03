@@ -2,22 +2,12 @@
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Content;
 using System;
+using System.Collections.Generic;
 
 namespace Pladi.Core.Scenes
 {
-    public class SceneComponent : BasicComponent
+    public class SceneComponent : BaseComponent
     {
-        public enum GameScenes
-        {
-            Splash,
-            Menu,
-            Settings,
-            Game,
-            Editor
-        }
-
-        // ...
-
         public bool CanChangeScene => expectedScene is null;
         public bool CanUpdateAndDrawScene => initSceneProgress >= 1f;
         public Scene Scene => current;
@@ -26,15 +16,27 @@ namespace Pladi.Core.Scenes
 
         private bool sceneWasChanged;
         private Scene current;
+        private Scene expectedScene;
         private float initSceneProgress;
-        private GameScenes? expectedScene;
+        private Dictionary<Type, Scene> sceneInstances;
 
         // ...
 
-        public override void Initialize()
+        public SceneComponent()
         {
-            current = CreateScene(GameScenes.Splash);
+            sceneInstances = new Dictionary<Type, Scene>();
+
+            AddSceneInstance<EditorScene>();
+            AddSceneInstance<LevelScene>();
+            AddSceneInstance<LevelMenuScene>();
+            AddSceneInstance<MenuScene>();
+            AddSceneInstance<SettingsScene>();
+            AddSceneInstance<SplashScene>();
+
+            current = sceneInstances[typeof(SplashScene)];
         }
+
+        // ...
 
         public override void Update(GameTime gameTime)
         {
@@ -49,7 +51,7 @@ namespace Pladi.Core.Scenes
                 else if (initSceneProgress > 0.5f && !sceneWasChanged)
                 {
                     current.OnDeactivate();
-                    current = CreateScene(expectedScene.Value);
+                    current = sceneInstances[expectedScene.GetType()];
                     sceneWasChanged = true;
                     current.OnActivate();
                 }
@@ -81,28 +83,25 @@ namespace Pladi.Core.Scenes
             spriteBatch.End();
         }
 
-        public void SetActiveScene(GameScenes gameScenes)
+        public void SetActiveScene<T>() where T : Scene
         {
             if (!CanChangeScene) return;
 
             sceneWasChanged = false;
-            expectedScene = gameScenes;
+            expectedScene = sceneInstances[typeof(T)];
             initSceneProgress = 0f;
         }
 
-        // ...
-
-        private static Scene CreateScene(GameScenes gameScene)
+        public Scene GetSceneInstance<T>() where T : Scene
         {
-            return gameScene switch
-            {
-                GameScenes.Editor => new EditorScene(),
-                GameScenes.Game => new LevelScene(),
-                GameScenes.Menu => new MenuScene(),
-                GameScenes.Settings => new SettingsScene(),
-                GameScenes.Splash => new SplashScene(),
-                _ => throw new Exception("..."),
-            };
+            return sceneInstances[typeof(T)];
+        }
+
+        private void AddSceneInstance<T>() where T : Scene
+        {
+            var instance = (T)Activator.CreateInstance(typeof(T));
+            instance.SceneComponent = this;
+            sceneInstances[typeof(T)] = instance;
         }
     }
 }

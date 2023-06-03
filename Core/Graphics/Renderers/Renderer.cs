@@ -30,7 +30,7 @@ namespace Pladi.Core.Graphics.Renderers
 
         // ...
 
-        void ILoadable.Load()
+        void ILoadable.Initialize()
         {
             Game = Main.Instance;
 

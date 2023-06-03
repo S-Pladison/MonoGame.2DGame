@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Pladi.Core.Input;
 using Pladi.Core.UI;
@@ -105,7 +106,7 @@ namespace Pladi.Core.Scenes
         {
             if (ILoadable.GetInstance<InputComponent>().JustPressed(Keys.Escape))
             {
-                SceneComponent.SetActiveScene(SceneComponent.GameScenes.Menu);
+                SceneComponent.SetActiveScene<MenuScene>();
             }
 
             userInterface.Update();
@@ -113,7 +114,7 @@ namespace Pladi.Core.Scenes
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.GraphicsDevice.Clear(Colors.MenuBackground);
+            spriteBatch.GraphicsDevice.Clear(new Color(47, 54, 73));
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
             userInterface.Draw(spriteBatch);

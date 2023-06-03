@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Pladi.Content;
+using Pladi.Core.Scenes;
 
 namespace Pladi.Core.Entities
 {
@@ -8,7 +9,7 @@ namespace Pladi.Core.Entities
     {
         // [constructors]
 
-        public SpikesTrigger()
+        public SpikesTrigger(LevelScene scene) : base(scene)
         {
             Width = 32;
             Height = 32;

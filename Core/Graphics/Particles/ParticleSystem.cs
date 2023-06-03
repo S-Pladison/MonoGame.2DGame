@@ -7,12 +7,16 @@ namespace Pladi.Core.Graphics.Particles
 {
     public class ParticleSystem
     {
+        // [public properties and fields]
+
         public Texture2D Texture { get; init; }
+
+        // [private properties and fields]
 
         private readonly List<Particle> particles;
         private readonly UpdateDelegate update;
 
-        // ...
+        // [constructors]
 
         public ParticleSystem(Texture2D texture, UpdateDelegate update)
         {
@@ -28,7 +32,7 @@ namespace Pladi.Core.Graphics.Particles
             this.update = update;
         }
 
-        // ...
+        // [public methods]
 
         public void Add(Particle particle)
         {
@@ -63,7 +67,7 @@ namespace Pladi.Core.Graphics.Particles
             }
         }
 
-        // ...
+        // [delegates]
 
         public delegate void UpdateDelegate(Particle particle);
     }

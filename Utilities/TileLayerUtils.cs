@@ -36,6 +36,30 @@ namespace Pladi.Utilities
             return false;
         }
 
+        public static bool IsRectInTiles(this TileLayer layer, RectangleF rectangle)
+        {
+            if (layer.Palette is null)
+                return false;
+
+            layer.GetTileCoordsIntersectsWithRect(rectangle, out Point leftTop, out Point rightBottom);
+
+            var tileWidth = layer.Palette.TileWidth * layer.Map.Scale;
+            var tileHeight = layer.Palette.TileHeight * layer.Map.Scale;
+
+            for (int x = leftTop.X; x <= rightBottom.X; x++)
+            {
+                for (int y = leftTop.Y; y <= rightBottom.Y; y++)
+                {
+                    ref var tile = ref layer.Tiles[x, y];
+                    var tileHitbox = new RectangleF(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
+
+                    if (!tile.HasTile && tileHitbox.Intersects(rectangle)) return false;
+                }
+            }
+
+            return true;
+        }
+
         public static List<Entity> GetTileEntitiesIntersectsWithRect(this TileLayer layer, RectangleF rectangle)
         {
             layer.GetTileCoordsIntersectsWithRect(rectangle, out Point leftTop, out Point rightBottom);
@@ -54,7 +78,7 @@ namespace Pladi.Utilities
 
                     var tileHitbox = new RectangleF(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
 
-                    boxes.Add(new TileEntity(tileHitbox));
+                    boxes.Add(new TileEntity(null, tileHitbox));
                 }
             }
 

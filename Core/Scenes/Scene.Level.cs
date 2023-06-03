@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using Pladi.Content;
 using Pladi.Core.Collisions;
 using Pladi.Core.Entities;
@@ -13,6 +12,7 @@ using Pladi.Core.UI;
 using Pladi.Core.UI.Elements;
 using Pladi.Utilities;
 using Pladi.Utilities.DataStructures;
+using Pladi.Utilities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,18 +21,20 @@ namespace Pladi.Core.Scenes
 {
     public class LevelScene : Scene
     {
-        private GraphicalUI graphicalUI;
+        // [private properties and fields]
+
+        private GameLevel gameLevel;
+        private string gameLevelName;
+
+        private GraphicalUI userInterface;
+        private KeyboardButtonSlotUIElement[] uiEntityElements;
+        private MouseKeyboardButtonUIElement mouseEntityElement;
 
         private List<Entity> entities;
         private SpatialHash<Entity> entitySpatialHash;
-
-        private LevelCollision levelCollision;
-
-        private List<Light> lights;
-
         private PlayerEntity player;
 
-        private TileMap tileMap;
+        private LevelCollision levelCollision;
 
         private CameraComponent camera;
         private Vector2 cameraSmoothVelocity;
@@ -43,35 +45,14 @@ namespace Pladi.Core.Scenes
         private EntityRenderer entityRenderer;
 
         private bool shouldDrawHitboxes;
+        private bool pause;
 
-        // ...
 
-        public LevelScene()
-        {
-            graphicalUI = new();
-
-            entities = new();
-            entitySpatialHash = new(48 * 5, 48 * 5);
-
-            lights = new();
-
-            InitTileMap();
-            InitPlayer();
-            InitEntities();
-            InitUI();
-
-            levelCollision = new(tileMap.TileLayer, entitySpatialHash);
-        }
-
-        // ...
+        // [public methods]
 
         public override void OnActivate()
         {
             Main.Instance.OnPreDraw += RequestLightRenderTarget;
-
-            /*MediaPlayer.Play(AudioAssets.Default);
-            MediaPlayer.IsRepeating = true;
-            MediaPlayer.Volume = 0.75f;*/
 
             camera = ILoadable.GetInstance<CameraComponent>();
             lightRendered = ILoadable.GetInstance<LightRenderer>();
@@ -79,254 +60,57 @@ namespace Pladi.Core.Scenes
             tileRenderer = ILoadable.GetInstance<TileRenderer>();
             entityRenderer = ILoadable.GetInstance<EntityRenderer>();
 
+            ActivateUserInterface();
+            ActivateLevel();
             PrepareLightRenderer();
+            ActivateEntities();
+            ResetLevel();
 
-            var e = new ZoneTrigger() { Height = 48 * 3, Position = new Vector2(48 * 15, 48 * 8) };
-            e.OnTriggerEnter += (other) =>
-            {
-                lights.Remove(lights.Last());
-                lights.Add(new Light(Rainbow(Main.Rand.NextFloat(0, 1)) * 0.3f, new Vector2(400, 100), 48 * 7));
-            };
-
-            entities.Add(e);
+            levelCollision = new(gameLevel.TileMap.TileLayer, entitySpatialHash);
         }
 
         public override void OnDeactivate()
         {
-            lightRendered.PrepareStaticShadowVertices(null);
-            camera.ResetPosition();
+            levelCollision = null;
 
-            MediaPlayer.Stop();
+            DeactivateEntities();
+            DeactivateUserInterface();
+
+            lightRendered.PrepareStaticShadowVertices(null);
+
+            camera = null;
+            lightRendered = null;
+            wallRenderer = null;
+            tileRenderer = null;
+            entityRenderer = null;
 
             Main.Instance.OnPreDraw -= RequestLightRenderTarget;
         }
 
-        private void PrepareLightRenderer()
-        {
-            var rectangle = new RectangleF(0, 0, tileMap.Width * tileMap.TileLayer.Palette.TileWidth, tileMap.Height * tileMap.TileLayer.Palette.TileHeight);
-            var edges = tileMap.TileLayer.GetEdgesFromTiles(rectangle);
-
-            lightRendered.PrepareStaticShadowVertices(edges);
-            lightRendered.PrepareDynamicBuffers(1024);
-        }
-
-        private void InitTileMap()
-        {
-            tileMap = new TileMap(300, 100, 3);
-
-            tileMap.WallLayer.SetPalette(new TilePalette(TextureAssets.WallPalette, 5, 1));
-            tileMap.TileLayer.SetPalette(new TilePalette(TextureAssets.TilePalette, 3, 1));
-
-            for (int i = 0; i < 300; i++)
-            {
-                tileMap.TileLayer.Tiles[i, 5 + 0].Type = 1;
-
-                for (int j = 0; j < 10; j++)
-                {
-                    tileMap.TileLayer.Tiles[i, 6 + 5 + j].Type = 1;
-                }
-            }
-
-            void Aa(int j, byte type = 1)
-            {
-                tileMap.WallLayer.Tiles[j, 5 + 1].Type = type;
-                tileMap.WallLayer.Tiles[j, 5 + 2].Type = type;
-                tileMap.WallLayer.Tiles[j, 5 + 3].Type = type;
-                tileMap.WallLayer.Tiles[j, 5 + 4].Type = type;
-                tileMap.WallLayer.Tiles[j, 5 + 5].Type = type;
-            }
-
-            tileMap.TileLayer.Tiles[0, 5 + 4].Type = 1;
-            tileMap.TileLayer.Tiles[0, 5 + 5].Type = 1;
-
-            tileMap.TileLayer.Tiles[5, 5 + 5].Type = 1;
-            tileMap.TileLayer.Tiles[6, 5 + 5].Type = 1;
-            tileMap.TileLayer.Tiles[7, 5 + 5].Type = 1;
-            tileMap.TileLayer.Tiles[8, 5 + 5].Type = 1;
-            tileMap.TileLayer.Tiles[9, 5 + 5].Type = 1;
-
-            Aa(2);
-            Aa(3);
-
-            Aa(7, 3);
-            Aa(8, 2);
-            Aa(9, 2);
-            Aa(10, 2);
-            Aa(11, 2);
-            Aa(12, 4);
-
-            Aa(15);
-            Aa(16);
-
-            tileMap.TileLayer.Tiles[5, 5 + 5].Type = 2;
-            tileMap.TileLayer.Tiles[6, 5 + 5].Type = 2;
-            tileMap.TileLayer.Tiles[7, 5 + 5].Type = 2;
-            tileMap.TileLayer.Tiles[8, 5 + 5].Type = 2;
-            tileMap.TileLayer.Tiles[9, 5 + 5].Type = 2;
-
-            tileMap.TileLayer.Tiles[11, 5 + 5].Type = 2;
-
-            tileMap.TileLayer.Tiles[12, 5 + 1].Type = 1;
-            tileMap.TileLayer.Tiles[13, 5 + 1].Type = 1;
-            tileMap.TileLayer.Tiles[14, 5 + 1].Type = 1;
-            tileMap.TileLayer.Tiles[15, 5 + 1].Type = 1;
-            tileMap.TileLayer.Tiles[16, 5 + 1].Type = 1;
-            tileMap.TileLayer.Tiles[17, 5 + 1].Type = 1;
-
-            tileMap.TileLayer.Tiles[13, 5 + 2].Type = 1;
-            tileMap.TileLayer.Tiles[14, 5 + 2].Type = 1;
-            tileMap.TileLayer.Tiles[15, 5 + 2].Type = 1;
-            tileMap.TileLayer.Tiles[16, 5 + 2].Type = 1;
-            tileMap.TileLayer.Tiles[17, 5 + 2].Type = 1;
-
-            tileMap.TileLayer.Tiles[19, 10].Type = 1;
-            tileMap.TileLayer.Tiles[23, 10].Type = 1;
-
-            Aa(20);
-            Aa(21);
-            Aa(22);
-
-
-
-            tileMap.TileLayer.Tiles[1, 11].Type = 2;
-            tileMap.TileLayer.Tiles[2, 11].Type = 2;
-            tileMap.TileLayer.Tiles[3, 11].Type = 2;
-            tileMap.TileLayer.Tiles[4, 11].Type = 2;
-
-            tileMap.TileLayer.Tiles[12, 11].Type = 2;
-            tileMap.TileLayer.Tiles[13, 11].Type = 2;
-            tileMap.TileLayer.Tiles[14, 11].Type = 2;
-            tileMap.TileLayer.Tiles[15, 11].Type = 2;
-            tileMap.TileLayer.Tiles[16, 11].Type = 2;
-            tileMap.TileLayer.Tiles[17, 11].Type = 2;
-            tileMap.TileLayer.Tiles[18, 11].Type = 2;
-
-            tileMap.TileLayer.Tiles[20, 11].Type = 2;
-            tileMap.TileLayer.Tiles[21, 11].Type = 2;
-            tileMap.TileLayer.Tiles[22, 11].Type = 2;
-        }
-
-        private void InitPlayer()
-        {
-            player = new()
-            {
-                Position = new Vector2(50, 48 * 6)
-            };
-        }
-
-        public static Color Rainbow(float progress)
-        {
-            float div = (Math.Abs(progress % 1) * 6);
-            int ascending = (int)((div % 1) * 255);
-            int descending = 255 - ascending;
-
-            return (int)div switch
-            {
-                0 => new(255, ascending, 0),
-                1 => new(descending, 255, 0),
-                2 => new(0, 255, ascending),
-                3 => new(0, descending, 255),
-                4 => new(ascending, 0, 255),
-                // case 5:
-                _ => new(255, 0, descending),
-            };
-        }
-
-        private void InitEntities()
-        {
-            entities.Add(new CrateEntity() { Position = new Vector2(48 * 8, 48 * 6) });
-            entities.Add(new SpikesTrigger() { Position = new Vector2(48 * 20 + 8, 48 * 10 + 8) });
-            entities.Add(new SpikesTrigger() { Position = new Vector2(48 * 21 + 8, 48 * 10 + 8) });
-            entities.Add(new SpikesTrigger() { Position = new Vector2(48 * 22 + 8, 48 * 10 + 8) });
-
-
-            entities.Add(player);
-
-            //lights.Add(new Light(Color.Red * 0.3f, new Vector2(48 * 3, 48 * 7), 48 * 13));
-            //lights.Add(new Light(Color.Yellow * 0.3f, new Vector2(48 * 21, 48 * 7), 48 * 12));
-
-            /*for (int i = 0; i < 100; i++)
-            {
-                lights.Add(new Light(Color.Red * 0.3f, new Vector2(400, 100), 48 * 7));
-            }*/
-
-            //lights.Add(new Light(Color.CadetBlue * 0.3f, new Vector2(48 * 3, 48 * 7), 48 * 6));
-            lights.Add(new Light(Color.DarkSlateBlue * 0.3f, new Vector2(48 * 0, 48 * 8), 48 * 9));
-            lights.Add(new Light(Color.Red * 0.3f, new Vector2(400, 100), 48 * 7));
-
-            foreach (var entity in entities)
-            {
-                entity.OnChangePosition += () => entitySpatialHash.Update(entity.Hitbox, entity);
-                entitySpatialHash.Insert(entity.Hitbox, entity);
-            }
-        }
-
-        private void InitUI()
-        {
-            var panel = new PanelUIElement();
-            panel.Width.SetPixel(230f);
-            panel.Height.SetPixel(84f);
-            panel.Left.SetPixel(10f);
-            panel.Top.SetPixel(10f);
-            graphicalUI.Append(panel);
-
-            var text = new TextUIElement();
-            text.OnPostUpdate += (elem) => (elem as TextUIElement).Text = $"" +
-                $"FPS: {(int)ILoadable.GetInstance<FrameCounterComponent>().AverageFramesPerSecond}\n" +
-                $"Entities: {entities.Count}\n" +
-                $"Lights: {lights.Count}\n" +
-                $"Location: [{Math.Round(player.Position.X, 2)}; {Math.Round(player.Position.Y, 2)}]";
-            text.Left.SetPixel(10f);
-            text.Top.SetPixel(10f);
-            panel.Append(text);
-        }
-
         public override void Update()
         {
-            if (ILoadable.GetInstance<InputComponent>().JustPressed(Keys.NumPad5))
-                shouldDrawHitboxes = !shouldDrawHitboxes;
+            var input = ILoadable.GetInstance<InputComponent>();
 
-            if (ILoadable.GetInstance<InputComponent>().JustPressed(Keys.Escape))
-                SceneComponent.SetActiveScene(SceneComponent.GameScenes.Menu);
-
-            UpdateEntities();
-
-            graphicalUI.Update();
-
-            List<EdgeF> edges = new List<EdgeF>();
-
-            for (int i = 0; i < entities.Count; i++)
+            if (input.JustPressed(Keys.Escape))
             {
-                var e = entities[i].ShadowCastEdges;
-
-                if (e is null) continue;
-
-                edges.AddRange(e);
+                SceneComponent.SetActiveScene<LevelMenuScene>();
+                return;
             }
 
-            lightRendered.Seeee(edges);
-
-            var camera = ILoadable.GetInstance<CameraComponent>();
-            camera.Position = MathUtils.SmoothDamp(camera.Position, player.Hitbox.Center, ref cameraSmoothVelocity, 0.05f, Main.DeltaTime);
-        }
-
-        private void UpdateEntities()
-        {
-            for (int i = 0; i < entities.Count; i++)
+            if (!pause)
             {
-                entities[i].Update(levelCollision);
+                UpdateInput();
+                UpdateEntities();
+                UpdateCamera();
+                UpdateShadowEdges();
             }
 
-            //lights.Last().Position = Vector2.Transform(ILoadable.GetInstance<InputComponent>().MousePosition, Matrix.Invert(ILoadable.GetInstance<CameraComponent>().ViewMatrix));
-            lights.Last().Position = player.Hitbox.Center;
+            userInterface.Update();
         }
 
-        public void RequestLightRenderTarget(GameTime _)
+        public override void OnResolutionChanged(int width, int height)
         {
-            lightRendered.Request((lights, tileMap.TileLayer));
-            wallRenderer.Request(tileMap.WallLayer);
-            tileRenderer.Request(tileMap.TileLayer);
-            entityRenderer.Request(entities);
+            userInterface.OnResolutionChanged(width, height);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -339,13 +123,385 @@ namespace Pladi.Core.Scenes
 
             PrepareEffects();
 
-            spriteBatch.GraphicsDevice.Clear(Colors.Main * 0.75f);
+            spriteBatch.GraphicsDevice.Clear(new Color(47, 54, 73) * 0.5f);
 
             Draw_Walls(spriteBatch);
             Draw_Entities(spriteBatch);
             Draw_Tiles(spriteBatch);
-            Draw_Hitboxes(spriteBatch);
+            Draw_HitboxesAndGrid(spriteBatch);
             Draw_UI(spriteBatch);
+        }
+
+        public void RequestLightRenderTarget(GameTime _)
+        {
+            lightRendered.Request((gameLevel.Lights, gameLevel.TileMap.TileLayer));
+            wallRenderer.Request(gameLevel.TileMap.WallLayer);
+            tileRenderer.Request(gameLevel.TileMap.TileLayer);
+            entityRenderer.Request(entities);
+        }
+
+        public void ResetLevel()
+        {
+            pause = false;
+
+            mouseEntityElement.SetEntity(null);
+
+            uiEntityElements[0].SetEntity(new KeyboardButtonEntity.LeftKeyboardButtonEntity(this));
+            uiEntityElements[1].SetEntity(new KeyboardButtonEntity.SpaceKeyboardButtonEntity(this));
+            uiEntityElements[2].SetEntity(new KeyboardButtonEntity.RightKeyboardButtonEntity(this));
+
+            entities.Clear();
+            entitySpatialHash.Clear();
+
+            foreach (var entityInfo in gameLevel.Entities)
+            {
+                var entity = Entity.CreateEntityByType(entityInfo.Item1, this);
+                entity.Position = entityInfo.Item2;
+
+                AddEntity(entity);
+            }
+
+            player = entities.FirstOrDefault(x => x is PlayerEntity, null) as PlayerEntity;
+
+            if (player is null)
+            {
+                throw new Exception("Не удалось найти сущность игрока...");
+            }
+        }
+
+        public void UpdateDeadZoneInfo()
+        {
+            var value = false;
+
+            foreach (var plates in entities.Where(x => x is PressurePlateTrigger))
+            {
+                value |= (plates as Trigger).AnyEntitiesInHistory;
+            }
+
+            foreach (var deadZones in entities.Where(x => x is DeadZoneTrigger))
+            {
+                (deadZones as DeadZoneTrigger).IsDangerous = !value;
+            }
+        }
+
+        public void SetGameLevelName(string name)
+        {
+            gameLevelName = name;
+        }
+
+        public void Pause()
+        {
+            pause = true;
+        }
+
+        public void Complite()
+        {
+            if (pause) return;
+
+            Pause();
+
+            static void InitButtonHoverEvents(UIElement button)
+            {
+                button.OnMouseOver += (_, e) =>
+                {
+                    var text = (e as TextUIElement);
+                    text.FontScale = 1.1f;
+                    text.FontColor = Color.Gold;
+                };
+                button.OnMouseOut += (_, e) =>
+                {
+                    var text = (e as TextUIElement);
+                    text.FontScale = 1.0f;
+                    text.FontColor = Color.White;
+                };
+            }
+
+            var blackScreen = new PanelUIElement(Color.Black * 0.75f);
+            blackScreen.Width.SetPercent(1f);
+            blackScreen.Height.SetPercent(1f);
+            userInterface.Append(blackScreen);
+
+            var secondPanel = new PanelUIElement(Color.White, PanelUIElement.PanelStyles.Standard);
+            secondPanel.HorizontalAlign = 0.5f;
+            secondPanel.VerticalAlign = 0.5f;
+            secondPanel.Width.SetPixel(220.0f);
+            secondPanel.Height.SetPixel(110.0f);
+            blackScreen.Append(secondPanel);
+
+            var lablePanel = new PanelUIElement(Color.White, PanelUIElement.PanelStyles.Standard);
+            lablePanel.HorizontalAlign = 0.5f;
+            lablePanel.Width.SetPixel(150.0f);
+            lablePanel.Height.SetPixel(40.0f);
+            lablePanel.Top.SetPixel(-20.0f);
+            secondPanel.Append(lablePanel);
+
+            var labelText = new TextUIElement("Уровень пройден!");
+            labelText.HorizontalAlign = 0.5f;
+            labelText.VerticalAlign = 0.5f;
+            lablePanel.Append(labelText);
+
+            var button = new TextUIElement("Перезапустить");
+            InitButtonHoverEvents(button);
+            button.Top.SetPixel(40.0f);
+            button.HorizontalAlign = 0.5f;
+            button.OnMouseClick += (_, _) => SceneComponent.SetActiveScene<LevelScene>();
+            secondPanel.Append(button);
+
+            button = new TextUIElement("Вернуться");
+            InitButtonHoverEvents(button);
+            button.Top.SetPixel(71.0f);
+            button.HorizontalAlign = 0.5f;
+            button.OnMouseClick += (_, _) => SceneComponent.SetActiveScene<LevelMenuScene>();
+            secondPanel.Append(button);
+        }
+
+        // [private methods]
+
+        private void ActivateUserInterface()
+        {
+            userInterface = new();
+            uiEntityElements = new KeyboardButtonSlotUIElement[3]
+            {
+                new(new KeyboardButtonEntity.LeftKeyboardButtonEntity(this)),
+                new(new KeyboardButtonEntity.SpaceKeyboardButtonEntity(this)),
+                new(new KeyboardButtonEntity.RightKeyboardButtonEntity(this))
+            };
+
+            var buttonPanel = new PanelUIElement(Color.White * 0.5f);
+            buttonPanel.Width.SetPixel(274.0f);
+            buttonPanel.Height.SetPixel(70.0f);
+            buttonPanel.Top.SetPixel(-4.0f);
+            buttonPanel.HorizontalAlign = 0.5f;
+            buttonPanel.VerticalAlign = 1.0f;
+            userInterface.Append(buttonPanel);
+
+            var button = uiEntityElements[0];
+            button.Width.SetPixel(48.0f);
+            button.Height.SetPixel(48.0f);
+            button.Left.SetPixel(11.0f);
+            button.Top.SetPixel(11.0f);
+            button.OnMouseClick += (e, o) =>
+            {
+                if (mouseEntityElement.ButtonEntity is not null) return;
+
+                var instance = o as KeyboardButtonSlotUIElement;
+
+                if (instance.ButtonEntity is not null)
+                {
+                    mouseEntityElement.SetEntity(instance.ButtonEntity);
+                    instance.SetEntity(null);
+                    player.Input &= ~PlayerEntity.InputFlags.Left;
+                }
+            };
+            buttonPanel.Append(button);
+
+            button = uiEntityElements[1];
+            button.Width.SetPixel(144.0f);
+            button.Height.SetPixel(48.0f);
+            button.Left.SetPixel(65.0f);
+            button.Top.SetPixel(11.0f);
+            button.OnMouseClick += (e, o) =>
+            {
+                if (mouseEntityElement.ButtonEntity is not null) return;
+
+                var instance = o as KeyboardButtonSlotUIElement;
+
+                if (instance.ButtonEntity is not null)
+                {
+                    mouseEntityElement.SetEntity(instance.ButtonEntity);
+                    instance.SetEntity(null);
+                    player.Input &= ~PlayerEntity.InputFlags.Jump;
+                }
+            };
+            buttonPanel.Append(button);
+
+            button = uiEntityElements[2];
+            button.Width.SetPixel(48.0f);
+            button.Height.SetPixel(48.0f);
+            button.Left.SetPixel(215.0f);
+            button.Top.SetPixel(11.0f);
+            button.OnMouseClick += (e, o) =>
+            {
+                if (mouseEntityElement.ButtonEntity is not null) return;
+
+                var instance = o as KeyboardButtonSlotUIElement;
+
+                if (instance.ButtonEntity is not null)
+                {
+                    mouseEntityElement.SetEntity(instance.ButtonEntity);
+                    instance.SetEntity(null);
+                    player.Input &= ~PlayerEntity.InputFlags.Right;
+                }
+            };
+            buttonPanel.Append(button);
+
+            mouseEntityElement = new MouseKeyboardButtonUIElement();
+            userInterface.Append(mouseEntityElement);
+        }
+
+        private void DeactivateUserInterface()
+        {
+            userInterface = null;
+            uiEntityElements = null;
+            mouseEntityElement = null;
+        }
+
+        private void ActivateEntities()
+        {
+            entities = new();
+            entitySpatialHash = new(48 * 5, 48 * 5);
+        }
+
+        private void DeactivateEntities()
+        {
+            entities = null;
+            player = null;
+            entitySpatialHash = null;
+        }
+
+        private void ActivateLevel()
+        {
+            if (!GameLevel.TryLoadLevelFromFile(gameLevelName, out GameLevel level))
+            {
+                throw new Exception($"Не удалось загрузить уровень \"{gameLevelName}\"...");
+            }
+
+            gameLevel = level;
+            gameLevel.TileMap.WallLayer.SetPalette(new TilePalette(TextureAssets.WallPalette, 5, 1));
+            gameLevel.TileMap.TileLayer.SetPalette(new TilePalette(TextureAssets.TilePalette, 4, 1));
+        }
+
+        private void PrepareLightRenderer()
+        {
+            var rectangle = new RectangleF(0, 0, gameLevel.TileMap.Width * 48 * gameLevel.TileMap.TileLayer.Palette.TileWidth, gameLevel.TileMap.Height * 48 * gameLevel.TileMap.TileLayer.Palette.TileHeight);
+            var edges = gameLevel.TileMap.TileLayer.GetEdgesFromTiles(rectangle);
+
+            lightRendered.PrepareStaticShadowVertices(edges);
+            lightRendered.PrepareDynamicBuffers(1024);
+        }
+
+        private void AddEntity(Entity entity)
+        {
+            entity.OnChangePosition += () => entitySpatialHash.Update(entity.Hitbox, entity);
+            entitySpatialHash.Insert(entity.Hitbox, entity);
+            entities.Add(entity);
+        }
+
+        private void RemoveEntity(Entity entity)
+        {
+            if (!entities.Contains(entity)) return;
+
+            entity.OnChangePosition = null;
+            entitySpatialHash.Remove(entity.Hitbox, entity);
+            entities.Remove(entity);
+        }
+
+        private void RestoreButtonEntity(Entity entity)
+        {
+            if (player is null) return;
+            if (entity is not KeyboardButtonEntity buttonEntity) return;
+
+            player.Input |= buttonEntity.InputType;
+
+            switch (buttonEntity.InputType)
+            {
+                case PlayerEntity.InputFlags.Left:
+                    uiEntityElements[0].SetEntity(buttonEntity);
+                    break;
+                case PlayerEntity.InputFlags.Jump:
+                    uiEntityElements[1].SetEntity(buttonEntity);
+                    break;
+                case PlayerEntity.InputFlags.Right:
+                    uiEntityElements[2].SetEntity(buttonEntity);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void UpdateInput()
+        {
+            var input = ILoadable.GetInstance<InputComponent>();
+
+            if (input.JustPressed(Keys.R))
+            {
+                ResetLevel();
+                return;
+            }
+
+            if (input.JustPressed(Keys.NumPad5))
+                shouldDrawHitboxes = !shouldDrawHitboxes;
+
+            var uiMousePosition = input.MousePosition;
+            var worldMousePosition = Vector2.Transform(uiMousePosition, camera.InvertViewMatrix);
+
+            if (mouseEntityElement.ButtonEntity is not null)
+            {
+                var mouseEntity = mouseEntityElement.ButtonEntity;
+                var entityRect = mouseEntity.Hitbox;
+                entityRect.Location = Vector2.Floor(worldMousePosition / 48) * 48 + new Vector2(24, 24) - entityRect.Size * 0.5f;
+
+                mouseEntityElement.CanBePlaced =
+                    new RectangleF(0, 0, gameLevel.Width * 48, gameLevel.Height * 48).Contains(entityRect)
+                    && gameLevel.TileMap.WallLayer.IsRectInTiles(entityRect)
+                    && !levelCollision.IsRectCollideWithEntities(entityRect);
+
+                if (input.JustPressed(MouseInputTypes.RightButton))
+                {
+                    RestoreButtonEntity(mouseEntityElement.ButtonEntity);
+                    mouseEntityElement.SetEntity(null);
+                }
+            }
+
+            if (input.JustPressed(MouseInputTypes.LeftButton))
+            {
+                if (mouseEntityElement.ButtonEntity is null)
+                {
+                    var mouseRect = new RectangleF(worldMousePosition.X, worldMousePosition.Y, 1, 1);
+
+                    foreach (var entity in entitySpatialHash.GetObjectsIntersectsWithRect(mouseRect).Where(e => e is KeyboardButtonEntity && e.Hitbox.Intersects(mouseRect)))
+                    {
+                        RestoreButtonEntity(entity);
+                        RemoveEntity(entity);
+                    }
+                }
+                else if (mouseEntityElement.CanBePlaced)
+                {
+                    AddEntity(mouseEntityElement.ButtonEntity);
+
+                    mouseEntityElement.ButtonEntity.Position = Vector2.Floor(worldMousePosition / 48) * 48 + new Vector2(24, 24) - mouseEntityElement.ButtonEntity.Hitbox.Size * 0.5f;
+                    mouseEntityElement.SetEntity(null);
+                }
+            }
+        }
+
+        private void UpdateEntities()
+        {
+            for (int i = 0; i < entities.Count; i++)
+            {
+                entities[i].Update(levelCollision);
+            }
+        }
+
+        private void UpdateCamera()
+        {
+            camera.Position = MathUtils.SmoothDamp(camera.Position, player.Hitbox.Center, ref cameraSmoothVelocity, 0.05f, Main.DeltaTime);
+        }
+
+        private void UpdateShadowEdges()
+        {
+            var shadowEdges = new List<EdgeF>();
+
+            for (int i = 0; i < entities.Count; i++)
+            {
+                var e = entities[i].ShadowCastEdges;
+
+                if (e is null) continue;
+
+                shadowEdges.AddRange(e);
+            }
+
+            lightRendered.UpdateDynamicBuffers(shadowEdges);
         }
 
         private void PrepareEffects()
@@ -397,7 +553,7 @@ namespace Pladi.Core.Scenes
             if (!entityRenderer.TryGetTargetIfPrepared(out var entityTarget))
                 throw new Exception("Цель рендеринга тайлов не была подготовлена...");
 
-            //Draw_OutlineEffect(spriteBatch, entityTarget);
+            Draw_OutlineEffect(spriteBatch, entityTarget);
 
             var effect = EffectAssets.He;
             effect.Parameters["Power"].SetValue(0.0f);
@@ -425,24 +581,29 @@ namespace Pladi.Core.Scenes
             spriteBatch.End();
         }
 
-        private void Draw_Hitboxes(SpriteBatch spriteBatch)
+        private void Draw_HitboxesAndGrid(SpriteBatch spriteBatch)
         {
-            if (!shouldDrawHitboxes) return;
+            if (!shouldDrawHitboxes)
+            {
+                if (mouseEntityElement.ButtonEntity is null) return;
+
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, camera.ViewMatrix);
+                spriteBatch.DrawGrid(camera.VisibleArea, Color.White * 0.05f, 48, 48, 1);
+                spriteBatch.DrawGrid(camera.VisibleArea, Color.White * 0.1f, 48 * 5, 48 * 5, 2);
+                spriteBatch.End();
+
+                return;
+            }
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, camera.ViewMatrix);
-
-            /*foreach (var e in Eee(tileMap.TileLayer))
-            {
-                spriteBatch.DrawRectangle(e.ToRectangle(), Color.Cyan * 0.35f, 1);
-            }*/
 
             spriteBatch.DrawGrid(camera.VisibleArea, Color.White * 0.05f, 48, 48, 1);
             spriteBatch.DrawGrid(camera.VisibleArea, Color.White * 0.1f, 48 * 5, 48 * 5, 2);
 
 
-            for (int i = 0; i < lights.Count; i++)
+            for (int i = 0; i < gameLevel.Lights.Count; i++)
             {
-                spriteBatch.DrawRectangle(lights[i].VisibleArea.ToRectangle(), Color.Yellow, 2);
+                spriteBatch.DrawRectangle(gameLevel.Lights[i].VisibleArea.ToRectangle(), Color.Yellow, 2);
             }
 
             for (int i = 0; i < entities.Count; i++)
@@ -450,142 +611,19 @@ namespace Pladi.Core.Scenes
                 spriteBatch.DrawRectangle(entities[i].Hitbox.ToRectangle(), entities[i].IsTrigger ? Color.Blue : Color.Red, 2);
             }
 
+            var mp = Vector2.Transform(ILoadable.GetInstance<InputComponent>().MousePosition, camera.InvertViewMatrix);
+            var rect = new Rectangle((int)mp.X - 8, (int)mp.Y - 8, 16, 16);
+
+            spriteBatch.DrawRectangle(rect, gameLevel.TileMap.WallLayer.IsRectInTiles(rect.ToRectangleF()) ? Color.Red : Color.Lime, 2);
+
             spriteBatch.End();
         }
 
         private void Draw_UI(SpriteBatch spriteBatch)
         {
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
-            graphicalUI.Draw(spriteBatch);
+            userInterface.Draw(spriteBatch);
             spriteBatch.End();
-        }
-
-        private List<RectangleF> Eee(TileLayer layer)
-        {
-            var result = new List<RectangleF>();
-
-            for (int x = 0; x < layer.Width; x++)
-            {
-                for (int y = 0; y < layer.Height; y++)
-                {
-                    ref var tile = ref layer.Tiles[x, y];
-
-                    if (!tile.HasTile) continue;
-
-                    var tileHitbox = new RectangleF(x * layer.Palette.TileWidth * layer.Map.Scale, y * layer.Palette.TileHeight * layer.Map.Scale, layer.Palette.TileWidth * layer.Map.Scale, layer.Palette.TileHeight * layer.Map.Scale);
-
-                    result.Add(tileHitbox);
-                }
-            }
-
-            return result;
-        }
-
-        public class TilesFromStrings
-        {
-            private List<Rectangle> Result = new List<Rectangle>();
-
-            public IEnumerable<Rectangle> Create(TileLayer tileLayer)
-            {
-                Result.Clear();
-
-                CreateMergedHorizontalTiles(tileLayer);
-                MergeVerticallyTilesWithSameWidth();
-
-                return Result.Where(f => f.Height > 0);
-            }
-
-            private void MergeVerticallyTilesWithSameWidth()
-            {
-                /*foreach (var current in Result)
-                {
-                    foreach (var other in Result)
-                    {
-                        if (other.Y + other.Height == current.Y
-                                && other.X == current.X
-                                && other.Height > 0
-                                && current.Height > 0)
-                        {
-                            if (other.Type == current.Type)
-                            {
-                                if (other.Width == current.Width)
-                                {
-                                    current.Height--;
-                                    current.Y++;
-                                    other.Height++;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }*/
-            }
-
-            private void CreateMergedHorizontalTiles(TileLayer tileLayer)
-            {
-                Rectangle currentRect = default;
-                var lastColumnIndex = tileLayer.Height - 1;
-
-                for (int rowIndex = 0; rowIndex < tileLayer.Width; rowIndex++)
-                {
-                    for (int columnIndex = 0; columnIndex < tileLayer.Height; columnIndex++)
-                    {
-                        var tile = tileLayer.Tiles[rowIndex, columnIndex];
-
-                        if (columnIndex == 0)
-                        {
-                            currentRect = new Rectangle
-                            {
-                                X = columnIndex + 1,
-                                Y = rowIndex + 1,
-                                Width = 1,
-                                Height = 1
-                            };
-
-                            continue;
-                        }
-
-                        if (columnIndex == lastColumnIndex)
-                        {
-                            if (tile.HasTile)
-                            {
-                                Result.Add(currentRect);
-                                currentRect.Width++;
-                            }
-                            else
-                            {
-                                Result.Add(currentRect);
-                                currentRect = new Rectangle
-                                {
-                                    X = columnIndex + 1,
-                                    Y = rowIndex + 1,
-                                    Width = 1,
-                                    Height = 1
-                                };
-                                Result.Add(currentRect);
-                            }
-
-                            continue;
-                        }
-
-                        if (tile.HasTile)
-                        {
-                            currentRect.Width++;
-                        }
-                        else
-                        {
-                            Result.Add(currentRect);
-                            currentRect = new Rectangle
-                            {
-                                X = columnIndex + 1,
-                                Y = rowIndex + 1,
-                                Width = 1,
-                                Height = 1
-                            };
-                        }
-                    }
-                }
-            }
         }
     }
 }
